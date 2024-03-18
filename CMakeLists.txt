@@ -235,7 +235,6 @@ target_link_libraries(${LIBRARY_TARGET_NAME}
     ${LIB_VORBIS}
     ${LIB_OGG}
     ${OGG_LIBRARIES}
-    vorbis vorbisenc vorbisfile ogg
     PRIVATE
 )
 
@@ -243,6 +242,7 @@ if(NOT EMSCRIPTEN)
     target_link_libraries(${LIBRARY_TARGET_NAME}
         PUBLIC
         SDL2::SDL2-static
+        vorbis vorbisenc vorbisfile ogg
     )
 endif(NOT EMSCRIPTEN)
 
@@ -255,6 +255,7 @@ target_include_directories(${LIBRARY_TARGET_NAME}
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/
+
     # Need both when not building (using emscripten)
     ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/freetype/
     ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
