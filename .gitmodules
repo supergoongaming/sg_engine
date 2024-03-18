@@ -7,3 +7,6 @@
 [submodule "external/sg_sound"]
 	path = external/sg_sound
 	url = https://github.com/supergoongaming/sg_sound.git
+[submodule "external/zlib"]
+	path = external/zlib
+	url = https://github.com/madler/zlib.git
