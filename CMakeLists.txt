@@ -255,12 +255,14 @@ target_include_directories(${LIBRARY_TARGET_NAME}
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/sg_sound/src/
 
     # Need both when not building (using emscripten)
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/freetype/
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
-    external/sg_sound/src/
+    /emsdk/upstream/emscripten/cache/sysroot/include
     /usr/local/include
+    # ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/freetype/
 
     # Freetype cause yeah
-    /usr/local/include/freetype2) # Add the freetype2 specific include directory
+    # /usr/local/include/freetype2) # Add the freetype2 specific include directory
+)
