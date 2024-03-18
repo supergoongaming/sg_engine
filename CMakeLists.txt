@@ -116,6 +116,7 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 # These should be added via subdir if not FULL BUILD
 message("Going to do the thing.. macos is ${MACOS} and GOON_FULL_MACOS_BUILD is ${GOON_FULL_MACOS_BUILD}")
+
 if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
     find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
     find_library(LIB_PNG
@@ -230,7 +231,6 @@ target_link_libraries(${LIBRARY_TARGET_NAME}
     ${LIB_FREETYPE}
 
     # testing
-    SDL2::SDL2-static
     ${LIB_VORBISFILE}
     ${LIB_VORBIS}
     ${LIB_OGG}
@@ -238,6 +238,14 @@ target_link_libraries(${LIBRARY_TARGET_NAME}
     vorbis vorbisenc vorbisfile ogg
     PRIVATE
 )
+
+if(NOT EMSCRIPTEN)
+    target_link_libraries(${LIBRARY_TARGET_NAME}
+        PUBLIC
+        SDL2::SDL2-static
+    )
+endif(NOT EMSCRIPTEN)
+
 target_link_directories(${LIBRARY_TARGET_NAME}
     PRIVATE
     /usr/local/lib
