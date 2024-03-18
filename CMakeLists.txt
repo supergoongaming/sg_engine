@@ -221,7 +221,7 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 set(LIBRARIES_TO_LINK
     SDL2::SDL2-static
     ZLIB::ZLIB
-    Freetype
+    freetype
     png
     ${LIB_PNG}
 )
@@ -235,7 +235,7 @@ endforeach()
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
-    Freetype
+    freetype
     png
     PRIVATE
     ${LIB_PNG}
