@@ -20,7 +20,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # File globbing
 # #########################################
 message(STATUS "Getting all files for cmake..")
-file(GLOB_RECURSE ENGINE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonEngine/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonPhysics/*.c* )
+file(GLOB_RECURSE ENGINE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonEngine/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonPhysics/*.c*)
 
 # #########################################
 # Platform specific Project setup
@@ -47,10 +47,20 @@ elseif(UNIX AND NOT APPLE)
     set(LINUX ON)
 endif(APPLE)
 
+# Subdirectory things
+
+# We want to skip installing freetype,etc, this is a var in their CMAKE file
+set(SKIP_INSTALL_ALL ON)
+
+# Don't build the png tests
+set(PNG_TESTS OFF)
+
 # #########################################
 # Initialize
 # #########################################
 message(STATUS "Initializing the project")
+message(STATUS "Adding subdirectories for engine")
+
 
 # if(LINUX)
 add_library(${LIBRARY_TARGET_NAME}
@@ -107,6 +117,8 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
 
 # These should be added via subdir if not FULL BUILD
+message("Going to do the thing.. macos is ${MACOS} and GOON_FULL_MACOS_BUILD is ${GOON_FULL_MACOS_BUILD}")
+
 if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
     find_library(LIB_PNG
         REQUIRED
@@ -120,15 +132,34 @@ if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
         NAMES libfreetype.a libfreetype.dll freetype.a freetype.dll freetype libfreetype
         HINTS /usr/local/lib /c/cmake/lib)
 else()
+    find_package(Git REQUIRED QUIET)
+    message(STATUS "Cloning and updating submodules")
+
+    if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            RESULT_VARIABLE GIT_SUBMOD_RESULT)
+
+        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+        endif()
+
+        if(NOT EMSCRIPTEN)
+
+        add_subdirectory(./external/freetype)
+        add_subdirectory(./external/libpng)
+        endif(NOT EMSCRIPTEN)
+    endif()
 endif(MACOS AND NOT GOON_FULL_MACOS_BUILD)
 
 # #########################################
 # Platform Specific Build settings
 # #########################################
-# if(EMSCRIPTEN)
-# set_target_properties(${EXECUTABLE_TARGET_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} " -O0 -g -s SAFE_HEAP=2 -s STACK_OVERFLOW_CHECK=1 --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets")
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s 'DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=[\"$autoResumeAudioContext\",\"$dynCall\"]'")
-# endif(EMSCRIPTEN)
+message("Going to do the thing.. emscripten is is ${EMSCRIPTEN} and GOON_FULL_MACOS_BUILD is ${GOON_FULL_MACOS_BUILD}")
+if(EMSCRIPTEN)
+    set_target_properties(${EXECUTABLE_TARGET_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} " -O0 -g -s SAFE_HEAP=2 -s STACK_OVERFLOW_CHECK=1 -sUSE_LIBPNG=1 -sUSE_FREETYPE=1 --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s 'DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=[\"$autoResumeAudioContext\",\"$dynCall\"]'")
+endif(EMSCRIPTEN)
 
 # #########################################
 # Compile Definitions
@@ -179,7 +210,7 @@ set(FULL_COMPILE_OPTIONS
 if(WIN32)
     set(FULL_COMPILE_OPTIONS /std:c99)
 elseif(EMSCRIPTEN)
-    # target_compile_options(${EXECUTABLE_TARGET_NAME} PRIVATE -sUSE_SDL_TTF=2)
+    target_compile_options(${EXECUTABLE_TARGET_NAME} PRIVATE -sUSE_LIBPNG=1 -sUSE_FREETYPE=1)
 endif(WIN32)
 
 target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
@@ -188,24 +219,24 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # Linking Options
 # #########################################
 set(LIBRARIES_TO_LINK
-
-    # supergoonSound::supergoonSound
-    # supergoonSound
-    # SDL2::SDL2main
     SDL2::SDL2-static
     ZLIB::ZLIB
+    Freetype
+    png
     ${LIB_PNG}
 )
 
 foreach(LIBRARY ${LIBRARIES_TO_LINK})
     # Check if the target exists, if we are building it then we should link to it.
     if(TARGET ${LIBRARY})
-        target_link_libraries(${LIBRARY_TARGET_NAME} PRIVATE ${LIBRARY})
+        target_link_libraries(${LIBRARY_TARGET_NAME} PUBLIC ${LIBRARY})
     endif()
 endforeach()
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
+    Freetype
+    png
     PRIVATE
     ${LIB_PNG}
     ${LIB_FREETYPE}
@@ -218,7 +249,8 @@ target_link_directories(${LIBRARY_TARGET_NAME}
 target_include_directories(${LIBRARY_TARGET_NAME}
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/sg_engine/include/
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
     /usr/local/include
 
     # Freetype cause yeah
