@@ -74,7 +74,7 @@ add_library(${LIBRARY_TARGET_NAME}
 # )
 # endif(LINUX)
 set_property(TARGET ${LIBRARY_TARGET_NAME} PROPERTY C_STANDARD 11)
-find_package(PkgConfig REQUIRED)
+# find_package(PkgConfig REQUIRED)
 
 # find_package(ZLIB)
 include(CTest)
@@ -131,10 +131,15 @@ if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
         NAMES libfreetype.a libfreetype.dll freetype.a freetype.dll freetype libfreetype
         HINTS /usr/local/lib /c/cmake/lib)
 else()
+# Windows doesn't have zlib by default.
+    if(WIN32)
+        add_subdirectory(./external/zlib)
+    endif(WIN32)
     if(NOT EMSCRIPTEN)
         add_subdirectory(./external/freetype)
         add_subdirectory(./external/libpng)
     endif(NOT EMSCRIPTEN)
+
 
     add_subdirectory(./external/sg_sound)
 endif(MACOS AND NOT GOON_FULL_MACOS_BUILD)
@@ -222,11 +227,14 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # target_link_libraries(${LIBRARY_TARGET_NAME} PUBLIC ${LIBRARY})
 # endif()
 # endforeach()
+
+
+
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
     supergoonSound
     freetype
-    png
+    png_static
     ${LIB_PNG}
     ${LIB_FREETYPE}
 
@@ -262,6 +270,8 @@ target_include_directories(${LIBRARY_TARGET_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
     external/sg_sound/src/
     /usr/local/include
+
+    ${CMAKE_CURRENT_BINARY_DIR}/external/sg_engine/exteral/libpng
 
     # Freetype cause yeah
     /usr/local/include/freetype2) # Add the freetype2 specific include directory

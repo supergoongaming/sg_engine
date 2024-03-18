@@ -1,10 +1,10 @@
 #include <SDL2/SDL.h>
 #include <GoonEngine/text.h>
-#include <freetype2/ft2build.h>
-
-extern SDL_Renderer *g_pRenderer;
+#include <ft2build.h>
 FT_Library _loadedLibrary;
 FT_Face _loadedFace;
+
+extern SDL_Renderer *g_pRenderer;
 
 SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, char letter, int r, int g, int b)
 {

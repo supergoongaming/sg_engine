@@ -1,5 +1,5 @@
 #pragma once
-#include <freetype2/ft2build.h>
+#include <ft2build.h>
 #include <GoonEngine/color.h>
 #include <GoonEngine/point.h>
 #include FT_FREETYPE_H
