@@ -260,10 +260,9 @@ target_include_directories(${LIBRARY_TARGET_NAME}
 
     # Need both when not building (using emscripten)
     /emsdk/upstream/emscripten/cache/sysroot/include
-    /usr/local/include/freetype2 # Add the freetype2 specific include directory
-    /usr/local/include
 
     # ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/freetype/
+    /usr/local/include
 
     # Freetype cause yeah
-)
+    /usr/local/include/freetype2) # Add the freetype2 specific include directory
