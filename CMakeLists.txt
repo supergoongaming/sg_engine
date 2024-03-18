@@ -113,12 +113,11 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 # Packages
 # #########################################
 # Have both of these already built, and then we find them.
-find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
 
 # These should be added via subdir if not FULL BUILD
 message("Going to do the thing.. macos is ${MACOS} and GOON_FULL_MACOS_BUILD is ${GOON_FULL_MACOS_BUILD}")
-
 if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
+    find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
     find_library(LIB_PNG
         REQUIRED
         PATH_SUFFIXES .a
