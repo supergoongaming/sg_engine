@@ -61,7 +61,6 @@ set(PNG_TESTS OFF)
 message(STATUS "Initializing the project")
 message(STATUS "Adding subdirectories for engine")
 
-
 # if(LINUX)
 add_library(${LIBRARY_TARGET_NAME}
     STATIC
@@ -132,30 +131,19 @@ if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
         NAMES libfreetype.a libfreetype.dll freetype.a freetype.dll freetype libfreetype
         HINTS /usr/local/lib /c/cmake/lib)
 else()
-    find_package(Git REQUIRED QUIET)
-    message(STATUS "Cloning and updating submodules")
-
-    if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            RESULT_VARIABLE GIT_SUBMOD_RESULT)
-
-        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-            message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
-        endif()
-
-        if(NOT EMSCRIPTEN)
-
+    if(NOT EMSCRIPTEN)
         add_subdirectory(./external/freetype)
         add_subdirectory(./external/libpng)
-        endif(NOT EMSCRIPTEN)
-    endif()
+    endif(NOT EMSCRIPTEN)
+
+    add_subdirectory(./external/sg_sound)
 endif(MACOS AND NOT GOON_FULL_MACOS_BUILD)
 
 # #########################################
 # Platform Specific Build settings
 # #########################################
 message("Going to do the thing.. emscripten is is ${EMSCRIPTEN} and GOON_FULL_MACOS_BUILD is ${GOON_FULL_MACOS_BUILD}")
+
 if(EMSCRIPTEN)
     set_target_properties(${EXECUTABLE_TARGET_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} " -O0 -g -s SAFE_HEAP=2 -s STACK_OVERFLOW_CHECK=1 -sUSE_LIBPNG=1 -sUSE_FREETYPE=1 --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s 'DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=[\"$autoResumeAudioContext\",\"$dynCall\"]'")
@@ -218,28 +206,38 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # #########################################
 # Linking Options
 # #########################################
-set(LIBRARIES_TO_LINK
-    SDL2::SDL2-static
-    ZLIB::ZLIB
-    freetype
-    png
-    ${LIB_PNG}
-)
+# set(LIBRARIES_TO_LINK
+# SDL2::SDL2-static
+# ZLIB::ZLIB
+# freetype
+# png
+# supergoonSound::supergoonSound
+# supergoonSound
+# ${LIB_PNG}
+# )
 
-foreach(LIBRARY ${LIBRARIES_TO_LINK})
-    # Check if the target exists, if we are building it then we should link to it.
-    if(TARGET ${LIBRARY})
-        target_link_libraries(${LIBRARY_TARGET_NAME} PUBLIC ${LIBRARY})
-    endif()
-endforeach()
-
+# foreach(LIBRARY ${LIBRARIES_TO_LINK})
+# # Check if the target exists, if we are building it then we should link to it.
+# if(TARGET ${LIBRARY})
+# target_link_libraries(${LIBRARY_TARGET_NAME} PUBLIC ${LIBRARY})
+# endif()
+# endforeach()
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
+    supergoonSound
     freetype
     png
-    PRIVATE
     ${LIB_PNG}
     ${LIB_FREETYPE}
+
+    # testing
+    SDL2::SDL2-static
+    ${LIB_VORBISFILE}
+    ${LIB_VORBIS}
+    ${LIB_OGG}
+    ${OGG_LIBRARIES}
+    vorbis vorbisenc vorbisfile ogg
+    PRIVATE
 )
 target_link_directories(${LIBRARY_TARGET_NAME}
     PRIVATE
@@ -251,6 +249,7 @@ target_include_directories(${LIBRARY_TARGET_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
+    external/sg_sound/src/
     /usr/local/include
 
     # Freetype cause yeah

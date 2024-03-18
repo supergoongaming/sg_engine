@@ -6,7 +6,7 @@
 #include <GoonEngine/joystick.h>
 #include <GoonEngine/debug.h>
 #include <GoonEngine/text.h>
-// #include <SupergoonSound/include/sound.h>
+#include <SupergoonSound/include/sound.h>
 #include <GoonPhysics/scene.h>
 
 #ifdef __EMSCRIPTEN__
