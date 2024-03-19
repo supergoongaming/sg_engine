@@ -33,8 +33,8 @@ if(APPLE)
         set(MACOS ON)
 
         if(CMAKE_GENERATOR STREQUAL "Xcode")
-            message(STATUS "Setting Build to Universal Binary")
-            set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "" FORCE)
+            # message(STATUS "Setting Build to Universal Binary")
+            # set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "" FORCE)
         endif(CMAKE_GENERATOR STREQUAL "Xcode")
     else()
         # IOS
@@ -74,8 +74,8 @@ add_library(${LIBRARY_TARGET_NAME}
 # )
 # endif(LINUX)
 set_property(TARGET ${LIBRARY_TARGET_NAME} PROPERTY C_STANDARD 11)
-# find_package(PkgConfig REQUIRED)
 
+# find_package(PkgConfig REQUIRED)
 find_package(ZLIB)
 include(CTest)
 
@@ -131,15 +131,15 @@ if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
         NAMES libfreetype.a libfreetype.dll freetype.a freetype.dll freetype libfreetype
         HINTS /usr/local/lib /c/cmake/lib)
 else()
-# Windows doesn't have zlib by default.
+    # Windows doesn't have zlib by default.
     if(WIN32)
         add_subdirectory(./external/zlib)
     endif(WIN32)
+
     if(NOT EMSCRIPTEN)
         add_subdirectory(./external/freetype)
         add_subdirectory(./external/libpng)
     endif(NOT EMSCRIPTEN)
-
 
     add_subdirectory(./external/sg_sound)
 endif(MACOS AND NOT GOON_FULL_MACOS_BUILD)
@@ -227,14 +227,11 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # target_link_libraries(${LIBRARY_TARGET_NAME} PUBLIC ${LIBRARY})
 # endif()
 # endforeach()
-if(EMSCRIPTEN)
-set(PNG_LIB_NAME png)
+if(EMSCRIPTEN OR(MACOS AND NOT GOON_FULL_MACOS_BUILD))
+    set(PNG_LIB_NAME png)
 else()
-set(PNG_LIB_NAME png_static)
-endif(EMSCRIPTEN)
-
-
-
+    set(PNG_LIB_NAME png_static)
+endif(EMSCRIPTEN OR(MACOS AND NOT GOON_FULL_MACOS_BUILD))
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
@@ -263,6 +260,12 @@ endif(NOT EMSCRIPTEN)
 target_link_directories(${LIBRARY_TARGET_NAME}
     PRIVATE
     /usr/local/lib
+)
+
+# libpng bs
+add_compile_options(
+    "$<$<COMPILE_LANGUAGE:C>: -DPNG_ARM_NEON_OPT=0>"
+    "$<$<COMPILE_LANGUAGE:CXX>: -DPNG_ARM_NEON_OPT=0>"
 )
 
 target_include_directories(${LIBRARY_TARGET_NAME}
