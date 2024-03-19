@@ -76,7 +76,7 @@ add_library(${LIBRARY_TARGET_NAME}
 set_property(TARGET ${LIBRARY_TARGET_NAME} PROPERTY C_STANDARD 11)
 # find_package(PkgConfig REQUIRED)
 
-# find_package(ZLIB)
+find_package(ZLIB)
 include(CTest)
 
 # #########################################
