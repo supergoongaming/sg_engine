@@ -227,6 +227,12 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # target_link_libraries(${LIBRARY_TARGET_NAME} PUBLIC ${LIBRARY})
 # endif()
 # endforeach()
+if(EMSCRIPTEN)
+set(PNG_LIB_NAME png)
+else()
+set(PNG_LIB_NAME png_static)
+endif(EMSCRIPTEN)
+
 
 
 
@@ -234,7 +240,7 @@ target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
     supergoonSound
     freetype
-    png_static
+    ${PNG_LIB_NAME}
     ${LIB_PNG}
     ${LIB_FREETYPE}
 
