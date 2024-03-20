@@ -186,8 +186,8 @@ int geInitializeEngine()
 
     geInitializeKeyboard();
     geInitializeJoysticks();
-    // geInitializeTextSubsystem("assets/fonts/main.ttf", 36);
-    geInitializeTextSubsystem("assets/fonts/himalaya.ttf", 72);
+    geInitializeTextSubsystem("assets/fonts/main.ttf", 36);
+    // geInitializeTextSubsystem("assets/fonts/himalaya.ttf", 72);
     // Pump out initial events, to prevent music problems.
     shouldQuit = sdlEventLoop();
     return true;
