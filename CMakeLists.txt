@@ -130,6 +130,7 @@ if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
         PATH_SUFFIXES .a
         NAMES libfreetype.a libfreetype.dll freetype.a freetype.dll freetype libfreetype
         HINTS /usr/local/lib /c/cmake/lib)
+    add_subdirectory(./external/sg_sound)
 else()
     # Windows doesn't have zlib by default.
     if(WIN32)
@@ -272,13 +273,14 @@ target_include_directories(${LIBRARY_TARGET_NAME}
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/
+    /usr/local/include
 
     # Need both when not building (using emscripten)
     /emsdk/upstream/emscripten/cache/sysroot/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/freetype/
     ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/
     external/sg_sound/src/
-    /usr/local/include
 
     ${CMAKE_CURRENT_BINARY_DIR}/external/sg_engine/exteral/libpng
 
