@@ -43,17 +43,18 @@ void gpSceneUpdate(gpScene *scene, float gameTime)
         if (!_isEnabled)
             return;
         gpBody *body = _currentBodies[i];
-        if (!body || !body->gravityEnabled)
+        if (!body)
             continue;
-        if (body->velocity.y == 3000)
-        {
-            puts("Its 3k!!");
-        }
         memcpy(body->lastFrameOverlaps, body->overlaps, sizeof(gpOverlap) * body->numOverlappingBodies);
         body->lastFrameNumOverlappingBodies = body->numOverlappingBodies;
-        gpGravityBodyStep(body, &sceneGravity, gameTime);
-        // Remove overlap bodies after gravity is updated.
         body->numOverlappingBodies = 0;
+        if (!body->gravityEnabled)
+        {
+            // We should still check if we are overlapping with other things, even if we aren't checking for movement
+            CheckForNonStaticOverlaps(body);
+            continue;
+        }
+        gpGravityBodyStep(body, &sceneGravity, gameTime);
         ApplyYVelocity(body, gameTime);
         ApplyXVelocity(body, gameTime);
     }

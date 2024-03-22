@@ -31,7 +31,8 @@ static double msBuildup;
 extern SDL_Renderer *g_pRenderer;
 extern int g_refreshRate;
 
-void (*DrawUpdateFunc)() = NULL; void (*GameUpdateFunc)(double deltaTime) = NULL;
+void (*DrawUpdateFunc)() = NULL;
+void (*GameUpdateFunc)(double deltaTime) = NULL;
 
 void *MusicUpdateWrapper(void *arg)
 {
@@ -79,9 +80,7 @@ static int loop_func()
     // const float oldDelta = delta;
     msBuildup += delta;
     lastFrameMilliseconds = beginFrame;
-    shouldQuit = sdlEventLoop();
-    if (shouldQuit)
-        return false;
+    // Moving this here to
     // TODO make these static and pass into as ref to stop allocations
     // Initialize time this frame
     double deltaTimeSeconds = 1 / (double)g_refreshRate;
@@ -96,8 +95,12 @@ static int loop_func()
     while (msBuildup >= deltaTimeMs)
     {
 #endif
+        geUpdateControllerLastFrame();
+        shouldQuit = sdlEventLoop();
         geUpdateKeyboard();
-        geUpdateControllers();
+        if (shouldQuit)
+            return false;
+        // geUpdateControllers();
         gsUpdateSound();
         // LogWarn("Update time: %f", deltaTimeMs);
         if (g_pScene)

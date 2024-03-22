@@ -91,15 +91,11 @@ static void CountPluggedInControllers()
         }
 }
 
-void geUpdateControllers()
+void geUpdateControllerLastFrame()
 {
-    if(_connectedGamepads[0].thisFrameButtons[0])
-    {
-        ;
-    }
     for (int i = 0; i < _numGamePads; i++)
     {
-        memcpy(_connectedGamepads[i].lastFrameAxis, _connectedGamepads[i].thisFrameAxis, sizeof(Uint8) * SDL_CONTROLLER_BUTTON_MAX);
+        memcpy(_connectedGamepads[i].lastFrameAxis, _connectedGamepads[i].thisFrameAxis, sizeof(Uint8) * SDL_CONTROLLER_AXIS_MAX);
         memcpy(_connectedGamepads[i].lastFrameButtons, _connectedGamepads[i].thisFrameButtons, sizeof(Uint8) * SDL_CONTROLLER_BUTTON_MAX);
     }
 }
@@ -110,6 +106,9 @@ bool geGamepadButtonJustReleased(const int padNum, const int button)
 }
 bool geGamepadButtonJustPressed(const int padNum, const int button)
 {
+    // if (padNum > _numGamePads)
+    //     return false;
+    // return _connectedGamepads[padNum].thisFrameButtons[button] && !_connectedGamepads[padNum].lastFrameButtons[button];
     return _numGamePads > padNum && (_connectedGamepads[padNum].thisFrameButtons[button] && !_connectedGamepads[padNum].lastFrameButtons[button]);
 }
 bool geGamepadButtonHeldDown(const int padNum, const int button)
