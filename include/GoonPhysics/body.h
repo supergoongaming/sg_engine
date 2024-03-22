@@ -20,6 +20,7 @@ extern "C"
     typedef struct gpBody gpBody;
     typedef struct gpOverlap gpOverlap;
     typedef void (*OverlapFunc)(void *args, gpBody *body, gpBody *overlapBody, gpOverlap *overlap);
+    typedef void (*BodyLocationUpdateFunc)(void *args, gpBody *body);
 
     typedef struct bodyOverlapArgs
     {
@@ -34,6 +35,7 @@ extern "C"
         int bodyType;
         int staticCollisionEnabled;
         int staticBody;
+        int enabled;
         gpBB boundingBox;
         gpVec acceleration;
         gpVec velocity;
@@ -44,6 +46,7 @@ extern "C"
         int gravityEnabled;
         int xGravityEnabled;
         int yGravityEnabled;
+        BodyLocationUpdateFunc updateFunc;
         int lastFrameOnGround;
         int thisFrameOnGround;
         bodyOverlapArgs *overlapFunctions;

@@ -21,16 +21,20 @@ extern "C"
         float friction;
     } gpScene;
 
+    typedef struct gpBoxCollider gpBoxCollider;
+
     gpScene *gpInitScene(void);
     void gpSceneSetGravity(gpScene *scene, float gravity);
     void gpSceneSetFriction(gpScene *scene, float friction);
     int gpSceneAddBody(gpBody *body);
     int gpSceneAddStaticBody(gpBody *body);
+    int gpSceneAddBoxCollider(gpBoxCollider *boxCollider);
     void gpSceneUpdate(gpScene *scene, float gameTime);
     void gpSceneSetEnabled(int isEnabled);
     gpBody *gpSceneGetBody(int bodyRef);
     void gpSceneRemoveBody(int bodyNum);
-    void gpSceneFree(gpScene* scene);
+    void gpSceneRemoveBoxCollider(int boxNum);
+    void gpSceneFree(gpScene *scene);
 
 #ifdef __cplusplus
 }

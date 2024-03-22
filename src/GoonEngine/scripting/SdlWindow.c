@@ -29,7 +29,6 @@ int geInitializeRenderingWindow(unsigned int windowWidth, unsigned int windowHei
         return 0;
     }
     g_pRenderer = SDL_CreateRenderer(g_pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    // g_pRenderer = SDL_CreateRenderer(g_pWindow, -1, SDL_RENDERER_ACCELERATED);
     if (g_pRenderer == NULL)
     {
         fprintf(stderr, "Renderer could not be created, Error: %s", SDL_GetError());
@@ -39,8 +38,9 @@ int geInitializeRenderingWindow(unsigned int windowWidth, unsigned int windowHei
     SDL_GetWindowDisplayMode(g_pWindow, &mode);
     // g_refreshRate = 30;
     // g_refreshRate = 120;
+    // g_refreshRate = 60;
     g_refreshRate = mode.refresh_rate ? mode.refresh_rate : 60;
-    LogDebug("Refresh rate is set to %d", g_refreshRate);
+    LogWarn("Refresh rate is set to %d", g_refreshRate);
     SDL_RenderSetIntegerScale(g_pRenderer, SDL_TRUE);
     SDL_RenderSetLogicalSize(g_pRenderer, gameWidth, gameHeight);
     return 0;

@@ -9,27 +9,24 @@
 #include <SupergoonSound/include/sound.h>
 #include <GoonPhysics/scene.h>
 
+#define DELTA_TIME_SECONDS (1.0 / 144.0)
+#define DELTA_TIME_MS (1000.0 / 144.0)
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
-static gpScene *g_pScene;
-extern SDL_Texture *g_BackgroundAtlas;
-extern SDL_Rect *g_backgroundDrawRect;
-static SDL_Texture *nerdText;
-static SDL_Texture *cuteText;
-
-#define MAX_STARTUP_FRAMES 1000
-
-static SDL_Event event;
-static bool shouldQuit = false;
-
-static uint64_t lastFrameMilliseconds;
-static double msBuildup;
-
 // TODO this should be different, it is inside of SDLwindow.c
 extern SDL_Renderer *g_pRenderer;
 extern int g_refreshRate;
+extern SDL_Texture *g_BackgroundAtlas;
+extern SDL_Rect *g_backgroundDrawRect;
+
+static gpScene *g_pScene = NULL;
+static SDL_Event event;
+static bool shouldQuit = false;
+static uint64_t previousTime = 0;
+static double msBuildup = 0;
 
 void (*DrawUpdateFunc)() = NULL;
 void (*GameUpdateFunc)(double deltaTime) = NULL;
@@ -73,48 +70,35 @@ static bool sdlEventLoop()
 
 static int loop_func()
 {
-    // static float deltaBuffer = 0;
-    Uint64 beginFrame = SDL_GetTicks64();
-    Uint64 delta = beginFrame - lastFrameMilliseconds;
-    // delta += deltaBuffer;
-    // const float oldDelta = delta;
-    msBuildup += delta;
-    lastFrameMilliseconds = beginFrame;
-    // Moving this here to
-    // TODO make these static and pass into as ref to stop allocations
-    // Initialize time this frame
-    double deltaTimeSeconds = 1 / (double)g_refreshRate;
-    double deltaTimeMs = 1000 / (double)g_refreshRate;
-    if (msBuildup < deltaTimeMs)
+    uint64_t current = SDL_GetTicks64();
+    uint64_t elapsed = current - previousTime;
+    previousTime = current;
+    msBuildup += elapsed;
+    // double deltaTimeSeconds = 1 / (double)144;
+    // double deltaTimeMs = 1000 / (double)144;
+    gsUpdateSound();
+    // if (msBuildup < deltaTimeMs)
+    if (msBuildup < DELTA_TIME_MS)
     {
-        SDL_Delay(1);
-        return true;
+        return 1;
     }
-
-#ifndef __EMSCRIPTEN__
-    while (msBuildup >= deltaTimeMs)
+    while (msBuildup >= DELTA_TIME_MS)
     {
-#endif
         geUpdateControllerLastFrame();
         shouldQuit = sdlEventLoop();
         geUpdateKeyboard();
         if (shouldQuit)
             return false;
-        // geUpdateControllers();
-        gsUpdateSound();
-        // LogWarn("Update time: %f", deltaTimeMs);
         if (g_pScene)
         {
-            gpSceneUpdate(g_pScene, deltaTimeSeconds);
+            gpSceneUpdate(g_pScene, DELTA_TIME_SECONDS);
         }
         if (GameUpdateFunc)
         {
-            GameUpdateFunc(deltaTimeMs);
+            GameUpdateFunc(DELTA_TIME_MS);
         }
-        msBuildup -= deltaTimeMs;
-#ifndef __EMSCRIPTEN__
+        msBuildup -= DELTA_TIME_MS;
     }
-#endif
     SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
     SDL_RenderClear(g_pRenderer);
     if (g_BackgroundAtlas)
@@ -135,23 +119,7 @@ static int loop_func()
     {
         DrawUpdateFunc();
     }
-
-    // LogInfo("Num iters this frame %d", iters);
     SDL_RenderPresent(g_pRenderer);
-    // deltaBuffer = oldDelta - delta;
-    // Handle waiting if Vsync is off
-    // Uint64 endTime = beginFrame + deltaTimeMs;
-    Uint64 currentTime = SDL_GetTicks64();
-    Uint64 endTime = currentTime + deltaTimeMs;
-
-    // // If there's time remaining until the next frame, delay the execution
-#ifndef __EMSCRIPTEN__
-    // if (endTime > currentTime)
-    // {
-    //     Uint32 delayTime = (Uint32)(endTime - currentTime);
-    //     SDL_Delay(delayTime);
-    // }
-#endif
     return true;
 }
 
@@ -165,12 +133,6 @@ int gePlayLoop()
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(LoopWrap, g_refreshRate, 1);
 #else
-    // geColor nerdColor = {0, 255, 255, 255};
-    // geColor cuteColor = {255, 100, 0, 255};
-
-    // nerdText = geCreateTextureForString("Kevin is a nerd", nerdColor);
-    // cuteText = geCreateTextureForString("Misha is a cute", cuteColor);
-
     while (!shouldQuit)
     {
         loop_func();
@@ -190,8 +152,6 @@ int geInitializeEngine()
     geInitializeKeyboard();
     geInitializeJoysticks();
     geInitializeTextSubsystem("assets/fonts/main.ttf", 36);
-    // geInitializeTextSubsystem("assets/fonts/himalaya.ttf", 72);
-    // Pump out initial events, to prevent music problems.
     shouldQuit = sdlEventLoop();
     return true;
 }

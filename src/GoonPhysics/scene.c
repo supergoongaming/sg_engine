@@ -8,6 +8,7 @@
 #include <GoonPhysics/gravity.h>
 #include <GoonPhysics/aabb.h>
 #include <GoonPhysics/overlap.h>
+#include <GoonPhysics/boxCollider.h>
 
 // Rigidbodies
 static int _currentNumBodies = 0;
@@ -16,14 +17,19 @@ static gpBody **_currentBodies;
 // Static Bodies
 static int _currentNumStaticBodies = 0;
 static int _currentCapacityStaticBodies = 4;
+static gpBody **_currentStaticBodies;
+// BoxColliders
+static int _currentNumBoxColliders = 0;
+static int _currentCapacityBoxColliders = 4;
+static gpBoxCollider **_currentBoxColliders;
 
 // Should we be doing things
 static int _isEnabled = 1;
-static gpBody **_currentStaticBodies;
 
 static void ApplyYVelocity(gpBody *body, float gameTime);
 static void ApplyXVelocity(gpBody *body, float gameTime);
 static void CheckForNonStaticOverlaps(gpBody *body);
+static void CheckForNonStaticBoxOverlaps(gpBoxCollider *box);
 
 void gpSceneUpdate(gpScene *scene, float gameTime)
 {
@@ -57,18 +63,95 @@ void gpSceneUpdate(gpScene *scene, float gameTime)
         gpGravityBodyStep(body, &sceneGravity, gameTime);
         ApplyYVelocity(body, gameTime);
         ApplyXVelocity(body, gameTime);
+        if (body->updateFunc)
+        {
+            body->updateFunc(body->funcArgs, body);
+        }
+    }
+    for (size_t i = 0; i < _currentNumBoxColliders; i++)
+    {
+        if (!_isEnabled)
+            return;
+        gpBoxCollider *box = _currentBoxColliders[i];
+        if (!box)
+            continue;
+        memcpy(box->lastFrameOverlaps, box->overlaps, sizeof(gpOverlap) * box->numOverlappingBodies);
+        box->lastFrameNumOverlappingBodies = box->numOverlappingBodies;
+        box->numOverlappingBodies = 0;
+        CheckForNonStaticBoxOverlaps(box);
     }
 }
 
-static void CheckForNonStaticOverlaps(gpBody *body)
+static void CheckForNonStaticBoxOverlaps(gpBoxCollider *box)
 {
-    if (!_isEnabled)
+    if (!_isEnabled || !box->enabled)
         return;
     // Check for non static bodies
     for (size_t i = 0; i < _currentNumBodies; i++)
     {
         gpBody *overlapBody = _currentBodies[i];
-        if (overlapBody == body)
+        // For now, skip if it is the same body type for testing
+        if (overlapBody->bodyType == box->bodyType || !overlapBody->enabled)
+            continue;
+        // Check to see if this overlap already happened (this happens inside of static body)
+        bool newOverlap = true;
+        for (size_t j = 0; j < box->numOverlappingBodies; j++)
+        {
+            if (box->overlaps[j].overlapBody == overlapBody)
+            {
+                newOverlap = false;
+                break;
+            }
+        }
+        if (!newOverlap)
+            continue;
+        gpBB overlapArea;
+        int intersect = gpIntersectRect(&box->boundingBox, &overlapBody->boundingBox, &overlapArea);
+        if (intersect)
+        {
+            int direction = gpCalculateIntersectionDirection(&overlapArea, &box->boundingBox);
+            gpBoxColliderAddOverlap(box, overlapBody, direction);
+        }
+    }
+    // Check for static objects too, like itembricks etc
+
+    for (size_t i = 0; i < _currentNumStaticBodies; i++)
+    {
+        gpBody *overlapBody = _currentStaticBodies[i];
+        // For now, skip if it is the same body type for testing
+        if (overlapBody->bodyType == box->bodyType)
+            continue;
+        // Check to see if this overlap already happened (this happens inside of static body)
+        bool newOverlap = true;
+        for (size_t j = 0; j < box->numOverlappingBodies; j++)
+        {
+            if (box->overlaps[j].overlapBody == overlapBody)
+            {
+                newOverlap = false;
+                break;
+            }
+        }
+        if (!newOverlap)
+            continue;
+        gpBB overlapArea;
+        int intersect = gpIntersectRect(&box->boundingBox, &overlapBody->boundingBox, &overlapArea);
+        if (intersect)
+        {
+            int direction = gpCalculateIntersectionDirection(&overlapArea, &box->boundingBox);
+            gpBoxColliderAddOverlap(box, overlapBody, direction);
+        }
+    }
+}
+
+static void CheckForNonStaticOverlaps(gpBody *body)
+{
+    if (!_isEnabled || !body->enabled)
+        return;
+    // Check for non static bodies
+    for (size_t i = 0; i < _currentNumBodies; i++)
+    {
+        gpBody *overlapBody = _currentBodies[i];
+        if (overlapBody == body || !overlapBody->enabled)
             continue;
         // Check to see if this overlap already happened (this happens inside of static body)
         bool newOverlap = true;
@@ -114,6 +197,8 @@ static void ApplyYVelocity(gpBody *body, float gameTime)
         for (size_t i = 0; i < _currentNumStaticBodies; i++)
         {
             gpBody *staticBody = _currentStaticBodies[i];
+            if (!staticBody)
+                return;
             int intersect = gpIntersectBoxBox(&body->boundingBox, &staticBody->boundingBox);
             if (intersect)
             {
@@ -212,10 +297,13 @@ gpScene *gpInitScene(void)
     gpScene *scene = calloc(1, sizeof(*scene));
     _currentNumBodies = 0;
     _currentNumStaticBodies = 0;
+    _currentNumBoxColliders = 0;
     _currentCapacityBodies = 4;
     _currentCapacityStaticBodies = 4;
+    _currentCapacityBoxColliders = 4;
     _currentBodies = calloc(_currentCapacityBodies, _currentCapacityBodies * sizeof(gpBody *));
-    _currentStaticBodies = calloc(_currentCapacityStaticBodies, _currentCapacityBodies * sizeof(gpBody *));
+    _currentStaticBodies = calloc(_currentCapacityStaticBodies, _currentCapacityBoxColliders * sizeof(gpBody *));
+    _currentBoxColliders = calloc(_currentCapacityBoxColliders, _currentCapacityBoxColliders * sizeof(gpBoxCollider *));
     return scene;
 }
 
@@ -300,7 +388,41 @@ void gpSceneFree(gpScene *scene)
             gpBodyFree(_currentStaticBodies[i]);
         }
     }
+    for (size_t i = 0; i < _currentNumBoxColliders; i++)
+    {
+        if (_currentBoxColliders[i])
+        {
+            gpBoxColliderFree(_currentBoxColliders[i]);
+        }
+    }
     free(_currentBodies);
     free(_currentStaticBodies);
+    free(_currentBoxColliders);
     free(scene);
+}
+
+int gpSceneAddBoxCollider(gpBoxCollider *boxCollider)
+{
+    if (_currentNumBoxColliders > _currentCapacityBoxColliders / 2)
+    {
+        _currentBoxColliders = realloc(_currentStaticBodies, _currentCapacityBoxColliders * 2 * sizeof(gpBoxCollider *));
+        if (_currentBoxColliders == NULL)
+        {
+            fprintf(stderr, "Couldn't reallocate to increase body size, what the");
+        }
+        _currentCapacityBoxColliders *= 2;
+    }
+    _currentBoxColliders[_currentNumBoxColliders] = boxCollider;
+    boxCollider->bodyNum = _currentNumBoxColliders;
+    ++_currentNumBoxColliders;
+    return boxCollider->bodyNum;
+}
+
+void gpSceneRemoveBoxCollider(int boxNum)
+{
+    if (boxNum < _currentNumBoxColliders && _currentBoxColliders[boxNum])
+    {
+        gpBoxColliderFree(_currentBoxColliders[boxNum]);
+        _currentBoxColliders[boxNum] = NULL;
+    }
 }
