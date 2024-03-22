@@ -47,6 +47,12 @@ void HandleJoystickEvent(const SDL_Event *event)
         break;
 
     case SDL_CONTROLLERBUTTONDOWN:
+        if (event->cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER)
+        {
+            SDL_Event quit;
+            quit.type = SDL_QUIT;
+            SDL_PushEvent(&quit);
+        }
         for (int i = 0; i < _numGamePads; i++)
         {
             if (event->cbutton.which == SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(_connectedGamepads[i].SdlController)))
