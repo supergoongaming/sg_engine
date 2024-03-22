@@ -8,6 +8,7 @@
 #include <GoonPhysics/gravity.h>
 #include <GoonPhysics/aabb.h>
 #include <GoonPhysics/overlap.h>
+#include <GoonPhysics/boxCollider.h>
 
 // Rigidbodies
 static int _currentNumBodies = 0;
@@ -16,10 +17,14 @@ static gpBody **_currentBodies;
 // Static Bodies
 static int _currentNumStaticBodies = 0;
 static int _currentCapacityStaticBodies = 4;
+static gpBody **_currentStaticBodies;
+// BoxColliders
+static int _currentNumBoxColliders = 0;
+static int _currentCapacityBoxColliders = 4;
+static gpBoxCollider **_currentBoxColliders;
 
 // Should we be doing things
 static int _isEnabled = 1;
-static gpBody **_currentStaticBodies;
 
 static void ApplyYVelocity(gpBody *body, float gameTime);
 static void ApplyXVelocity(gpBody *body, float gameTime);
@@ -218,8 +223,10 @@ gpScene *gpInitScene(void)
     _currentNumStaticBodies = 0;
     _currentCapacityBodies = 4;
     _currentCapacityStaticBodies = 4;
+    _currentCapacityBoxColliders = 4;
     _currentBodies = calloc(_currentCapacityBodies, _currentCapacityBodies * sizeof(gpBody *));
-    _currentStaticBodies = calloc(_currentCapacityStaticBodies, _currentCapacityBodies * sizeof(gpBody *));
+    _currentStaticBodies = calloc(_currentCapacityStaticBodies, _currentCapacityBoxColliders * sizeof(gpBody *));
+    _currentBoxColliders = calloc(_currentCapacityBoxColliders, _currentCapacityBoxColliders * sizeof(gpBoxCollider *));
     return scene;
 }
 
@@ -307,4 +314,30 @@ void gpSceneFree(gpScene *scene)
     free(_currentBodies);
     free(_currentStaticBodies);
     free(scene);
+}
+
+int gpSceneAddBoxCollider(gpBoxCollider *boxCollider)
+{
+    if (_currentNumBoxColliders > _currentCapacityBoxColliders / 2)
+    {
+        _currentBoxColliders = realloc(_currentStaticBodies, _currentCapacityBoxColliders * 2 * sizeof(gpBoxCollider *));
+        if (_currentBoxColliders == NULL)
+        {
+            fprintf(stderr, "Couldn't reallocate to increase body size, what the");
+        }
+        _currentCapacityBoxColliders *= 2;
+    }
+    _currentBoxColliders[_currentNumBoxColliders] = boxCollider;
+    boxCollider->bodyNum = _currentNumBoxColliders;
+    ++_currentNumBoxColliders;
+    return boxCollider->bodyNum;
+}
+
+void gpSceneRemoveBoxCollider(int boxNum)
+{
+    if (boxNum < _currentNumBoxColliders && _currentBoxColliders[boxNum])
+    {
+        gpBoxColliderFree(_currentBoxColliders[boxNum]);
+        _currentBoxColliders[boxNum] = NULL;
+    }
 }
