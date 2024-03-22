@@ -23,6 +23,7 @@ gpBody *gpBodyNew(gpBB boundingBox)
     body->yGravityEnabled = 1;
     body->numOverlappingBodies = 0;
     body->numOverlapFunctions = 0;
+    body->updateFunc = NULL;
     body->overlapFunctions = calloc(1, sizeof(bodyOverlapArgs));
     body->velocity = gpV(0, 0);
     body->maxVelocity = gpV(0, 0);
@@ -93,21 +94,6 @@ void gpBodyAddOverlap(gpBody *body, gpBody *overlapBody, int direction)
 int gpBodyIsOnGround(gpBody *body)
 {
     return body->thisFrameOnGround;
-
-    // for (size_t i = 0; i < body->numOverlappingBodies; i++)
-    // {
-    //     gpBody *overlap = body->overlaps[i].overlapBody;
-    //     // If we are not a static body (type0), then continue
-    //     if (!overlap->staticBody)
-    //     {
-    //         continue;
-    //     }
-    //     if (overlap->boundingBox.y >= body->boundingBox.y + body->boundingBox.h)
-    //     {
-    //         return 1;
-    //     }
-    // }
-    // return 0;
 }
 int gpBodyJustNotOnGround(gpBody *body)
 {

@@ -57,6 +57,10 @@ void gpSceneUpdate(gpScene *scene, float gameTime)
         gpGravityBodyStep(body, &sceneGravity, gameTime);
         ApplyYVelocity(body, gameTime);
         ApplyXVelocity(body, gameTime);
+        if (body->updateFunc)
+        {
+            body->updateFunc(body->funcArgs, body);
+        }
     }
 }
 
