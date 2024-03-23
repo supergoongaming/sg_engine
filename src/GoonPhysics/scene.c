@@ -84,14 +84,14 @@ void gpSceneUpdate(gpScene *scene, float gameTime)
 
 static void CheckForNonStaticBoxOverlaps(gpBoxCollider *box)
 {
-    if (!_isEnabled)
+    if (!_isEnabled || !box->enabled)
         return;
     // Check for non static bodies
     for (size_t i = 0; i < _currentNumBodies; i++)
     {
         gpBody *overlapBody = _currentBodies[i];
         // For now, skip if it is the same body type for testing
-        if (overlapBody->bodyType == box->bodyType)
+        if (overlapBody->bodyType == box->bodyType || !overlapBody->enabled)
             continue;
         // Check to see if this overlap already happened (this happens inside of static body)
         bool newOverlap = true;
@@ -145,13 +145,13 @@ static void CheckForNonStaticBoxOverlaps(gpBoxCollider *box)
 
 static void CheckForNonStaticOverlaps(gpBody *body)
 {
-    if (!_isEnabled)
+    if (!_isEnabled || !body->enabled)
         return;
     // Check for non static bodies
     for (size_t i = 0; i < _currentNumBodies; i++)
     {
         gpBody *overlapBody = _currentBodies[i];
-        if (overlapBody == body)
+        if (overlapBody == body || !overlapBody->enabled)
             continue;
         // Check to see if this overlap already happened (this happens inside of static body)
         bool newOverlap = true;

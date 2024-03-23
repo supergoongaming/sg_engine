@@ -12,6 +12,7 @@ gpBoxCollider *gpBoxColliderNew(gpBB boundingBox)
     box->bodyNum = -1;
     box->bodyType = -1;
     box->boundingBox = boundingBox;
+    box->enabled = 1;
     box->numOverlappingBodies = 0;
     box->overlapFunctions = calloc(1, sizeof(bodyOverlapArgs));
     box->numOverlapFunctions = 0;

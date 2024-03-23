@@ -15,6 +15,7 @@ extern "C"
     {
         int bodyNum;
         int bodyType;
+        int enabled;
         gpBB boundingBox;
         int numOverlappingBodies;
         int lastFrameNumOverlappingBodies;

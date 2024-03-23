@@ -35,6 +35,7 @@ extern "C"
         int bodyType;
         int staticCollisionEnabled;
         int staticBody;
+        int enabled;
         gpBB boundingBox;
         gpVec acceleration;
         gpVec velocity;
