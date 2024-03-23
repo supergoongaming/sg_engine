@@ -18,6 +18,8 @@ GamePad _connectedGamepads[MAX_GAMEPADS];
 
 static void InitializeEngineGamepad(int padNum)
 {
+    if (_connectedGamepads[padNum].SdlController)
+        return;
     GamePad *gamepad = &_connectedGamepads[padNum];
     SDL_GameController *pad = SDL_GameControllerOpen(padNum);
     if (!pad)
@@ -43,7 +45,8 @@ void HandleJoystickEvent(const SDL_Event *event)
     switch (event->type)
     {
     case SDL_CONTROLLERDEVICEADDED:
-        LogInfo("Controller added %s", event->cdevice.which);
+        LogDebug("Controller added %s", event->cdevice.which);
+        CountPluggedInControllers();
         break;
 
     case SDL_CONTROLLERBUTTONDOWN:
