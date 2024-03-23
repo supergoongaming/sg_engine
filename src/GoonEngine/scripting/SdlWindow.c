@@ -28,11 +28,7 @@ int geInitializeRenderingWindow(unsigned int windowWidth, unsigned int windowHei
         fprintf(stderr, "Window could not be created, Error: %s", SDL_GetError());
         return 0;
     }
-#ifdef __EMSCRIPTEN__
-    g_pRenderer = SDL_CreateRenderer(g_pWindow, -1, SDL_RENDERER_ACCELERATED);
-#else
     g_pRenderer = SDL_CreateRenderer(g_pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-#endif
     if (g_pRenderer == NULL)
     {
         fprintf(stderr, "Renderer could not be created, Error: %s", SDL_GetError());

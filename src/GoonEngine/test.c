@@ -78,10 +78,8 @@ static int loop_func()
     {
         return 1;
     }
-#ifndef __EMSCRIPTEN__
     while (msBuildup >= deltaTimeMs)
     {
-#endif
         geUpdateControllerLastFrame();
         shouldQuit = sdlEventLoop();
         geUpdateKeyboard();
@@ -96,9 +94,7 @@ static int loop_func()
             GameUpdateFunc(deltaTimeMs);
         }
         msBuildup -= deltaTimeMs;
-#ifndef __EMSCRIPTEN__
     }
-#endif
     SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
     SDL_RenderClear(g_pRenderer);
     if (g_BackgroundAtlas)
