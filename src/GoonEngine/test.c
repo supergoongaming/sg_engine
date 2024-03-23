@@ -9,6 +9,9 @@
 #include <SupergoonSound/include/sound.h>
 #include <GoonPhysics/scene.h>
 
+#define DELTA_TIME_SECONDS (1.0 / 144.0)
+#define DELTA_TIME_MS (1000.0 / 144.0)
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -71,14 +74,15 @@ static int loop_func()
     uint64_t elapsed = current - previousTime;
     previousTime = current;
     msBuildup += elapsed;
-    double deltaTimeSeconds = 1 / (double)144;
-    double deltaTimeMs = 1000 / (double)144;
+    // double deltaTimeSeconds = 1 / (double)144;
+    // double deltaTimeMs = 1000 / (double)144;
     gsUpdateSound();
-    if (msBuildup < deltaTimeMs)
+    // if (msBuildup < deltaTimeMs)
+    if (msBuildup < DELTA_TIME_MS)
     {
         return 1;
     }
-    while (msBuildup >= deltaTimeMs)
+    while (msBuildup >= DELTA_TIME_MS)
     {
         geUpdateControllerLastFrame();
         shouldQuit = sdlEventLoop();
@@ -87,13 +91,13 @@ static int loop_func()
             return false;
         if (g_pScene)
         {
-            gpSceneUpdate(g_pScene, deltaTimeSeconds);
+            gpSceneUpdate(g_pScene, DELTA_TIME_SECONDS);
         }
         if (GameUpdateFunc)
         {
-            GameUpdateFunc(deltaTimeMs);
+            GameUpdateFunc(DELTA_TIME_MS);
         }
-        msBuildup -= deltaTimeMs;
+        msBuildup -= DELTA_TIME_MS;
     }
     SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
     SDL_RenderClear(g_pRenderer);
