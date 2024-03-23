@@ -197,6 +197,8 @@ static void ApplyYVelocity(gpBody *body, float gameTime)
         for (size_t i = 0; i < _currentNumStaticBodies; i++)
         {
             gpBody *staticBody = _currentStaticBodies[i];
+            if (!staticBody)
+                return;
             int intersect = gpIntersectBoxBox(&body->boundingBox, &staticBody->boundingBox);
             if (intersect)
             {
@@ -295,6 +297,7 @@ gpScene *gpInitScene(void)
     gpScene *scene = calloc(1, sizeof(*scene));
     _currentNumBodies = 0;
     _currentNumStaticBodies = 0;
+    _currentNumBoxColliders = 0;
     _currentCapacityBodies = 4;
     _currentCapacityStaticBodies = 4;
     _currentCapacityBoxColliders = 4;
@@ -385,8 +388,16 @@ void gpSceneFree(gpScene *scene)
             gpBodyFree(_currentStaticBodies[i]);
         }
     }
+    for (size_t i = 0; i < _currentNumBoxColliders; i++)
+    {
+        if (_currentBoxColliders[i])
+        {
+            gpBoxColliderFree(_currentBoxColliders[i]);
+        }
+    }
     free(_currentBodies);
     free(_currentStaticBodies);
+    free(_currentBoxColliders);
     free(scene);
 }
 
