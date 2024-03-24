@@ -116,7 +116,7 @@ static int loop_func()
     }
 
     const double alpha = msBuildup / DELTA_TIME_MS;
-    LogWarn("Alpha is %f", alpha);
+    // LogWarn("Alpha is %f", alpha);
 
     if (DrawUpdateFunc)
     {
