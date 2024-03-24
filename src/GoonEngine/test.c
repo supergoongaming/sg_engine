@@ -28,8 +28,8 @@ static bool shouldQuit = false;
 static uint64_t previousTime = 0;
 static double msBuildup = 0;
 
-// void (*DrawUpdateFunc)(double interpolationTime) = NULL;
-void (*DrawUpdateFunc)() = NULL;
+void (*DrawUpdateFunc)(double interpolationTime) = NULL;
+// void (*DrawUpdateFunc)() = NULL;
 void (*GameUpdateFunc)(double deltaTime) = NULL;
 
 void *MusicUpdateWrapper(void *arg)
@@ -120,8 +120,8 @@ static int loop_func()
 
     if (DrawUpdateFunc)
     {
-        // DrawUpdateFunc(alpha);
-        DrawUpdateFunc();
+        DrawUpdateFunc(alpha);
+        // DrawUpdateFunc();
     }
     SDL_RenderPresent(g_pRenderer);
     return true;
@@ -165,7 +165,7 @@ void geSetCurrentScene(void *scene)
     g_pScene = scene;
 }
 
-void geGameSetDrawFunc(void (*drawFunc)())
+void geGameSetDrawFunc(void (*drawFunc)(double accum))
 {
     DrawUpdateFunc = drawFunc;
 }
