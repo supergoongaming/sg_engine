@@ -28,6 +28,7 @@ static bool shouldQuit = false;
 static uint64_t previousTime = 0;
 static double msBuildup = 0;
 
+// void (*DrawUpdateFunc)(double interpolationTime) = NULL;
 void (*DrawUpdateFunc)() = NULL;
 void (*GameUpdateFunc)(double deltaTime) = NULL;
 
@@ -72,12 +73,10 @@ static int loop_func()
 {
     uint64_t current = SDL_GetTicks64();
     uint64_t elapsed = current - previousTime;
+
     previousTime = current;
     msBuildup += elapsed;
-    // double deltaTimeSeconds = 1 / (double)144;
-    // double deltaTimeMs = 1000 / (double)144;
     gsUpdateSound();
-    // if (msBuildup < deltaTimeMs)
     if (msBuildup < DELTA_TIME_MS)
     {
         return 1;
@@ -115,8 +114,13 @@ static int loop_func()
             LogError("Did not draw properly, Error %s\n", SDL_GetError());
         }
     }
+
+    const double alpha = msBuildup / DELTA_TIME_MS;
+    LogWarn("Alpha is %f", alpha);
+
     if (DrawUpdateFunc)
     {
+        // DrawUpdateFunc(alpha);
         DrawUpdateFunc();
     }
     SDL_RenderPresent(g_pRenderer);
