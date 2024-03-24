@@ -9,8 +9,11 @@
 #include <SupergoonSound/include/sound.h>
 #include <GoonPhysics/scene.h>
 
-#define DELTA_TIME_SECONDS (1.0 / 144.0)
-#define DELTA_TIME_MS (1000.0 / 144.0)
+// #define DELTA_TIME_SECONDS (1.0 / 144.0)
+// #define DELTA_TIME_MS (1000.0 / 144.0)
+
+#define DELTA_TIME_SECONDS (1.0 / 60.0)
+#define DELTA_TIME_MS (1000.0 / 60.0)
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -29,6 +32,7 @@ static uint64_t previousTime = 0;
 static double msBuildup = 0;
 
 void (*DrawUpdateFunc)(double interpolationTime) = NULL;
+void (*CameraUpdateFunc)(double interpolationTime) = NULL;
 // void (*DrawUpdateFunc)() = NULL;
 void (*GameUpdateFunc)(double deltaTime) = NULL;
 
@@ -98,8 +102,16 @@ static int loop_func()
         }
         msBuildup -= DELTA_TIME_MS;
     }
+    const double alpha = msBuildup / DELTA_TIME_MS;
+    LogWarn("Alpha is %f", alpha);
     SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
     SDL_RenderClear(g_pRenderer);
+    if (CameraUpdateFunc)
+    {
+        CameraUpdateFunc(alpha);
+    }
+
+    // Need to update camera here, so that background is drawn properly.
     if (g_BackgroundAtlas)
     {
         // We always want to draw at destination 0, however source should be used from camera.
@@ -114,9 +126,6 @@ static int loop_func()
             LogError("Did not draw properly, Error %s\n", SDL_GetError());
         }
     }
-
-    const double alpha = msBuildup / DELTA_TIME_MS;
-    // LogWarn("Alpha is %f", alpha);
 
     if (DrawUpdateFunc)
     {
@@ -172,6 +181,10 @@ void geGameSetDrawFunc(void (*drawFunc)(double accum))
 void geGameSetUpdateFunc(void (*updateFunc)(double deltaTime))
 {
     GameUpdateFunc = updateFunc;
+}
+void geSetCameraUpdateFunc(void (*cameraUpdateFunc)(double deltaTime))
+{
+    CameraUpdateFunc = cameraUpdateFunc;
 }
 int ExitEngine()
 {

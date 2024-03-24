@@ -10,6 +10,7 @@ extern "C"
     int geInitializeEngine();
     void geSetCurrentScene(void *scene);
     void geGameSetUpdateFunc(void (*updateFunc)(double deltaTime));
+    void geSetCameraUpdateFunc(void (*cameraUpdateFunc)(double deltaTime));
     void geGameSetDrawFunc(void (*drawFunc)(double accum));
 #ifdef __cplusplus
 }
