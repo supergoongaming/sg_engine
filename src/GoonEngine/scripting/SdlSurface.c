@@ -18,23 +18,6 @@ void SetCameraRect(geRectangle *rect)
     g_backgroundDrawRect = (SDL_Rect *)rect;
 }
 
-static void flipImageVertically(unsigned char *data, int width, int height, int channels)
-{
-    int rowSize = width * channels;
-
-    for (int i = 0; i < height / 2; ++i)
-    {
-        int rowIndex1 = i * rowSize;
-        int rowIndex2 = (height - 1 - i) * rowSize;
-
-        for (int j = 0; j < rowSize; ++j)
-        {
-            unsigned char temp = data[rowIndex1 + j];
-            data[rowIndex1 + j] = data[rowIndex2 + j];
-            data[rowIndex2 + j] = temp;
-        }
-    }
-}
 static void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 {
     Uint8 *target_pixel = (Uint8 *)surface->pixels + y * surface->pitch + x * sizeof(Uint32);
@@ -214,7 +197,7 @@ void BlitSurface(
     geRectangle *dstRect)
 {
     // int result = SDL_BlitSurface(srcSurface, srcRect, dstSurface, dstRect);
-    int result = SDL_BlitSurface(srcSurface, srcRect, dstSurface, dstRect);
+    int result = SDL_BlitSurface(srcSurface, (SDL_Rect *)srcRect, dstSurface, (SDL_Rect *)dstRect);
     if (result)
     {
         fprintf(stderr, "Failed to blit surface %s", SDL_GetError());
@@ -253,7 +236,7 @@ void geDrawTexture(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstR
     SDL_RenderCopyEx(g_pRenderer,
                      texture,
                      (SDL_Rect *)srcRect,
-                     dstRect,
+                     (SDL_Rect *)dstRect,
                      0,
                      NULL,
                      (shouldFlip) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);

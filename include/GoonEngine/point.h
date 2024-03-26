@@ -13,7 +13,7 @@ extern "C"
     {
         Point point = {0, 0};
         return point;
-    };
+    }
 #ifdef _cplusplus
 }
 #endif

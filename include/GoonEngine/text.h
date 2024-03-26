@@ -23,7 +23,7 @@ extern "C"
      * @param b Blue
      * @return SDL_Surface* Surface with the color
      */
-    SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, char letter, int r, int g, int b);
+    SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, int r, int g, int b);
     /**
      * @brief Create a Empty Surface object used as "paper" for drawing letters on
      *
