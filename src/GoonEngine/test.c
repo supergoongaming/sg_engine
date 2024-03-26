@@ -74,10 +74,7 @@ static int loop_func()
     uint64_t elapsed = current - previousTime;
     previousTime = current;
     msBuildup += elapsed;
-    // double deltaTimeSeconds = 1 / (double)144;
-    // double deltaTimeMs = 1000 / (double)144;
     gsUpdateSound();
-    // if (msBuildup < deltaTimeMs)
     if (msBuildup < DELTA_TIME_MS)
     {
         return 1;
@@ -131,7 +128,7 @@ static void LoopWrap()
 int gePlayLoop()
 {
 #ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(LoopWrap, g_refreshRate, 1);
+    emscripten_set_main_loop(LoopWrap, 0, 1);
 #else
     while (!shouldQuit)
     {
