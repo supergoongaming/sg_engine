@@ -19,7 +19,8 @@ extern "C"
 #endif
     typedef struct gpBody gpBody;
     typedef struct gpOverlap gpOverlap;
-    typedef void (*OverlapFunc)(void *args, gpBody *body, gpBody *overlapBody, gpOverlap *overlap);
+    // typedef void (*OverlapFunc)(void *args, gpBody *body, gpBody *overlapBody, gpOverlap *overlap);
+    typedef void (*OverlapFunc)(void *args, void *body, void *overlapBody, gpOverlap *overlap);
     typedef void (*BodyLocationUpdateFunc)(void *args, gpBody *body);
 
     typedef struct bodyOverlapArgs
