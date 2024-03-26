@@ -26,6 +26,10 @@
 // For more information, please refer to <https://unlicense.org>
 //
 
+
+// For windows
+#define _USE_MATH_DEFINES
+
 #include <math.h>
 #include <GoonEngine/easing.h>
 
