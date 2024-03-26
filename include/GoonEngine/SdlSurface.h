@@ -33,6 +33,7 @@ extern "C"
     void SetBackgroundAtlas(SDL_Texture *background);
     void SetCameraRect(geRectangle *rect);
     SDL_Texture *CreateTextureFromFile(const char *filename);
+    void geUpdateTextureAlpha(SDL_Texture* texture, int alpha);
     void geDrawTextureWithCameraOffset(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip);
     void geDrawTexture(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip);
     void geDrawDebugRect(geRectangle *rect, geColor *color);

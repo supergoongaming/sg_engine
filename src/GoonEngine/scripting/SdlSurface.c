@@ -259,6 +259,13 @@ void geDrawTexture(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstR
                      (shouldFlip) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
+void geUpdateTextureAlpha(SDL_Texture *texture, int alpha)
+{
+    SDL_SetRenderDrawBlendMode(g_pRenderer, SDL_BLENDMODE_BLEND);
+    // Set the alpha modulation (transparency) for the texture
+    SDL_SetTextureAlphaMod(texture, alpha); // alphaValue should be between 0 (fully transparent) and 255 (fully opaque)
+}
+
 void geDrawTextureWithCameraOffset(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip)
 {
     SDL_Rect translatedDstRect;
