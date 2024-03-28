@@ -4,7 +4,7 @@
 FT_Library _loadedLibrary;
 FT_Face _loadedFace;
 
-extern SDL_Renderer *g_pRenderer;
+SDL_Renderer *g_pRenderer = NULL;
 
 SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, int r, int g, int b)
 {

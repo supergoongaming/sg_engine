@@ -10,3 +10,6 @@
 [submodule "external/zlib"]
 	path = external/zlib
 	url = https://github.com/madler/zlib.git
+[submodule "external/cglm"]
+	path = external/cglm
+	url = https://github.com/recp/cglm.git

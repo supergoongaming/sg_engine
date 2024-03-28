@@ -7,7 +7,8 @@
 
 SDL_Texture *g_BackgroundAtlas = NULL;
 SDL_Rect *g_backgroundDrawRect = NULL;
-extern SDL_Renderer *g_pRenderer;
+extern SDL_GLContext *g_pContext;
+// extern SDL_Renderer *g_pRenderer;
 
 void SetBackgroundAtlas(SDL_Texture *background)
 {
@@ -222,57 +223,58 @@ void DestroyTexture(SDL_Texture *texture)
 
 SDL_Texture *CreateTextureFromSurface(SDL_Surface *surface)
 {
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(g_pRenderer, surface);
-    if (texture == NULL)
-    {
-        fprintf(stderr, "Could not create texture, Error: %s", SDL_GetError());
-        return NULL;
-    }
-    SDL_FreeSurface(surface); // We no longer need the surface after creating the texture
-    return texture;
+    // SDL_Texture *texture = SDL_CreateTextureFromSurface(g_pRenderer, surface);
+    // if (texture == NULL)
+    // {
+    //     fprintf(stderr, "Could not create texture, Error: %s", SDL_GetError());
+    //     return NULL;
+    // }
+    // SDL_FreeSurface(surface); // We no longer need the surface after creating the texture
+    // return texture;
+    return NULL;
 }
 void geDrawTexture(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip)
 {
-    SDL_RenderCopyEx(g_pRenderer,
-                     texture,
-                     (SDL_Rect *)srcRect,
-                     (SDL_Rect *)dstRect,
-                     0,
-                     NULL,
-                     (shouldFlip) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+    // SDL_RenderCopyEx(g_pRenderer,
+    //                  texture,
+    //                  (SDL_Rect *)srcRect,
+    //                  (SDL_Rect *)dstRect,
+    //                  0,
+    //                  NULL,
+    //                  (shouldFlip) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
 void geUpdateTextureAlpha(SDL_Texture *texture, int alpha)
 {
-    SDL_SetRenderDrawBlendMode(g_pRenderer, SDL_BLENDMODE_BLEND);
-    // Set the alpha modulation (transparency) for the texture
-    SDL_SetTextureAlphaMod(texture, alpha); // alphaValue should be between 0 (fully transparent) and 255 (fully opaque)
+    // SDL_SetRenderDrawBlendMode(g_pRenderer, SDL_BLENDMODE_BLEND);
+    // // Set the alpha modulation (transparency) for the texture
+    // SDL_SetTextureAlphaMod(texture, alpha); // alphaValue should be between 0 (fully transparent) and 255 (fully opaque)
 }
 
 void geDrawTextureWithCameraOffset(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip)
 {
-    SDL_Rect translatedDstRect;
-    translatedDstRect.x = (dstRect->x - g_backgroundDrawRect->x);
-    translatedDstRect.y = dstRect->y;
-    translatedDstRect.w = dstRect->w;
-    translatedDstRect.h = dstRect->h;
-    SDL_RenderCopyEx(g_pRenderer,
-                     texture,
-                     (SDL_Rect *)srcRect,
-                     &translatedDstRect,
-                     0,
-                     NULL,
-                     (shouldFlip) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+    // SDL_Rect translatedDstRect;
+    // translatedDstRect.x = (dstRect->x - g_backgroundDrawRect->x);
+    // translatedDstRect.y = dstRect->y;
+    // translatedDstRect.w = dstRect->w;
+    // translatedDstRect.h = dstRect->h;
+    // SDL_RenderCopyEx(g_pRenderer,
+    //                  texture,
+    //                  (SDL_Rect *)srcRect,
+    //                  &translatedDstRect,
+    //                  0,
+    //                  NULL,
+    //                  (shouldFlip) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
 void geDrawDebugRect(geRectangle *dstRect, geColor *color)
 {
-    SDL_Rect translatedDstRect;
-    translatedDstRect.x = (dstRect->x - g_backgroundDrawRect->x);
-    translatedDstRect.y = dstRect->y * 1;
-    translatedDstRect.w = dstRect->w * 1;
-    translatedDstRect.h = dstRect->h * 1;
-    SDL_SetRenderDrawColor(g_pRenderer, color->R, color->G, color->B, color->A);
-    SDL_RenderDrawRect(g_pRenderer, &translatedDstRect);
-    SDL_SetRenderDrawColor(g_pRenderer, 100, 100, 100, 255);
+    // SDL_Rect translatedDstRect;
+    // translatedDstRect.x = (dstRect->x - g_backgroundDrawRect->x);
+    // translatedDstRect.y = dstRect->y * 1;
+    // translatedDstRect.w = dstRect->w * 1;
+    // translatedDstRect.h = dstRect->h * 1;
+    // SDL_SetRenderDrawColor(g_pRenderer, color->R, color->G, color->B, color->A);
+    // SDL_RenderDrawRect(g_pRenderer, &translatedDstRect);
+    // SDL_SetRenderDrawColor(g_pRenderer, 100, 100, 100, 255);
 }

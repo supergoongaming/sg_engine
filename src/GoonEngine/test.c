@@ -9,6 +9,8 @@
 #include <SupergoonSound/include/sound.h>
 #include <GoonPhysics/scene.h>
 
+#include <glad/glad.h>
+
 #define DELTA_TIME_SECONDS (1.0 / 144.0)
 #define DELTA_TIME_MS (1000.0 / 144.0)
 
@@ -17,7 +19,10 @@
 #endif
 
 // TODO this should be different, it is inside of SDLwindow.c
-extern SDL_Renderer *g_pRenderer;
+// extern SDL_Renderer *g_pRenderer;
+// extern SDL_GLContext *g_pContext;
+extern SDL_Window *g_pWindow;
+extern SDL_GLContext *g_pContext;
 extern int g_refreshRate;
 extern SDL_Texture *g_BackgroundAtlas;
 extern SDL_Rect *g_backgroundDrawRect;
@@ -96,27 +101,31 @@ static int loop_func()
         }
         msBuildup -= DELTA_TIME_MS;
     }
-    SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
-    SDL_RenderClear(g_pRenderer);
+    // SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
+    // SDL_RenderClear(g_pRenderer);
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     if (g_BackgroundAtlas)
     {
         // We always want to draw at destination 0, however source should be used from camera.
-        SDL_Rect dst;
-        dst.x = 0;
-        dst.y = 0;
-        dst.w = g_backgroundDrawRect->w;
-        dst.h = g_backgroundDrawRect->h;
-        int drawResult = SDL_RenderCopy(g_pRenderer, g_BackgroundAtlas, g_backgroundDrawRect, &dst);
-        if (drawResult != 0)
-        {
-            LogError("Did not draw properly, Error %s\n", SDL_GetError());
-        }
+        // SDL_Rect dst;
+        // dst.x = 0;
+        // dst.y = 0;
+        // dst.w = g_backgroundDrawRect->w;
+        // dst.h = g_backgroundDrawRect->h;
+        // int drawResult = SDL_RenderCopy(g_pRenderer, g_BackgroundAtlas, g_backgroundDrawRect, &dst);
+        // if (drawResult != 0)
+        // {
+        //     LogError("Did not draw properly, Error %s\n", SDL_GetError());
+        // }
     }
     if (DrawUpdateFunc)
     {
         DrawUpdateFunc();
     }
-    SDL_RenderPresent(g_pRenderer);
+    SDL_GL_SwapWindow(g_pWindow);
+    // SDL_RenderPresent(g_pRenderer);
     return true;
 }
 

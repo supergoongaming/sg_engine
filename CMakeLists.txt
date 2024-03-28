@@ -20,7 +20,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # File globbing
 # #########################################
 message(STATUS "Getting all files for cmake..")
-file(GLOB_RECURSE ENGINE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonEngine/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonPhysics/*.c*)
+file(GLOB_RECURSE ENGINE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonEngine/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonPhysics/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/*.c*)
 
 # #########################################
 # Platform specific Project setup
@@ -76,7 +76,8 @@ add_library(${LIBRARY_TARGET_NAME}
 set_property(TARGET ${LIBRARY_TARGET_NAME} PROPERTY C_STANDARD 11)
 
 # find_package(PkgConfig REQUIRED)
-find_package(ZLIB)
+find_package(ZLIB REQUIRED)
+find_package(OpenGL REQUIRED)
 include(CTest)
 
 # #########################################
@@ -151,7 +152,7 @@ endif(MACOS AND NOT GOON_FULL_MACOS_BUILD)
 message("Going to do the thing.. emscripten is is ${EMSCRIPTEN} and GOON_FULL_MACOS_BUILD is ${GOON_FULL_MACOS_BUILD}")
 
 if(EMSCRIPTEN)
-    set_target_properties(${EXECUTABLE_TARGET_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} " -O0 -g -s SAFE_HEAP=2 -s STACK_OVERFLOW_CHECK=1 -sUSE_LIBPNG=1 -sUSE_FREETYPE=1 --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets")
+    set_target_properties(${EXECUTABLE_TARGET_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} " -O0 -g -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -s SAFE_HEAP=2 -s STACK_OVERFLOW_CHECK=1 -sUSE_LIBPNG=1 -sUSE_FREETYPE=1 --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s 'DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=[\"$autoResumeAudioContext\",\"$dynCall\"]'")
 endif(EMSCRIPTEN)
 
@@ -241,6 +242,7 @@ target_link_libraries(${LIBRARY_TARGET_NAME}
     ${PNG_LIB_NAME}
     ${LIB_PNG}
     ${LIB_FREETYPE}
+    ${OPENGL_LIBRARIES}
 
     # testing
     ${LIB_VORBISFILE}
@@ -279,6 +281,7 @@ target_include_directories(${LIBRARY_TARGET_NAME}
     /emsdk/upstream/emscripten/cache/sysroot/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/freetype/
     ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/
     external/sg_sound/src/
 
