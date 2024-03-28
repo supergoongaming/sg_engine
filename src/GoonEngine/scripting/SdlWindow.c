@@ -5,6 +5,9 @@
 #include <GoonEngine/SdlWindow.h>
 #include <glad/glad.h>
 
+#include <cglm/mat4.h>
+#include <cglm/cam.h>
+
 SDL_Window *g_pWindow = 0;
 // SDL_Renderer *g_pRenderer = 0;
 SDL_GLContext *g_pContext = 0;
@@ -86,6 +89,10 @@ int geInitializeRenderingWindow(unsigned int windowWidth, unsigned int windowHei
     glViewport(0, 0, windowWidth, windowHeight);
 
     printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
+    mat4 proj;
+    // setup screen camera
+    glm_ortho(0.0f, windowWidth, windowHeight, 0.0f, -1.0f, 1.0f, proj);
+
     // SDL_RenderSetIntegerScale(g_pRenderer, SDL_TRUE);
     // SDL_RenderSetLogicalSize(g_pRenderer, gameWidth, gameHeight);
     return 0;

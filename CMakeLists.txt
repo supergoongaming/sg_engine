@@ -131,6 +131,12 @@ if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
         PATH_SUFFIXES .a
         NAMES libfreetype.a libfreetype.dll freetype.a freetype.dll freetype libfreetype
         HINTS /usr/local/lib /c/cmake/lib)
+
+    find_library(LIB_GLM
+        REQUIRED
+        PATH_SUFFIXES .a
+        NAMES libcglm.a libcglm.dll cglm.a cglm.dll cglm libcglm
+        HINTS /usr/local/lib /c/cmake/lib)
     add_subdirectory(./external/sg_sound)
 else()
     # Windows doesn't have zlib by default.
@@ -143,6 +149,7 @@ else()
         add_subdirectory(./external/libpng)
     endif(NOT EMSCRIPTEN)
 
+    add_subdirectory(./external/cglm)
     add_subdirectory(./external/sg_sound)
 endif(MACOS AND NOT GOON_FULL_MACOS_BUILD)
 
@@ -233,6 +240,7 @@ if(EMSCRIPTEN OR(MACOS AND NOT GOON_FULL_MACOS_BUILD))
     set(PNG_LIB_NAME png)
 else()
     set(PNG_LIB_NAME png_static)
+    set (LIB_CGLM cglm)
 endif(EMSCRIPTEN OR(MACOS AND NOT GOON_FULL_MACOS_BUILD))
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
@@ -242,6 +250,7 @@ target_link_libraries(${LIBRARY_TARGET_NAME}
     ${PNG_LIB_NAME}
     ${LIB_PNG}
     ${LIB_FREETYPE}
+    ${LIB_CGLM}
     ${OPENGL_LIBRARIES}
 
     # testing
