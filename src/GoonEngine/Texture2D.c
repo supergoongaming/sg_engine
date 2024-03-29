@@ -169,10 +169,9 @@ geTexture2D *geTexture2DNew()
     // Only using pngs for now, so always set RGBA
     texture->Internal_Format = GL_RGBA;
     texture->Image_Format = GL_RGBA;
-    texture->Wrap_S = GL_REPEAT;
-    texture->Wrap_T = GL_REPEAT;
-    // texture->Filter_Min = GL_LINEAR;
-    // texture->Filter_Max = GL_LINEAR;
+    // For non power of 2 textures in opengles, we need to use clamp to edge and not repeat
+    texture->Wrap_S = GL_CLAMP_TO_EDGE;
+    texture->Wrap_T = GL_CLAMP_TO_EDGE;
     // We want it to look classic, so use nearest and not linear
     texture->Filter_Min = GL_NEAREST;
     texture->Filter_Max = GL_NEAREST;
