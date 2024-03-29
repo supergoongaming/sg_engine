@@ -20,7 +20,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # File globbing
 # #########################################
 message(STATUS "Getting all files for cmake..")
-file(GLOB_RECURSE ENGINE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonEngine/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonPhysics/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/*.c*)
+file(GLOB_RECURSE ENGINE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonEngine/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonPhysics/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonPhysics/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/*.c*)
 
 # #########################################
 # Platform specific Project setup
