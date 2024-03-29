@@ -15,6 +15,8 @@ int g_refreshRate = 60;
 int scaleX = 0;
 int scaleY = 0;
 
+mat4 projection;
+
 /**
  * @brief
  * Lua params: string name, int window width, int window height

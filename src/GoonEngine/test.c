@@ -16,6 +16,10 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+unsigned int USE_GL_ES = 1;
+
+#else
+unsigned int USE_GL_ES = 0;
 #endif
 
 // TODO this should be different, it is inside of SDLwindow.c
