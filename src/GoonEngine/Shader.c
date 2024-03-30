@@ -128,6 +128,13 @@ void geShaderSetInteger(geShader *shader, const char *name, int value, bool useS
     glUniform1i(glGetUniformLocation(shader->ID, name), value);
 }
 
+void geShaderSetVector2f(geShader *shader, const char *name, float x, float y, bool useShader)
+{
+    if (useShader)
+        geShaderUse(shader);
+    glUniform2f(glGetUniformLocation(shader->ID, name), x, y);
+}
+
 // void Shader::SetFloat(const char *name, float value, bool useShader)
 // {
 //     if (useShader)

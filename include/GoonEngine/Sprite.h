@@ -10,16 +10,25 @@ extern "C"
     {
         geShader *shader;
         unsigned int quadVAO; // Needed for gl
-        unsigned int VBO; //Needed for gles
+        unsigned int VBO;     // Needed for gles
 
     } geSpriteRenderer;
+
     geSpriteRenderer *geSpriteRendererNew(geShader *shader);
-    void geSpriteRendererDraw(geSpriteRenderer *sprite,
-                              geTexture2D *texture,
-                              vec2 pos,
-                              vec2 size,
-                              float rotate,
-                              vec3 color);
+    // void geSpriteRendererDraw(geSpriteRenderer *sprite,
+    //                           geTexture2D *texture,
+    //                           vec2 pos,
+    //                           vec2 size,
+    //                           float rotate,
+    //                           vec3 color);
+void geSpriteRendererDraw(geSpriteRenderer *sprite,
+                          geTexture2D *texture,
+                          vec2 pos,
+                          vec2 size,
+                          float rotate,
+                          vec3 color,
+                          vec2 texOffset,
+                          vec2 texSize);
 #ifdef __cplusplus
 }
 #endif

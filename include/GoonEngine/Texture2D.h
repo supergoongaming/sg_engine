@@ -4,8 +4,6 @@
 extern "C"
 {
 #endif
-    // Texture2D is able to store and configure a texture in OpenGL.
-    // It also hosts utility functions for easy management.
     typedef struct geTexture2D
     {
         // holds the ID of the texture object, used for all texture operations to reference to this particular texture

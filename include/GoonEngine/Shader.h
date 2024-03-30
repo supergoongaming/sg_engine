@@ -27,7 +27,7 @@ extern "C"
     // void SetFloat(const char *name, float value, bool useShader = false);
     // void SetInteger(const char *name, int value, bool useShader = false);
     void geShaderSetInteger(geShader *shader, const char *name, int value, bool useShader);
-    // void SetVector2f(const char *name, float x, float y, bool useShader = false);
+    void geShaderSetVector2f(geShader *shader, const char *name, float x, float y, bool useShader);
     // void SetVector2f(const char *name, const glm::vec2 &value, bool useShader = false);
     // void SetVector3f(const char *name, float x, float y, float z, bool useShader = false);
     void geShaderSetVector3f(geShader *shader, const char *name, vec3 value, bool useShader);

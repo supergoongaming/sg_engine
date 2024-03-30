@@ -152,12 +152,8 @@ static unsigned char *loadPNG(const char *filename, int *widthp, int *heightp, i
         }
         free(row_pointers[y]);
     }
-
-    // Clean up libpng structures
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
     fclose(file);
-
-    // Set returns
     *widthp = width;
     *heightp = height;
     return imageData;
