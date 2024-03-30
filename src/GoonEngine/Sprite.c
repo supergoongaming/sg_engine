@@ -55,7 +55,8 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
                           float rotate,
                           vec3 color,
                           vec2 texOffset,
-                          vec2 texSize)
+                          vec2 texSize,
+                          int flipHorizontal)
 {
 
     // prepare transformations
@@ -88,6 +89,7 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     // Set texture offset and size
     geShaderSetVector2f(sprite->shader, "texOffset", texOffset[0], texOffset[1], true);
     geShaderSetVector2f(sprite->shader, "texSize", texSize[0], texSize[1], true);
+    geShaderSetInteger(sprite->shader, "flipHorizontal", flipHorizontal, true);
 
     glActiveTexture(GL_TEXTURE0);
     geTexture2DBind(texture);
