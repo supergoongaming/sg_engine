@@ -91,12 +91,18 @@ int geInitializeRenderingWindow(unsigned int windowWidth, unsigned int windowHei
     glViewport(0, 0, windowWidth, windowHeight);
 
     printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
-    mat4 proj;
+    // mat4 proj;
     // setup screen camera
     // glm_ortho(0.0f, windowWidth, windowHeight, 0.0f, -1.0f, 1.0f, proj);
 
     // SDL_RenderSetIntegerScale(g_pRenderer, SDL_TRUE);
     // SDL_RenderSetLogicalSize(g_pRenderer, gameWidth, gameHeight);
+    if (SDL_GL_SetSwapInterval(1) < 0)
+    {
+        puts("Error setting swap");
+        // Handle setting swap interval error
+        // VSync may not be supported or available
+    }
     return 0;
 }
 
