@@ -169,7 +169,7 @@ geTexture2D *geTexture2DNew()
     // Only using pngs for now, so always set RGBA
     texture->Internal_Format = GL_RGBA;
     texture->Image_Format = GL_RGBA;
-    // For non power of 2 textures in opengles, we need to use clamp to edge and not repeat
+    // For non power of 2 textures in opengles, we need to use clamp to edge and not repeat.  Also can't use minmaps. probably look into using pot
     texture->Wrap_S = GL_CLAMP_TO_EDGE;
     texture->Wrap_T = GL_CLAMP_TO_EDGE;
     // We want it to look classic, so use nearest and not linear
