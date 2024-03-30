@@ -190,7 +190,7 @@ void geTexture2DGenerate(geTexture2D *texture, const char *filename)
     int height = 0;
     int channels = 0;
     unsigned char *data = loadPNG(filename, &width, &height, &channels);
-    flipImageVertically(data, width, height, channels);
+    // flipImageVertically(data, width, height, channels);
     // If we want to test with stb.
     // stbi_set_flip_vertically_on_load(1);
     // unsigned char *data = stbi_load(filename, &width, &height, &channels, 0);

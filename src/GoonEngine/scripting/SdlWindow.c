@@ -93,7 +93,7 @@ int geInitializeRenderingWindow(unsigned int windowWidth, unsigned int windowHei
     printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
     mat4 proj;
     // setup screen camera
-    glm_ortho(0.0f, windowWidth, windowHeight, 0.0f, -1.0f, 1.0f, proj);
+    // glm_ortho(0.0f, windowWidth, windowHeight, 0.0f, -1.0f, 1.0f, proj);
 
     // SDL_RenderSetIntegerScale(g_pRenderer, SDL_TRUE);
     // SDL_RenderSetLogicalSize(g_pRenderer, gameWidth, gameHeight);
