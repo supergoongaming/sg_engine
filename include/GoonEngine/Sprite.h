@@ -9,7 +9,8 @@ extern "C"
     typedef struct geSpriteRenderer
     {
         geShader *shader;
-        unsigned int quadVAO;
+        unsigned int quadVAO; // Needed for gl
+        unsigned int VBO; //Needed for gles
 
     } geSpriteRenderer;
     geSpriteRenderer *geSpriteRendererNew(geShader *shader);
