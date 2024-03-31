@@ -5,12 +5,13 @@
 #include <GoonEngine/color.h>
 #include <GoonEngine/rectangle.h>
 
-SDL_Texture *g_BackgroundAtlas = NULL;
+// SDL_Texture *g_BackgroundAtlas = NULL;
+unsigned int g_BackgroundAtlas = 0;
 SDL_Rect *g_backgroundDrawRect = NULL;
 extern SDL_GLContext *g_pContext;
 // extern SDL_Renderer *g_pRenderer;
 
-void SetBackgroundAtlas(SDL_Texture *background)
+void SetBackgroundAtlas(unsigned int background)
 {
     g_BackgroundAtlas = background;
 }

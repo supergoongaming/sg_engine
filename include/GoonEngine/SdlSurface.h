@@ -30,10 +30,11 @@ extern "C"
     void DestroyPixelData(void *data);
     void DestroySurface(SDL_Surface *surface);
     void DestroyTexture(SDL_Texture *texture);
-    void SetBackgroundAtlas(SDL_Texture *background);
+    // void SetBackgroundAtlas(SDL_Texture *background);
+    void SetBackgroundAtlas(unsigned int background);
     void SetCameraRect(geRectangle *rect);
     SDL_Texture *CreateTextureFromFile(const char *filename);
-    void geUpdateTextureAlpha(SDL_Texture* texture, int alpha);
+    void geUpdateTextureAlpha(SDL_Texture *texture, int alpha);
     void geDrawTextureWithCameraOffset(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip);
     void geDrawTexture(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip);
     void geDrawDebugRect(geRectangle *rect, geColor *color);
