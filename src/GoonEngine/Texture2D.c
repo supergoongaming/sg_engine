@@ -192,6 +192,7 @@ void geTexture2DGenerate(geTexture2D *texture, const char *filename)
     // unsigned char *data = stbi_load(filename, &width, &height, &channels, 0);
     texture->Width = width;
     texture->Height = height;
+    // Bind and create texture, before unbinding.
     glBindTexture(GL_TEXTURE_2D, texture->ID);
     glTexImage2D(GL_TEXTURE_2D, 0, texture->Internal_Format, width, height, 0, texture->Image_Format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);

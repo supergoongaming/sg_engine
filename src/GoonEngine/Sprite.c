@@ -1,6 +1,7 @@
 #include <GoonEngine/Sprite.h>
 #include <GoonEngine/Shader.h>
 #include <GoonEngine/Texture2D.h>
+#include <GoonEngine/Camera.h>
 #include <cglm/mat4.h>
 #include <cglm/call.h>
 
@@ -56,7 +57,8 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
                           vec3 color,
                           vec2 texOffset,
                           vec2 texSize,
-                          int flipHorizontal)
+                          int flipHorizontal,
+                          geCamera *camera)
 {
 
     // prepare transformations
@@ -79,6 +81,7 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     glm_scale(model, scaleVec);
     // Set the shader model and sprite color
     geShaderSetMatrix4(sprite->shader, "model", &model, false);
+    geShaderSetMatrix4(sprite->shader, "view", &camera->CameraMatrix, false);
     geShaderSetVector3f(sprite->shader, "spriteColor", color, false);
 
     texOffset[0] /= texture->Width;
