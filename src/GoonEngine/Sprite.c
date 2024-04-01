@@ -6,7 +6,6 @@
 #include <cglm/call.h>
 
 extern unsigned int USE_GL_ES;
-
 // Each vertex has this many attributes in it, vec2 pos vec2 texture
 const int ATTRIBUTE_SIZE = 4;
 
@@ -31,7 +30,8 @@ static void initRenderData(geSpriteRenderer *sprite)
     }
     glGenBuffers(1, &sprite->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
     if (!USE_GL_ES)
     {
         glEnableVertexAttribArray(0);
@@ -88,16 +88,41 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     texOffset[1] /= texture->Height;
     texSize[0] /= texture->Width;
     texSize[1] /= texture->Height;
+    // Adjust the offset, this will normally be done only once and not in the draw call.
+    float vertices[] = {
+        // pos      // tex
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f,
 
-    // Set texture offset and size
-    geShaderSetVector2f(sprite->shader, "texOffset", texOffset[0], texOffset[1], true);
-    geShaderSetVector2f(sprite->shader, "texSize", texSize[0], texSize[1], true);
-    geShaderSetInteger(sprite->shader, "flipHorizontal", flipHorizontal, true);
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f};
+
+    for (int i = 0; i < 6; ++i)
+    {
+        if (flipHorizontal)
+        {
+            //     originalCoords.x = 1.0 - originalCoords.x;
+            vertices[i * 4 + 2] = 1.0 - vertices[i * 4 + 2];
+        }
+        vertices[i * 4 + 2] *= texSize[0];
+        vertices[i * 4 + 2] += texOffset[0];
+        vertices[i * 4 + 3] *= texSize[1];
+        vertices[i * 4 + 3] += texOffset[1];
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glActiveTexture(GL_TEXTURE0);
     geTexture2DBind(texture);
+
     if (!USE_GL_ES)
     {
+        // // Test updating the data.
+        // glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
+        // glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(adjustedTexCoords), adjustedTexCoords);
         glBindVertexArray(sprite->quadVAO);
     }
     else
