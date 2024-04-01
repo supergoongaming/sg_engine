@@ -30,14 +30,26 @@ static void initRenderData(geSpriteRenderer *sprite)
     }
     glGenBuffers(1, &sprite->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+
+    // Setup the instance data, for now just test with 1
+    // glGenBuffers(1, &sprite->VBOInstanceData);
+    // glBindBuffer(GL_ARRAY_BUFFER, sprite->VBOInstanceData);
+    // float offset[] = {
+    //     0, 0, 16, 16};
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(offset), offset, GL_DYNAMIC_DRAW);
     if (!USE_GL_ES)
     {
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, ATTRIBUTE_SIZE, GL_FLOAT, GL_FALSE, ATTRIBUTE_SIZE * sizeof(float), (void *)0);
+        // glEnableVertexAttribArray(1);
+        // glBindBuffer(GL_ARRAY_BUFFER, sprite->VBOInstanceData); // this attribute comes from a different vertex buffer
+        // glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+        // glVertexAttribDivisor(1, 1); // tell OpenGL this is an instanced vertex attribute.
         glBindVertexArray(0);
     }
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -88,32 +100,25 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     texOffset[1] /= texture->Height;
     texSize[0] /= texture->Width;
     texSize[1] /= texture->Height;
-    // Adjust the offset, this will normally be done only once and not in the draw call.
-    float vertices[] = {
-        // pos      // tex
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
 
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f};
+    geShaderSetVector2f(sprite->shader, "texOffset", texOffset[0], texOffset[1], true);
+    geShaderSetVector2f(sprite->shader, "texSize", texSize[0], texSize[1], true);
 
-    for (int i = 0; i < 6; ++i)
-    {
-        if (flipHorizontal)
-        {
-            //     originalCoords.x = 1.0 - originalCoords.x;
-            vertices[i * 4 + 2] = 1.0 - vertices[i * 4 + 2];
-        }
-        vertices[i * 4 + 2] *= texSize[0];
-        vertices[i * 4 + 2] += texOffset[0];
-        vertices[i * 4 + 3] *= texSize[1];
-        vertices[i * 4 + 3] += texOffset[1];
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // vec4 texOffsetVec = {texOffset[0], texOffset[1], texSize[0], texSize[1]};
+
+    //     if (flipHorizontal)
+    //     {
+    //         //     originalCoords.x = 1.0 - originalCoords.x;
+    //         vertices[i * 4 + 2] = 1.0 - vertices[i * 4 + 2];
+    //     }
+    //     vertices[i * 4 + 2] *= texSize[0];
+    //     vertices[i * 4 + 2] += texOffset[0];
+    //     vertices[i * 4 + 3] *= texSize[1];
+    //     vertices[i * 4 + 3] += texOffset[1];
+
+    // glBindBuffer(GL_ARRAY_BUFFER, sprite->VBOInstanceData);
+    // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(texOffsetVec), texOffsetVec);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glActiveTexture(GL_TEXTURE0);
     geTexture2DBind(texture);
@@ -121,8 +126,6 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     if (!USE_GL_ES)
     {
         // // Test updating the data.
-        // glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
-        // glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(adjustedTexCoords), adjustedTexCoords);
         glBindVertexArray(sprite->quadVAO);
     }
     else
@@ -130,8 +133,14 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
         glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, sprite->VBOInstanceData); // this attribute comes from a different vertex buffer
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glVertexAttribDivisor(1, 1); // tell OpenGL this is an instanced vertex attribute.
     }
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    // glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
     if (!USE_GL_ES)
     {
         glBindVertexArray(0);

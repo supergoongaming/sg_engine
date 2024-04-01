@@ -12,6 +12,7 @@ extern "C"
         geShader *shader;
         unsigned int quadVAO; // Needed for gl
         unsigned int VBO;     // Needed for gles
+        unsigned int VBOInstanceData; // used for testing instances
 
     } geSpriteRenderer;
 
