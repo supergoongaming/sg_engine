@@ -11,18 +11,22 @@ extern unsigned int USE_GL_ES;
 
 // Each vertex has this many attributes in it, vec2 pos vec2 texture
 #define NUM_VERTICES_PER_QUAD 6
-#define NUM_COMPONENTS_PER_VERTEX 9
+#define NUM_COMPONENTS_PER_VERTEX 13
 #define NUM_TEXTURE_SLOTS 16
 
-#define BASE_VERTICES                  \
-    {                                  \
-            0.0f, 1.0f, 0.0f, 1.0f, 0, 1,1,1,1, \
-            1.0f, 0.0f, 1.0f, 0.0f, 0, 1,1,1,1, \
-            0.0f, 0.0f, 0.0f, 0.0f, 0, 1,1,1,1, \
-                                       \
-            0.0f, 1.0f, 0.0f, 1.0f, 0, 1,1,1,1, \
-            1.0f, 1.0f, 1.0f, 1.0f, 0, 1,1,1,1, \
-            1.0f, 0.0f, 1.0f, 0.0f, 0, 1,1,1,1\
+// Vec4 - pos/texpos
+//  float imagenum
+// vec4 color
+// vec4 source tex rect
+#define BASE_VERTICES                                          \
+    {                                                          \
+        0.0f, 1.0f, 0.0f, 1.0f, 0, 1, 1, 1, 1, 0, 0, 0, 0,     \
+            1.0f, 0.0f, 1.0f, 0.0f, 0, 1, 1, 1, 1, 0, 0, 0, 0, \
+            0.0f, 0.0f, 0.0f, 0.0f, 0, 1, 1, 1, 1, 0, 0, 0, 0, \
+                                                               \
+            0.0f, 1.0f, 0.0f, 1.0f, 0, 1, 1, 1, 1, 0, 0, 0, 0, \
+            1.0f, 1.0f, 1.0f, 1.0f, 0, 1, 1, 1, 1, 0, 0, 0, 0, \
+            1.0f, 0.0f, 1.0f, 0.0f, 0, 1, 1, 1, 1, 0, 0, 0, 0, \
     }
 
 int TEXTURES[NUM_TEXTURE_SLOTS] = {0};
@@ -52,6 +56,9 @@ static void initRenderData(geSpriteRenderer *sprite)
         // Color, vec4
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, NUM_COMPONENTS_PER_VERTEX * sizeof(float), (void *)(5 * sizeof(float)));
+        // Texture Source rect, vec4
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, NUM_COMPONENTS_PER_VERTEX * sizeof(float), (void *)(9 * sizeof(float)));
 
         glBindVertexArray(0);
     }
@@ -71,7 +78,7 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
                           vec2 pos,
                           vec2 size,
                           float rotate,
-                          vec3 color,
+                          vec4 color,
                           vec2 texOffset,
                           vec2 texSize,
                           int flipHorizontal,
@@ -105,9 +112,8 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     texSize[0] /= texture->Width;
     texSize[1] /= texture->Height;
 
+
     // Set texture offset and size
-    geShaderSetVector2f(sprite->shader, "texOffset", texOffset[0], texOffset[1], true);
-    geShaderSetVector2f(sprite->shader, "texSize", texSize[0], texSize[1], true);
     geShaderSetInteger(sprite->shader, "flipHorizontal", flipHorizontal, true);
 
     // What image are we binding to, currently lets use 0 to test.
@@ -126,6 +132,23 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     // Send data to spritebatch
     glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
     float verts[] = BASE_VERTICES;
+    // Update information inside of vertices prior to send
+    for (size_t i = 0; i < NUM_VERTICES_PER_QUAD; i++)
+    {
+        // Update the color
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 6] = color[0];
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 6] = color[1];
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 7] = color[2];
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 8] = color[3];
+        // Update texture source rect
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 9] = texOffset[0];
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 10] = texOffset[1];
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 11] = texSize[0];
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 12] = texSize[1];
+    }
+
+
+
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), (void *)verts);
     if (!USE_GL_ES)
     {

@@ -21,7 +21,7 @@ extern "C"
                               vec2 pos,
                               vec2 size,
                               float rotate,
-                              vec3 color,
+                              vec4 color,
                               vec2 texOffset,
                               vec2 texSize,
                               int flipHorizontal,
