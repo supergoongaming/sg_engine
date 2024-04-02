@@ -1,3 +1,5 @@
+// #include <stdlib.h>
+// #include <stdio.h>
 #include <GoonEngine/Sprite.h>
 #include <GoonEngine/Shader.h>
 #include <GoonEngine/Texture2D.h>
@@ -9,6 +11,7 @@ extern unsigned int USE_GL_ES;
 
 // Each vertex has this many attributes in it, vec2 pos vec2 texture
 const int ATTRIBUTE_SIZE = 4;
+int TEXTURES[16] = {0};
 
 static void initRenderData(geSpriteRenderer *sprite)
 {
@@ -94,8 +97,18 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     geShaderSetVector2f(sprite->shader, "texSize", texSize[0], texSize[1], true);
     geShaderSetInteger(sprite->shader, "flipHorizontal", flipHorizontal, true);
 
-    glActiveTexture(GL_TEXTURE0);
+    // What image are we binding to, currently lets use 0 to test.
+    int i = 0;
+    glActiveTexture(GL_TEXTURE0 + i);
     geTexture2DBind(texture);
+    // Add in the texture
+    char uniformName[200];
+    sprintf(uniformName, "images[%d]", i);
+
+    // Get the uniform location for the sampler2D array
+    geShaderSetInteger(sprite->shader, uniformName, i, true);
+    // Set the uniform value to the texture unit index
+    geShaderSetInteger(sprite->shader, "imageNum", i, true);
     if (!USE_GL_ES)
     {
         glBindVertexArray(sprite->quadVAO);
