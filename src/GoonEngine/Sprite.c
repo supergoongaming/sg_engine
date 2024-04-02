@@ -10,21 +10,21 @@
 extern unsigned int USE_GL_ES;
 
 // Each vertex has this many attributes in it, vec2 pos vec2 texture
-const int ATTRIBUTE_SIZE = 4;
+const int ATTRIBUTE_SIZE = 5;
 int TEXTURES[16] = {0};
 
 static void initRenderData(geSpriteRenderer *sprite)
 {
     sprite->VBO = 0;
     float vertices[] = {
-        // pos      // tex
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+        // pos      // tex      //textureid
+        0.0f, 1.0f, 0.0f, 1.0f, 0,
+        1.0f, 0.0f, 1.0f, 0.0f, 0,
+        0.0f, 0.0f, 0.0f, 0.0f, 0,
 
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f};
+        0.0f, 1.0f, 0.0f, 1.0f, 0,
+        1.0f, 1.0f, 1.0f, 1.0f, 0,
+        1.0f, 0.0f, 1.0f, 0.0f, 0};
 
     // ES cannot use VAO
     if (!USE_GL_ES)
@@ -38,7 +38,9 @@ static void initRenderData(geSpriteRenderer *sprite)
     if (!USE_GL_ES)
     {
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, ATTRIBUTE_SIZE, GL_FLOAT, GL_FALSE, ATTRIBUTE_SIZE * sizeof(float), (void *)0);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, ATTRIBUTE_SIZE * sizeof(float), (void *)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, ATTRIBUTE_SIZE * sizeof(float), (void *)ATTRIBUTE_SIZE - 1);
         glBindVertexArray(0);
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -108,7 +110,7 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     // Get the uniform location for the sampler2D array
     geShaderSetInteger(sprite->shader, uniformName, i, true);
     // Set the uniform value to the texture unit index
-    geShaderSetInteger(sprite->shader, "imageNum", i, true);
+    // geShaderSetInteger(sprite->shader, "imageNum", i, true);
     if (!USE_GL_ES)
     {
         glBindVertexArray(sprite->quadVAO);
