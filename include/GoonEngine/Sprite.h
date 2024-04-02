@@ -6,6 +6,7 @@ extern "C"
 #endif
     typedef struct geShader geShader;
     typedef struct geTexture2D geTexture2D;
+    typedef struct geCamera geCamera;
     typedef struct geSpriteRenderer
     {
         geShader *shader;
@@ -23,7 +24,8 @@ extern "C"
                               vec3 color,
                               vec2 texOffset,
                               vec2 texSize,
-                              int flipHorizontal);
+                              int flipHorizontal,
+                              geCamera* camera);
 #ifdef __cplusplus
 }
 #endif
