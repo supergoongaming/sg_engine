@@ -11,18 +11,18 @@ extern unsigned int USE_GL_ES;
 
 // Each vertex has this many attributes in it, vec2 pos vec2 texture
 #define NUM_VERTICES_PER_QUAD 6
-#define NUM_COMPONENTS_PER_VERTEX 5
+#define NUM_COMPONENTS_PER_VERTEX 9
 #define NUM_TEXTURE_SLOTS 16
 
 #define BASE_VERTICES                  \
     {                                  \
-        0.0f, 1.0f, 0.0f, 1.0f, 0,     \
-            1.0f, 0.0f, 1.0f, 0.0f, 0, \
-            0.0f, 0.0f, 0.0f, 0.0f, 0, \
+            0.0f, 1.0f, 0.0f, 1.0f, 0, 1,1,1,1, \
+            1.0f, 0.0f, 1.0f, 0.0f, 0, 1,1,1,1, \
+            0.0f, 0.0f, 0.0f, 0.0f, 0, 1,1,1,1, \
                                        \
-            0.0f, 1.0f, 0.0f, 1.0f, 0, \
-            1.0f, 1.0f, 1.0f, 1.0f, 0, \
-            1.0f, 0.0f, 1.0f, 0.0f, 0  \
+            0.0f, 1.0f, 0.0f, 1.0f, 0, 1,1,1,1, \
+            1.0f, 1.0f, 1.0f, 1.0f, 0, 1,1,1,1, \
+            1.0f, 0.0f, 1.0f, 0.0f, 0, 1,1,1,1\
     }
 
 int TEXTURES[NUM_TEXTURE_SLOTS] = {0};
@@ -40,13 +40,19 @@ static void initRenderData(geSpriteRenderer *sprite)
     }
     glGenBuffers(1, &sprite->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
     if (!USE_GL_ES)
     {
+        // Pos / tex pos vec4
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, NUM_COMPONENTS_PER_VERTEX * sizeof(float), (void *)0);
+        // Texture num, float
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, NUM_COMPONENTS_PER_VERTEX * sizeof(float), (void *)(NUM_COMPONENTS_PER_VERTEX - 1));
+        glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, NUM_COMPONENTS_PER_VERTEX * sizeof(float), (void *)(4 * sizeof(float)));
+        // Color, vec4
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, NUM_COMPONENTS_PER_VERTEX * sizeof(float), (void *)(5 * sizeof(float)));
+
         glBindVertexArray(0);
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -93,7 +99,6 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     // Set the shader model and sprite color
     geShaderSetMatrix4(sprite->shader, "model", &model, false);
     geShaderSetMatrix4(sprite->shader, "view", &camera->CameraMatrix, false);
-    geShaderSetVector3f(sprite->shader, "spriteColor", color, false);
 
     texOffset[0] /= texture->Width;
     texOffset[1] /= texture->Height;
@@ -117,6 +122,11 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     geShaderSetInteger(sprite->shader, uniformName, i, true);
     // Set the uniform value to the texture unit index
     // geShaderSetInteger(sprite->shader, "imageNum", i, true);
+
+    // Send data to spritebatch
+    glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
+    float verts[] = BASE_VERTICES;
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), (void *)verts);
     if (!USE_GL_ES)
     {
         glBindVertexArray(sprite->quadVAO);
@@ -127,7 +137,7 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
     }
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES_PER_QUAD);
     if (!USE_GL_ES)
     {
         glBindVertexArray(0);
