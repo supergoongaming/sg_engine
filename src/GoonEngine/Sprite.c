@@ -135,8 +135,16 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     // Update information inside of vertices prior to send
     for (size_t i = 0; i < NUM_VERTICES_PER_QUAD; i++)
     {
+        // Update the pos and tex coords
+        // verts[(i * NUM_COMPONENTS_PER_VERTEX) + 0] = color[0];
+        // verts[(i * NUM_COMPONENTS_PER_VERTEX) + 1] = color[1];
+        // verts[(i * NUM_COMPONENTS_PER_VERTEX) + 2] = color[2];
+        // verts[(i * NUM_COMPONENTS_PER_VERTEX) + 3] = color[3];
+
+        // Update the image num, current set to 0
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 4] = 0;
         // Update the color
-        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 6] = color[0];
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 5] = color[0];
         verts[(i * NUM_COMPONENTS_PER_VERTEX) + 6] = color[1];
         verts[(i * NUM_COMPONENTS_PER_VERTEX) + 7] = color[2];
         verts[(i * NUM_COMPONENTS_PER_VERTEX) + 8] = color[3];
