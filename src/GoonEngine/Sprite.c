@@ -104,19 +104,13 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     vec3 scaleVec = {size[0], size[1], 1.0f};
     glm_scale(model, scaleVec);
     // Set the shader model and sprite color
-    // geShaderSetMatrix4(sprite->shader, "model", &model, false);
     geShaderSetMatrix4(sprite->shader, "view", &camera->CameraMatrix, false);
+    // Calculate texture offset
 
     texOffset[0] /= texture->Width;
     texOffset[1] /= texture->Height;
     texSize[0] /= texture->Width;
     texSize[1] /= texture->Height;
-
-    // Apply model to pos
-    // glm_vec2_mul
-
-    // Set texture offset and size
-    geShaderSetInteger(sprite->shader, "flipHorizontal", flipHorizontal, true);
 
     // What image are we binding to, currently lets use 0 to test.
     int i = 0;
@@ -137,6 +131,10 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     // Update information inside of vertices prior to send
     for (size_t i = 0; i < NUM_VERTICES_PER_QUAD; i++)
     {
+        if (flipHorizontal)
+        {
+            verts[(i * NUM_COMPONENTS_PER_VERTEX) + 0] = 1.0 - verts[(i * NUM_COMPONENTS_PER_VERTEX) + 0];
+        }
         vec4 oldpos = {verts[(i * NUM_COMPONENTS_PER_VERTEX) + 0], verts[(i * NUM_COMPONENTS_PER_VERTEX) + 1], 0.0, 1.0};
         vec4 newpos = {0, 0, 0, 0};
         glm_mat4_mulv(model, oldpos, newpos);
