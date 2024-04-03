@@ -104,7 +104,7 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     vec3 scaleVec = {size[0], size[1], 1.0f};
     glm_scale(model, scaleVec);
     // Set the shader model and sprite color
-    geShaderSetMatrix4(sprite->shader, "model", &model, false);
+    // geShaderSetMatrix4(sprite->shader, "model", &model, false);
     geShaderSetMatrix4(sprite->shader, "view", &camera->CameraMatrix, false);
 
     texOffset[0] /= texture->Width;
@@ -112,6 +112,8 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     texSize[0] /= texture->Width;
     texSize[1] /= texture->Height;
 
+    // Apply model to pos
+    // glm_vec2_mul
 
     // Set texture offset and size
     geShaderSetInteger(sprite->shader, "flipHorizontal", flipHorizontal, true);
@@ -135,9 +137,12 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
     // Update information inside of vertices prior to send
     for (size_t i = 0; i < NUM_VERTICES_PER_QUAD; i++)
     {
+        vec4 oldpos = {verts[(i * NUM_COMPONENTS_PER_VERTEX) + 0], verts[(i * NUM_COMPONENTS_PER_VERTEX) + 1], 0.0, 1.0};
+        vec4 newpos = {0, 0, 0, 0};
+        glm_mat4_mulv(model, oldpos, newpos);
         // Update the pos and tex coords
-        // verts[(i * NUM_COMPONENTS_PER_VERTEX) + 0] = color[0];
-        // verts[(i * NUM_COMPONENTS_PER_VERTEX) + 1] = color[1];
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 0] = newpos[0];
+        verts[(i * NUM_COMPONENTS_PER_VERTEX) + 1] = newpos[1];
         // verts[(i * NUM_COMPONENTS_PER_VERTEX) + 2] = color[2];
         // verts[(i * NUM_COMPONENTS_PER_VERTEX) + 3] = color[3];
 
@@ -154,8 +159,6 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
         verts[(i * NUM_COMPONENTS_PER_VERTEX) + 11] = texSize[0];
         verts[(i * NUM_COMPONENTS_PER_VERTEX) + 12] = texSize[1];
     }
-
-
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), (void *)verts);
     if (!USE_GL_ES)
