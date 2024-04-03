@@ -26,6 +26,7 @@ extern "C"
                               vec2 texOffset,
                               vec2 texSize,
                               int flipHorizontal);
+    void geSpriteRendererEnd(geSpriteRenderer *sprite);
 #ifdef __cplusplus
 }
 #endif

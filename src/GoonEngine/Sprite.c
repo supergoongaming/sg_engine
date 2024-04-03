@@ -14,6 +14,7 @@ extern unsigned int USE_GL_ES;
 #define NUM_VERTICES_PER_QUAD 6
 #define NUM_COMPONENTS_PER_VERTEX 13
 #define NUM_TEXTURE_SLOTS 16
+#define NUM_QUADS_PER_DRAW 1000
 
 // Vec4 - pos/texpos
 //  float imagenum
@@ -32,6 +33,7 @@ extern unsigned int USE_GL_ES;
 
 int TEXTURES[NUM_TEXTURE_SLOTS] = {0};
 static unsigned int _currentNumUsedTextureSlots = 0;
+static unsigned int _currentNumQuadsDrawn = 0;
 
 static void initRenderData(geSpriteRenderer *sprite)
 {
@@ -46,7 +48,8 @@ static void initRenderData(geSpriteRenderer *sprite)
     }
     glGenBuffers(1, &sprite->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * NUM_QUADS_PER_DRAW, NULL, GL_DYNAMIC_DRAW);
     if (!USE_GL_ES)
     {
         // Pos / tex pos vec4
@@ -104,6 +107,7 @@ geSpriteRenderer *geSpriteRendererNew(geShader *shader)
 void geSpriteRendererStart(geSpriteRenderer *sprite, geCamera *camera)
 {
     geShaderSetViewUniform(sprite->shader, camera);
+    _currentNumQuadsDrawn = 0;
 }
 
 void geSpriteRendererDraw(geSpriteRenderer *sprite,
@@ -177,8 +181,13 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
         verts[(i * NUM_COMPONENTS_PER_VERTEX) + offset++] = texSize[1];
     }
 
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), (void *)verts);
-    // This probably should only happen at end.
+    // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), (void *)verts);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(verts) * _currentNumQuadsDrawn, sizeof(verts), (void *)verts);
+    ++_currentNumQuadsDrawn;
+}
+
+void geSpriteRendererEnd(geSpriteRenderer *sprite)
+{
     if (!USE_GL_ES)
     {
         glBindVertexArray(sprite->quadVAO);
@@ -189,7 +198,7 @@ void geSpriteRendererDraw(geSpriteRenderer *sprite,
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
     }
-    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES_PER_QUAD);
+    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES_PER_QUAD * _currentNumQuadsDrawn);
     if (!USE_GL_ES)
     {
         glBindVertexArray(0);
