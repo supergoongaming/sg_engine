@@ -10,6 +10,8 @@ extern "C"
 {
 #endif
 
+    typedef struct geCamera geCamera;
+
     // General purpose shader object. Compiles from file, generates
     // compile/link-time error messages and hosts several utility
     // functions for easy management.
@@ -34,6 +36,8 @@ extern "C"
     // void SetVector4f(const char *name, float x, float y, float z, float w, bool useShader = false);
     // void SetVector4f(const char *name, const glm::vec4 &value, bool useShader = false);
     void geShaderSetMatrix4(geShader *shader, const char *name, mat4 *matrix, bool useShader);
+
+    void geShaderSetViewUniform(geShader *shader, geCamera *camera);
 
 #ifdef __cplusplus
 }

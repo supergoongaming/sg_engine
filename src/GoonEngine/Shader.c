@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <glad/glad.h>
 #include <GoonEngine/Shader.h>
+#include <GoonEngine/Camera.h>
 
 geShader *geShaderNew()
 {
@@ -133,6 +134,11 @@ void geShaderSetVector2f(geShader *shader, const char *name, float x, float y, b
     if (useShader)
         geShaderUse(shader);
     glUniform2f(glGetUniformLocation(shader->ID, name), x, y);
+}
+
+void geShaderSetViewUniform(geShader *shader, geCamera *camera)
+{
+    geShaderSetMatrix4(shader, "view", &camera->CameraMatrix, false);
 }
 
 // void Shader::SetFloat(const char *name, float value, bool useShader)

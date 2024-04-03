@@ -16,6 +16,7 @@ extern "C"
     } geSpriteRenderer;
 
     geSpriteRenderer *geSpriteRendererNew(geShader *shader);
+    void geSpriteRendererStart(geSpriteRenderer *sprite, geCamera *camera);
     void geSpriteRendererDraw(geSpriteRenderer *sprite,
                               geTexture2D *texture,
                               vec2 pos,
@@ -24,8 +25,7 @@ extern "C"
                               vec4 color,
                               vec2 texOffset,
                               vec2 texSize,
-                              int flipHorizontal,
-                              geCamera* camera);
+                              int flipHorizontal);
 #ifdef __cplusplus
 }
 #endif
