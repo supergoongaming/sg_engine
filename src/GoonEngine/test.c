@@ -10,6 +10,7 @@
 #include <GoonPhysics/scene.h>
 
 #include <glad/glad.h>
+#include <GoonEngine/TileSheet.h>
 
 #define DELTA_TIME_SECONDS (1.0 / 144.0)
 #define DELTA_TIME_MS (1000.0 / 144.0)
@@ -28,7 +29,7 @@ unsigned int USE_GL_ES = 0;
 extern SDL_Window *g_pWindow;
 extern SDL_GLContext *g_pContext;
 extern int g_refreshRate;
-extern SDL_Texture *g_BackgroundAtlas;
+extern geTileSheet *g_BackgroundAtlas;
 extern SDL_Rect *g_backgroundDrawRect;
 
 static gpScene *g_pScene = NULL;
@@ -123,6 +124,7 @@ static int loop_func()
         // {
         //     LogError("Did not draw properly, Error %s\n", SDL_GetError());
         // }
+        geTileSheetDraw(g_BackgroundAtlas);
     }
     if (DrawUpdateFunc)
     {

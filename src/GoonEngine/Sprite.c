@@ -31,7 +31,7 @@ extern unsigned int USE_GL_ES;
             1.0f, 0.0f, 1.0f, 0.0f, 0, 1, 1, 1, 1, 0, 0, 0, 0, \
     }
 
-int TEXTURES[NUM_TEXTURE_SLOTS] = {0};
+static int TEXTURES[NUM_TEXTURE_SLOTS] = {0};
 static unsigned int _currentNumUsedTextureSlots = 0;
 static unsigned int _currentNumQuadsDrawn = 0;
 

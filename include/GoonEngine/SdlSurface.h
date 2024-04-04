@@ -21,6 +21,7 @@ extern "C"
 
     typedef struct SDL_Texture SDL_Texture;
     typedef struct SDL_Surface SDL_Surface;
+    typedef struct geTileSheet geTileSheet;
 
     // SDL_Surface *LoadSurfaceFromFile(const char *filePath, void **data);
     SDL_Surface *LoadSurfaceFromFile(const char *filePath);
@@ -31,7 +32,8 @@ extern "C"
     void DestroySurface(SDL_Surface *surface);
     void DestroyTexture(SDL_Texture *texture);
     // void SetBackgroundAtlas(SDL_Texture *background);
-    void SetBackgroundAtlas(unsigned int background);
+    // void SetBackgroundAtlas(unsigned int background);
+    void SetBackgroundAtlas(geTileSheet* background);
     void SetCameraRect(geRectangle *rect);
     SDL_Texture *CreateTextureFromFile(const char *filename);
     void geUpdateTextureAlpha(SDL_Texture *texture, int alpha);

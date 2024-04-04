@@ -4,14 +4,17 @@
 #include <GoonEngine/SdlSurface.h>
 #include <GoonEngine/color.h>
 #include <GoonEngine/rectangle.h>
+#include <GoonEngine/TileSheet.h>
 
 // SDL_Texture *g_BackgroundAtlas = NULL;
-unsigned int g_BackgroundAtlas = 0;
+// unsigned int g_BackgroundAtlas = 0;
+geTileSheet* g_BackgroundAtlas = NULL;
 SDL_Rect *g_backgroundDrawRect = NULL;
 extern SDL_GLContext *g_pContext;
 // extern SDL_Renderer *g_pRenderer;
 
-void SetBackgroundAtlas(unsigned int background)
+// void SetBackgroundAtlas(unsigned int background)
+void SetBackgroundAtlas(geTileSheet* background)
 {
     g_BackgroundAtlas = background;
 }
