@@ -19,6 +19,8 @@ static float *_bufferedVertices = NULL;
 static int _currentBufferVerticesSize = 0;
 static int _currentNumTileVertices = 0;
 
+extern geShader* tileShader;
+
 // // Vec4 - pos/texpos
 // //  float imagenum
 // // vec4 color
@@ -127,11 +129,12 @@ geTileSheet *geTileSheetNew()
     // Start the buffer we will use.
     _currentBufferVerticesSize = 200;
     _currentNumTileVertices = 0;
-    geShader* shad = geShaderNew();
-    const char *vertexShaderFile = USE_GL_ES ? "assets/shaders/vertex_es.vs" : "assets/shaders/vertex.vs";
-    const char *fragmentShaderFile = USE_GL_ES ? "assets/shaders/tfragment_es.vs" : "assets/shaders/tfragment.vs";
-    geShaderCompile(shad, vertexShaderFile, fragmentShaderFile, NULL);
-    tilesheet->shader = shad;
+    // geShader* shad = geShaderNew();
+    // This is compiled in main.cpp for now
+    // const char *vertexShaderFile = USE_GL_ES ? "assets/shaders/vertex_es.vs" : "assets/shaders/v_tile.vs";
+    // const char *fragmentShaderFile = USE_GL_ES ? "assets/shaders/tfragment_es.vs" : "assets/shaders/fragment.vs";
+    // geShaderCompile(shad, vertexShaderFile, fragmentShaderFile, NULL);
+    tilesheet->shader = tileShader;
     _bufferedVertices = calloc(_currentBufferVerticesSize, sizeof(float));
     // initRenderData(sprite);
     return tilesheet;

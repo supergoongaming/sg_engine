@@ -124,7 +124,9 @@ static int loop_func()
         // {
         //     LogError("Did not draw properly, Error %s\n", SDL_GetError());
         // }
-        geTileSheetDraw(g_BackgroundAtlas);
+
+        // For now, don't draw as it breaks everything.
+        // geTileSheetDraw(g_BackgroundAtlas);
     }
     if (DrawUpdateFunc)
     {
