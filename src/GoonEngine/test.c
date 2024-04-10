@@ -126,7 +126,7 @@ static int loop_func()
         // }
 
         // For now, don't draw as it breaks everything.
-        // geTileSheetDraw(g_BackgroundAtlas);
+        geTileSheetDraw(g_BackgroundAtlas);
     }
     if (DrawUpdateFunc)
     {

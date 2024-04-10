@@ -106,6 +106,7 @@ geSpriteRenderer *geSpriteRendererNew(geShader *shader)
 
 void geSpriteRendererStart(geSpriteRenderer *sprite, geCamera *camera)
 {
+    geShaderUse(sprite->shader);
     geShaderSetViewUniform(sprite->shader, camera);
     _currentNumQuadsDrawn = 0;
 }
