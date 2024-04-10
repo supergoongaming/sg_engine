@@ -19,7 +19,7 @@ static float *_bufferedVertices = NULL;
 static int _currentBufferVerticesSize = 0;
 static int _currentNumTileVertices = 0;
 
-extern geShader* tileShader;
+extern geShader *tileShader;
 
 // // Vec4 - pos/texpos
 // //  float imagenum
@@ -42,6 +42,7 @@ static unsigned int _currentNumTileQuadsDrawn = 0;
 
 static unsigned int getBindTexture(unsigned int loadedTextureId, geShader *shader)
 {
+    geShaderUse(shader);
     if (_currentNumUsedTileTextureSlots >= NUM_TEXTURE_SLOTS)
     {
         LogError("Too many loaded textures, please fix this logic");
@@ -68,6 +69,7 @@ static unsigned int getBindTexture(unsigned int loadedTextureId, geShader *shade
 
 static void setTexturesForDraw(geTileSheet *tilesheet)
 {
+    geShaderUse(tilesheet->shader);
     for (size_t i = 0; i < _currentNumUsedTileTextureSlots; i++)
     {
         glActiveTexture(GL_TEXTURE0 + i);
@@ -75,6 +77,7 @@ static void setTexturesForDraw(geTileSheet *tilesheet)
         // Add in the texture
         char uniformName[20];
         sprintf(uniformName, "timages[%d]", _currentNumUsedTileTextureSlots);
+        LogWarn("Setting the uniform %s on shader num %d", uniformName, tilesheet->shader->ID);
         geShaderSetInteger(tilesheet->shader, uniformName, _currentNumUsedTileTextureSlots, true);
     }
 }
@@ -211,7 +214,8 @@ void geTileSheetAddTile(geTileSheet *tilesheet,
     // Get or load texture into slot
     unsigned int imageNum = getBindTexture(texture->ID, tilesheet->shader);
 
-    addVerticesToBuffer(tilesheet, model, imageNum, texOffset);
+// Not actually adding to buffer yet as this doesn't add floats properly
+    // addVerticesToBuffer(tilesheet, model, imageNum, texOffset);
 }
 
 void geTileSheetDraw(geTileSheet *tilesheet)
