@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <GoonEngine/TileSheet.h>
 #include <GoonEngine/debug.h>
 #include <GoonEngine/Shader.h>
@@ -76,10 +77,20 @@ static void setTexturesForDraw(geTileSheet *tilesheet)
         glBindTexture(GL_TEXTURE_2D, TILE_TEXTURES[i]);
         // Add in the texture
         char uniformName[20];
-        sprintf(uniformName, "timages[%d]", _currentNumUsedTileTextureSlots);
-        LogWarn("Setting the uniform %s on shader num %d", uniformName, tilesheet->shader->ID);
+        // sprintf(uniformName, "timages[%d]", _currentNumUsedTileTextureSlots);
+        sprintf(uniformName, "timages[%d]", i);
+        // LogWarn("Setting the uniform %s on shader num %d", uniformName, tilesheet->shader->ID);
         geShaderSetInteger(tilesheet->shader, uniformName, _currentNumUsedTileTextureSlots, true);
     }
+}
+static void addVerts(float *verts, int num)
+{
+    if (_currentNumTileVertices + num >= _currentBufferVerticesSize)
+    {
+        LogWarn("Need to increase size, realloc");
+        return;
+    }
+    memcpy(&_bufferedVertices[_currentNumTileVertices], (void *)verts, num * sizeof(float));
 }
 
 static void addVerticesToBuffer(geTileSheet *tilesheet, mat4 model, int imageNum, vec4 texOffset)
@@ -121,7 +132,10 @@ static void addVerticesToBuffer(geTileSheet *tilesheet, mat4 model, int imageNum
     }
 
     // Need to add to buffer data, not sub data.
+    int numFloats = sizeof(verts) / sizeof(float);
+    addVerts(verts, numFloats);
 
+    _currentNumTileVertices += numFloats;
     ++_currentNumTileQuadsDrawn;
 }
 
@@ -130,7 +144,7 @@ geTileSheet *geTileSheetNew()
 
     geTileSheet *tilesheet = calloc(1, sizeof(*tilesheet));
     // Start the buffer we will use.
-    _currentBufferVerticesSize = 200;
+    _currentBufferVerticesSize = 500000;
     _currentNumTileVertices = 0;
     // geShader* shad = geShaderNew();
     // This is compiled in main.cpp for now
@@ -154,7 +168,8 @@ void geTileSheetBufferData(geTileSheet *tilesheet)
     }
     glGenBuffers(1, &tilesheet->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, tilesheet->VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(_bufferedVertices), _bufferedVertices, GL_STATIC_DRAW);
+    int bufferSize = sizeof(float) * _currentNumTileVertices;
+    glBufferData(GL_ARRAY_BUFFER, bufferSize, _bufferedVertices, GL_STATIC_DRAW);
     if (!USE_GL_ES)
     {
         // Pos / tex pos vec4
@@ -214,8 +229,7 @@ void geTileSheetAddTile(geTileSheet *tilesheet,
     // Get or load texture into slot
     unsigned int imageNum = getBindTexture(texture->ID, tilesheet->shader);
 
-// Not actually adding to buffer yet as this doesn't add floats properly
-    // addVerticesToBuffer(tilesheet, model, imageNum, texOffset);
+    addVerticesToBuffer(tilesheet, model, imageNum, texOffset);
 }
 
 void geTileSheetDraw(geTileSheet *tilesheet)
@@ -223,23 +237,23 @@ void geTileSheetDraw(geTileSheet *tilesheet)
     geShaderUse(tilesheet->shader);
     setTexturesForDraw(tilesheet);
 
-    // if (!USE_GL_ES)
-    // {
-    //     glBindVertexArray(tilesheet->quadVAO);
-    // }
-    // else
-    // {
-    //     glBindBuffer(GL_ARRAY_BUFFER, tilesheet->VBO);
-    //     glEnableVertexAttribArray(0);
-    //     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
-    // }
-    // glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES_PER_QUAD * _currentNumTileQuadsDrawn);
-    // if (!USE_GL_ES)
-    // {
-    //     glBindVertexArray(0);
-    // }
-    // else
-    // {
-    //     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // }
+    if (!USE_GL_ES)
+    {
+        glBindVertexArray(tilesheet->quadVAO);
+    }
+    else
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, tilesheet->VBO);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+    }
+    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES_PER_QUAD * _currentNumTileQuadsDrawn);
+    if (!USE_GL_ES)
+    {
+        glBindVertexArray(0);
+    }
+    else
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
 }

@@ -19,6 +19,7 @@ extern "C"
 
     geTileSheet *geTileSheetNew();
     void geTileSheetFree(geTileSheet tilesheet);
+    void geTileSheetPushBuffer(geTileSheet tilesheet);
     void geTileSheetAddTile(geTileSheet *tilesheet,
                             geRectangle *dstRect,
                             geRectangle *srcRect,

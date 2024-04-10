@@ -92,7 +92,7 @@ static unsigned int getBindTexture(unsigned int loadedTextureId, geShader *shade
     sprintf(uniformName, "images[%d]", _currentNumUsedTextureSlots);
     geShaderSetInteger(shader, uniformName, _currentNumUsedTextureSlots, true);
     // Setup next
-    LogWarn("Setting the uniform %s on shader num %d", uniformName, shader->ID);
+    // LogWarn("Setting the uniform %s on shader num %d", uniformName, shader->ID);
     ++_currentNumUsedTextureSlots;
     return _currentNumUsedTextureSlots - 1;
 }
