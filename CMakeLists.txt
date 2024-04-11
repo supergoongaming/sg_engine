@@ -137,6 +137,12 @@ else()
         add_subdirectory(./external/zlib)
     endif(WIN32)
 
+    if(APPLE)
+        find_package(PNG REQUIRED)
+    else()
+        add_subdirectory(./external/libpng)
+    endif(APPLE)
+
     if(NOT EMSCRIPTEN)
         add_subdirectory(./external/freetype)
         add_subdirectory(./external/libpng)
