@@ -8,5 +8,3 @@
 #include <SDL2/SDL.h>
 #endif
 
-#define STB_IMAGE_IMPLEMENTATION
-// #include <SDL2/SDL_image.h>

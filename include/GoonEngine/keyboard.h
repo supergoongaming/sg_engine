@@ -17,7 +17,7 @@ extern "C"
 
 typedef union SDL_Event SDL_Event;
 
-int HandleKeyboardEvent(SDL_Event *event);
+int geHandleKeyboardEvent(SDL_Event *event);
 void geInitializeKeyboard();
 void geUpdateKeyboard();
 bool geKeyJustReleased(const int key);

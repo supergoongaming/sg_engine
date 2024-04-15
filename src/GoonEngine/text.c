@@ -6,6 +6,15 @@ FT_Face _loadedFace;
 
 extern SDL_Renderer *g_pRenderer;
 
+/**
+ * @brief Create a Empty Surface object used as "paper" for drawing letters on
+ *
+ * @param width
+ * @param height
+ * @return SDL_Surface* Surface you can use for blitting
+ */
+static SDL_Surface *createEmptySurface(int width, int height);
+
 SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, int r, int g, int b)
 {
     // Check if this is a space, return null if so

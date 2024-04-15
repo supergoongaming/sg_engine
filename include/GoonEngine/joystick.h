@@ -5,7 +5,7 @@ typedef union SDL_Event SDL_Event;
 extern "C"
 {
 #endif
-    void HandleJoystickEvent(const SDL_Event *event);
+    void geHandleJoystickEvent(const SDL_Event *event);
     void geInitializeJoysticks();
     void geUpdateControllerLastFrame();
     bool geGamepadButtonJustReleased(const int padNum, const int button);

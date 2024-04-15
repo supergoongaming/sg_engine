@@ -11,7 +11,7 @@ uint64_t gGN_TIMER_TOC = 0;
  * @brief The file that will be written to when logs are put.
  *
  */
-static FILE *open_debug_file = NULL;
+static FILE *openDebugFile = NULL;
 /**
  * @brief The internal logging function that the others will end up calling.  Probably don't call it manually
  *
@@ -28,8 +28,8 @@ static const char *logFileName = "errors.log";
 int InitializeDebugLogFile()
 {
     LogDebug("Opening log file at %s", logFileName);
-    open_debug_file = fopen(logFileName, "a");
-    if (open_debug_file)
+    openDebugFile = fopen(logFileName, "a");
+    if (openDebugFile)
         return 1;
     LogError("Could not open file for logging!");
     return 0;
@@ -37,9 +37,9 @@ int InitializeDebugLogFile()
 
 int CloseDebugLogFile()
 {
-    if (!open_debug_file)
+    if (!openDebugFile)
         return 1;
-    int result = fclose(open_debug_file);
+    int result = fclose(openDebugFile);
     if (result)
         LogError("Couldn't close logging file.");
     return !result;
@@ -53,9 +53,9 @@ static void Log(LogLevel level, const char *thing_to_write)
     strftime(buf, sizeof(buf), "%m-%d-%H:%M-%S", gm_time);
     FILE *outStream = level == Log_LError ? stderr : stdout;
     fprintf(outStream, "%s: %s end\n", buf, thing_to_write);
-    if (level == Log_LError && open_debug_file)
+    if (level == Log_LError && openDebugFile)
     {
-        fprintf(open_debug_file, "%s: %s\n", buf, thing_to_write);
+        fprintf(openDebugFile, "%s: %s\n", buf, thing_to_write);
     }
 }
 static void LogSetup(LogLevel level, const char *fmt, va_list args)

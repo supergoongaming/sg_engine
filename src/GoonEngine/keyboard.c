@@ -1,8 +1,8 @@
 #include <GoonEngine/gnpch.h>
 #include <GoonEngine/keyboard.h>
 
-Uint8 _currentKeyboardState[SDL_NUM_SCANCODES];
-Uint8 _previousKeyboardState[SDL_NUM_SCANCODES];
+static Uint8 _currentKeyboardState[SDL_NUM_SCANCODES];
+static Uint8 _previousKeyboardState[SDL_NUM_SCANCODES];
 
 static void InitializeKeyboardStateArrays()
 {
@@ -15,20 +15,18 @@ void geInitializeKeyboard()
     InitializeKeyboardStateArrays();
 }
 
-int HandleKeyboardEvent(SDL_Event *event)
+int geHandleKeyboardEvent(SDL_Event *event)
 {
-    // Handle quit events currently
+    if (event->key.repeat)
+    {
+        return true;
+    }
+
     if (event->type == SDL_KEYDOWN && (event->key.keysym.sym == SDLK_q || event->key.keysym.sym == SDLK_ESCAPE))
     {
         SDL_Event quit;
         quit.type = SDL_QUIT;
         SDL_PushEvent(&quit);
-        return true;
-    }
-
-    // Don't pass repeat keys to lua, as he handles the processing
-    if (event->key.repeat)
-    {
         return true;
     }
 
@@ -45,8 +43,6 @@ bool geKeyJustPressed(const int key)
     return _currentKeyboardState[key] && !_previousKeyboardState[key];
 }
 
-// bool geKeyHeldDown(SDL_Scancode key)
-// bool geKeyJustPressed(const SDL_Scancode key)
 bool geKeyJustReleased(const int key)
 {
     return !_currentKeyboardState[key] && _previousKeyboardState[key];

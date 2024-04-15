@@ -40,7 +40,7 @@ void geInitializeJoysticks()
     CountPluggedInControllers();
 }
 
-void HandleJoystickEvent(const SDL_Event *event)
+void geHandleJoystickEvent(const SDL_Event *event)
 {
     switch (event->type)
     {

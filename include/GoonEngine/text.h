@@ -25,14 +25,6 @@ extern "C"
      */
     SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, int r, int g, int b);
     /**
-     * @brief Create a Empty Surface object used as "paper" for drawing letters on
-     *
-     * @param width
-     * @param height
-     * @return SDL_Surface* Surface you can use for blitting
-     */
-    SDL_Surface *createEmptySurface(int width, int height);
-    /**
      * @brief Creates a texture with a bunch of letters blitted on it for you, cannot modify characters after the fact
      *
      * @param word The word that should be written

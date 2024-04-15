@@ -16,7 +16,6 @@ extern "C"
 {
 #endif
 
-    // int geInitializeRenderingWindow(unsigned int width, unsigned int height, const char *windowName);
     int geInitializeRenderingWindow(unsigned int windowWidth, unsigned int windowHeight, unsigned int gameWidth, unsigned int gameHeight, const char *windowName);
 #ifdef __cplusplus
 }

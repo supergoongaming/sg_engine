@@ -9,11 +9,11 @@ SDL_Texture *g_BackgroundAtlas = NULL;
 SDL_Rect *g_backgroundDrawRect = NULL;
 extern SDL_Renderer *g_pRenderer;
 
-void SetBackgroundAtlas(SDL_Texture *background)
+void geSetBackgroundAtlas(SDL_Texture *background)
 {
     g_BackgroundAtlas = background;
 }
-void SetCameraRect(geRectangle *rect)
+void geSetCameraRect(geRectangle *rect)
 {
     g_backgroundDrawRect = (SDL_Rect *)rect;
 }
@@ -203,19 +203,19 @@ void BlitSurface(
         fprintf(stderr, "Failed to blit surface %s", SDL_GetError());
     }
 }
-SDL_Texture *CreateTextureFromFile(const char *filename)
+SDL_Texture *geCreateTextureFromFile(const char *filename)
 {
     SDL_Surface *surface = LoadSurfaceFromFile(filename);
     SDL_Texture *texture = CreateTextureFromSurface(surface);
     // stbi_image_free(data);
     return texture;
 }
-void DestroySurface(SDL_Surface *surface)
+void geDestroySurface(SDL_Surface *surface)
 {
     SDL_FreeSurface(surface);
 }
 
-void DestroyTexture(SDL_Texture *texture)
+void geDestroyTexture(SDL_Texture *texture)
 {
     SDL_DestroyTexture(texture);
 }
