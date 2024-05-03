@@ -267,6 +267,14 @@ void geDrawTextureWithCameraOffset(SDL_Texture *texture, geRectangle *srcRect, g
 
 void geDrawDebugRect(geRectangle *dstRect, geColor *color)
 {
+    SDL_SetRenderDrawColor(g_pRenderer, color->R, color->G, color->B, color->A);
+    // SDL_RenderDrawRect(g_pRenderer, &dstRect);
+    SDL_RenderFillRect(g_pRenderer, dstRect);
+    SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
+}
+
+void geDrawDebugRectCamera(geRectangle *dstRect, geColor *color)
+{
     SDL_Rect translatedDstRect;
     translatedDstRect.x = (dstRect->x - g_backgroundDrawRect->x);
     translatedDstRect.y = dstRect->y * 1;
@@ -274,5 +282,5 @@ void geDrawDebugRect(geRectangle *dstRect, geColor *color)
     translatedDstRect.h = dstRect->h * 1;
     SDL_SetRenderDrawColor(g_pRenderer, color->R, color->G, color->B, color->A);
     SDL_RenderDrawRect(g_pRenderer, &translatedDstRect);
-    SDL_SetRenderDrawColor(g_pRenderer, 100, 100, 100, 255);
+    SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
 }

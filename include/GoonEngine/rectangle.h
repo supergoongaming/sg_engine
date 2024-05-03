@@ -13,3 +13,12 @@ inline geRectangle geRectangleZero()
     rect.h = 0;
     return rect;
 }
+inline int geRectangleIsZero(geRectangle *lhs)
+{
+    if (lhs->h == 0 &&
+        lhs->w == 0 &&
+        lhs->x == 0 &&
+        lhs->y == 0)
+        return 1;
+    return 0;
+}
