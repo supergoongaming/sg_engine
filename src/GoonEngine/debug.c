@@ -117,7 +117,7 @@ void LogCritical(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     LogSetup(Log_LCritical, fmt, args);
-    fprintf(stderr, "Critical error, exiting!");
+    fprintf(stderr, "Critical error, exiting!\n");
     exit(1);
 }
 

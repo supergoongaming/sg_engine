@@ -16,7 +16,13 @@ extern "C"
 {
 #endif
 
-    int geInitializeRenderingWindow(unsigned int windowWidth, unsigned int windowHeight, unsigned int gameWidth, unsigned int gameHeight, const char *windowName);
+typedef struct geWindowSettings {
+    int WindowX, WindowY, WorldX, WorldY;
+    const char* Title
+} geWindowSettings;
+
+    // int geInitializeRenderingWindow(unsigned int windowWidth, unsigned int windowHeight, unsigned int gameWidth, unsigned int gameHeight, const char *windowName);
+    int geInitializeRenderingWindow();
 #ifdef __cplusplus
 }
 #endif

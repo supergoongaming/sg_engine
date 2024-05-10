@@ -20,7 +20,11 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # File globbing
 # #########################################
 message(STATUS "Getting all files for cmake..")
-file(GLOB_RECURSE ENGINE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonEngine/*.c* ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonPhysics/*.c*)
+file(GLOB_RECURSE ENGINE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonEngine/*.c*
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonPhysics/*.c*
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ini/*.c*
+)
 
 # #########################################
 # Platform specific Project setup
@@ -48,12 +52,6 @@ elseif(UNIX AND NOT APPLE)
 endif(APPLE)
 
 # Subdirectory things
-
-# We want to skip installing freetype,etc, this is a var in their CMAKE file
-set(SKIP_INSTALL_ALL ON)
-
-# Don't build the png tests
-set(PNG_TESTS OFF)
 
 # #########################################
 # Initialize
@@ -119,27 +117,13 @@ message("Going to do the thing.. macos is ${MACOS} and GOON_FULL_MACOS_BUILD is 
 
 if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
     find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
-    find_library(LIB_PNG
-        REQUIRED
-        PATH_SUFFIXES .a
-        NAMES libpng png.a png.dll libpng.a
-        HINTS /usr/local/lib /c/cmake/lib)
-
-    find_library(LIB_FREETYPE
-        REQUIRED
-        PATH_SUFFIXES .a
-        NAMES libfreetype.a libfreetype.dll freetype.a freetype.dll freetype libfreetype
-        HINTS /usr/local/lib /c/cmake/lib)
     add_subdirectory(./external/sg_sound)
 else()
     # Windows doesn't have zlib by default.
     if(WIN32)
-        add_subdirectory(./external/zlib)
     endif(WIN32)
 
     if(NOT EMSCRIPTEN)
-        add_subdirectory(./external/freetype)
-        add_subdirectory(./external/libpng)
     endif(NOT EMSCRIPTEN)
 
     add_subdirectory(./external/sg_sound)
@@ -151,7 +135,7 @@ endif(MACOS AND NOT GOON_FULL_MACOS_BUILD)
 message("Going to do the thing.. emscripten is is ${EMSCRIPTEN} and GOON_FULL_MACOS_BUILD is ${GOON_FULL_MACOS_BUILD}")
 
 if(EMSCRIPTEN)
-    set_target_properties(${EXECUTABLE_TARGET_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} " -O0 -g -s SAFE_HEAP=2 -s STACK_OVERFLOW_CHECK=1 -sUSE_LIBPNG=1 -sUSE_FREETYPE=1 --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets")
+    set_target_properties(${EXECUTABLE_TARGET_NAME} PROPERTIES LINK_FLAGS ${LINK_FLAGS} " -O0 -g -s SAFE_HEAP=2 -s STACK_OVERFLOW_CHECK=1 --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s 'DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=[\"$autoResumeAudioContext\",\"$dynCall\"]'")
 endif(EMSCRIPTEN)
 
@@ -204,7 +188,7 @@ set(FULL_COMPILE_OPTIONS
 if(WIN32)
     set(FULL_COMPILE_OPTIONS /std:c99)
 elseif(EMSCRIPTEN)
-    target_compile_options(${EXECUTABLE_TARGET_NAME} PRIVATE -sUSE_LIBPNG=1 -sUSE_FREETYPE=1)
+    target_compile_options(${EXECUTABLE_TARGET_NAME} PRIVATE)
 endif(WIN32)
 
 target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
@@ -212,35 +196,9 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # #########################################
 # Linking Options
 # #########################################
-# set(LIBRARIES_TO_LINK
-# SDL2::SDL2-static
-# ZLIB::ZLIB
-# freetype
-# png
-# supergoonSound::supergoonSound
-# supergoonSound
-# ${LIB_PNG}
-# )
-
-# foreach(LIBRARY ${LIBRARIES_TO_LINK})
-# # Check if the target exists, if we are building it then we should link to it.
-# if(TARGET ${LIBRARY})
-# target_link_libraries(${LIBRARY_TARGET_NAME} PUBLIC ${LIBRARY})
-# endif()
-# endforeach()
-if(EMSCRIPTEN OR(MACOS AND NOT GOON_FULL_MACOS_BUILD))
-    set(PNG_LIB_NAME png)
-else()
-    set(PNG_LIB_NAME png_static)
-endif(EMSCRIPTEN OR(MACOS AND NOT GOON_FULL_MACOS_BUILD))
-
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
     supergoonSound
-    freetype
-    ${PNG_LIB_NAME}
-    ${LIB_PNG}
-    ${LIB_FREETYPE}
 
     # testing
     ${LIB_VORBISFILE}
@@ -263,26 +221,15 @@ target_link_directories(${LIBRARY_TARGET_NAME}
     /usr/local/lib
 )
 
-# libpng bs
-add_compile_options(
-    "$<$<COMPILE_LANGUAGE:C>: -DPNG_ARM_NEON_OPT=0>"
-    "$<$<COMPILE_LANGUAGE:CXX>: -DPNG_ARM_NEON_OPT=0>"
-)
-
 target_include_directories(${LIBRARY_TARGET_NAME}
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/
     /usr/local/include
 
     # Need both when not building (using emscripten)
     /emsdk/upstream/emscripten/cache/sysroot/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include/freetype/
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
     ${CMAKE_CURRENT_SOURCE_DIR}/external/
     external/sg_sound/src/
 
-    ${CMAKE_CURRENT_BINARY_DIR}/external/sg_engine/exteral/libpng
-
     # Freetype cause yeah
-    /usr/local/include/freetype2) # Add the freetype2 specific include directory
+)

@@ -4,8 +4,8 @@
 #include <GoonEngine/keyboard.h>
 #include <GoonEngine/joystick.h>
 #include <GoonEngine/debug.h>
-#include <GoonEngine/text.h>
 #include <SupergoonSound/include/sound.h>
+#include <ini/ini.h>
 #include <GoonPhysics/scene.h>
 
 #define DELTA_TIME_SECONDS (1.0 / 144.0)
@@ -29,12 +29,6 @@ static double msBuildup = 0;
 
 void (*DrawUpdateFunc)() = NULL;
 void (*GameUpdateFunc)(double deltaTime) = NULL;
-
-void *MusicUpdateWrapper(void *arg)
-{
-    (void)arg;
-    return NULL;
-}
 
 /**
  * @brief Handles all SDL events every frame.
@@ -147,7 +141,8 @@ int geInitializeEngine()
 
     geInitializeKeyboard();
     geInitializeJoysticks();
-    geInitializeTextSubsystem("assets/fonts/main.ttf", 36);
+    gsInitializeSound();
+    geInitializeRenderingWindow();
     shouldQuit = sdlEventLoop();
     return true;
 }

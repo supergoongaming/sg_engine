@@ -7,4 +7,5 @@
 #else
 #include <SDL2/SDL.h>
 #endif
+#include <GoonEngine/debug.h>
 
