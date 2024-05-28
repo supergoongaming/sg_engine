@@ -1,3 +1,6 @@
 [submodule "external/sg_sound"]
 	path = external/sg_sound
 	url = https://github.com/supergoongaming/sg_sound.git
+[submodule "external/freetype"]
+	path = external/freetype
+	url = https://github.com/freetype/freetype.git
