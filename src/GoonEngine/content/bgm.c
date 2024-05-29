@@ -15,7 +15,6 @@ typedef struct geBgm
 
 static void geBgmFree(geBgm *bgm)
 {
-    LogWarn("Deleted bgm %s", bgm->FilePath);
     free(bgm->FilePath);
     if (bgm->pBgm)
         free(bgm->pBgm);

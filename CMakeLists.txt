@@ -118,6 +118,7 @@ message("Going to do the thing.. macos is ${MACOS} and GOON_FULL_MACOS_BUILD is 
 if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
     find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
     add_subdirectory(./external/sg_sound)
+    add_subdirectory(./external/freetype)
 else()
     # Windows doesn't have zlib by default.
     if(WIN32)
@@ -199,6 +200,7 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
     supergoonSound
+    freetype
 
     # testing
     ${LIB_VORBISFILE}

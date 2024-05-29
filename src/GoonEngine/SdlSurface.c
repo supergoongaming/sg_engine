@@ -42,7 +42,6 @@ void BlitSurface(
     SDL_Surface *dstSurface,
     geRectangle *dstRect)
 {
-    // int result = SDL_BlitSurface(srcSurface, srcRect, dstSurface, dstRect);
     int result = SDL_BlitSurface(srcSurface, (SDL_Rect *)srcRect, dstSurface, (SDL_Rect *)dstRect);
     if (result)
     {
@@ -110,7 +109,14 @@ void geDrawTextureWithCameraOffset(SDL_Texture *texture, geRectangle *srcRect, g
                      (shouldFlip) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
-void geDrawDebugRect(geRectangle *dstRect, geColor *color)
+void geDrawRect(geRectangle *dstRect, geColor *color)
+{
+    SDL_SetRenderDrawColor(g_pRenderer, color->R, color->G, color->B, color->A);
+    SDL_RenderDrawRect(g_pRenderer, (SDL_Rect*)dstRect);
+    SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
+}
+
+void geDrawFilledRect(geRectangle *dstRect, geColor *color)
 {
     SDL_SetRenderDrawColor(g_pRenderer, color->R, color->G, color->B, color->A);
     SDL_RenderFillRect(g_pRenderer, (SDL_Rect*)dstRect);

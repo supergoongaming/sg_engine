@@ -34,7 +34,8 @@ extern "C"
     void geUpdateTextureAlpha(SDL_Texture* texture, int alpha);
     void geDrawTextureWithCameraOffset(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip);
     void geDrawTexture(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip);
-    void geDrawDebugRect(geRectangle *rect, geColor *color);
+    void geDrawRect(geRectangle *rect, geColor *color);
+    void geDrawFilledRect(geRectangle *rect, geColor *color);
     void geDrawDebugRectCamera(geRectangle *rect, geColor *color);
 #ifdef __cplusplus
 }
