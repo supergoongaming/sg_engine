@@ -18,7 +18,7 @@ typedef struct geFont {
 	int Size;
 	char *Path;
 	char *ContentName;
-} geImage;
+} geFont;
 
 static void fontFree(geFont *f) {
 	if (f->Face) {

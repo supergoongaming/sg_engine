@@ -10,7 +10,6 @@
 #include <ft2build.h>
 #include <stdbool.h>
 #include FT_FREETYPE_H
-extern SDL_Renderer *g_pRenderer;
 
 typedef struct geRichText {
 	const char *Text;
@@ -18,7 +17,7 @@ typedef struct geRichText {
 	int FontSize;
 	geFont *Font;
 	geColor Color;
-	SDL_Texture *Texture;
+	geImage *Texture;
 	geRectangle DrawRect;
 	Point TextBounds;
 } geRichText;
@@ -49,16 +48,12 @@ SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, int r, int g, int b) {
 	return surface;
 }
 
-SDL_Texture *createEmptyTexture(int width, int height) {
-	// Create a render target texture
-	SDL_Texture *renderTarget =
-		SDL_CreateTexture(g_pRenderer, SDL_PIXELFORMAT_RGBA8888,
-						  SDL_TEXTUREACCESS_TARGET, width, height);
-	return renderTarget;
+geImage *createEmptyTexture(int width, int height) {
+	return geImageNewRenderTarget("thing", width, height);
 }
 
-SDL_Texture *geCreateTextureForString(const char *word, geFont *font,
-									  Point *textureDimensions, geColor color) {
+geImage *geCreateTextureForString(const char *word, geFont *font,
+								  Point *textureDimensions, geColor color) {
 	int totalWidth = 0;
 	int maxHeight = 0;
 	FT_Face f = geFontGetFont(font);
@@ -74,7 +69,7 @@ SDL_Texture *geCreateTextureForString(const char *word, geFont *font,
 		int letterHeight = (f->ascender - f->descender) >> 6;
 		maxHeight = maxHeight > letterHeight ? maxHeight : letterHeight;
 	}
-	SDL_Texture *paper = createEmptyTexture(totalWidth * 2, maxHeight * 2);
+	geImage *paper = createEmptyTexture(totalWidth * 2, maxHeight * 2);
 	int x = 0;
 	int baseline = 0;
 	for (size_t i = 0; i < strlen(word); i++) {
@@ -99,15 +94,17 @@ SDL_Texture *geCreateTextureForString(const char *word, geFont *font,
 			SDL_FreeSurface(letterSurface);
 			continue;
 		}
-		SDL_Rect dst = {x, y, letterSurface->w, letterSurface->h};
+		geRectangle dst = {x, y, letterSurface->w, letterSurface->h};
 		// Convert to a texture
-		SDL_Texture *letterTexture = geCreateTextureFromSurface(letterSurface);
+		// SDL_Texture *letterTexture =
+		char letterString[2];
+		letterString[0] = letter;
+		letterString[1] = '\0';
+		geImage *letterTexture =
+			geImageNewFromSurface(letterString, letterSurface);
 		// Draw this onto the paper
-		SDL_SetRenderTarget(g_pRenderer, paper);
-		SDL_RenderCopy(g_pRenderer, letterTexture, NULL, &dst);
-
+		geImageDrawImageToImage(letterTexture, paper, NULL, &dst);
 		x += (f->glyph->advance.x >> 6);
-		SDL_SetRenderTarget(g_pRenderer, NULL);
 	}
 	textureDimensions->x = totalWidth;
 	textureDimensions->y = maxHeight;
@@ -118,7 +115,7 @@ static void textFree(geRichText *t) {
 	LogWarn("Freeing text %s", t->Text);
 	if (t->Font) geFontFree(t->Font);
 	t->Font = NULL;
-	geDestroyTexture(t->Texture);
+	geImageFree(t->Texture);
 	t->Texture = NULL;
 	free(t->Font);
 }
@@ -191,7 +188,7 @@ void geRichTextDraw(geRichText *t) {
 	r.y = t->DrawRect.y;
 	r.w = t->DrawRect.w != 0 ? t->DrawRect.w : t->TextBounds.x;
 	r.h = t->DrawRect.h != 0 ? t->DrawRect.h : t->TextBounds.y;
-	geDrawTexture(t->Texture, NULL, &r, false);
+	geImageDraw(t->Texture, NULL, &r);
 }
 
 void geRichTextFree(geRichText *f) {

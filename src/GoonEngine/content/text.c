@@ -108,8 +108,10 @@ SDL_Texture *geCreateTextureForString(const char *word, geFont *font,
 	}
 	textureDimensions->x = totalWidth;
 	textureDimensions->y = maxHeight;
-	SDL_Texture *charTexture = geCreateTextureFromSurface(paper);
-	return charTexture;
+	// removed this func, so commented.  should use geImage now
+	// SDL_Texture *charTexture = geCreateTextureFromSurface(paper);
+	// return charTexture;
+	return NULL;
 }
 
 static void textFree(geText *t) {
@@ -189,7 +191,7 @@ void geTextDraw(geText *t) {
 	r.y = t->DrawRect.y;
 	r.w = t->DrawRect.w != 0 ? t->DrawRect.w : t->TextBounds.x;
 	r.h = t->DrawRect.h != 0 ? t->DrawRect.h : t->TextBounds.y;
-	geDrawTexture(t->Texture, NULL, &r, false);
+	// geDrawTexture(t->Texture, NULL, &r, false);
 }
 
 void geTextFree(geText *f) { geUnloadContent(geContentTypeText, f->Text); }

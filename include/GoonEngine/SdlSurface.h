@@ -25,15 +25,13 @@ extern "C"
     SDL_Surface *LoadSurfaceFromFile(const char *filePath);
     SDL_Surface *LoadTextureAtlas(int width, int height);
     void BlitSurface(SDL_Surface *srcSurface, geRectangle *srcRect, SDL_Surface *dstSurface, geRectangle *dstRect);
-    SDL_Texture *geCreateTextureFromSurface(SDL_Surface *surface);
     void geDestroySurface(SDL_Surface *surface);
     void geDestroyTexture(SDL_Texture *texture);
     void geSetBackgroundAtlas(SDL_Texture *background);
     void geSetCameraRect(geRectangle *rect);
-    SDL_Texture *geCreateTextureFromFile(const char *filename);
     void geUpdateTextureAlpha(SDL_Texture* texture, int alpha);
-    void geDrawTextureWithCameraOffset(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip);
-    void geDrawTexture(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, bool shouldFlip);
+    void geDrawTextureWithCameraOffset(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, int shouldFlip);
+    // void geDrawTexture(SDL_Texture *texture, geRectangle *srcRect, geRectangle *dstRect, int shouldFlip);
     void geDrawRect(geRectangle *rect, geColor *color);
     void geDrawFilledRect(geRectangle *rect, geColor *color);
     void geDrawDebugRectCamera(geRectangle *rect, geColor *color);
