@@ -398,7 +398,8 @@ void gpSceneFree(gpScene *scene)
     free(_currentBodies);
     free(_currentStaticBodies);
     free(_currentBoxColliders);
-    free(scene);
+    if (scene)
+        free(scene);
 }
 
 int gpSceneAddBoxCollider(gpBoxCollider *boxCollider)
