@@ -25,7 +25,7 @@ extern "C"
     SDL_Surface *LoadSurfaceFromFile(const char *filePath);
     SDL_Surface *LoadTextureAtlas(int width, int height);
     void BlitSurface(SDL_Surface *srcSurface, geRectangle *srcRect, SDL_Surface *dstSurface, geRectangle *dstRect);
-    SDL_Texture *CreateTextureFromSurface(SDL_Surface *surface);
+    SDL_Texture *geCreateTextureFromSurface(SDL_Surface *surface);
     void geDestroySurface(SDL_Surface *surface);
     void geDestroyTexture(SDL_Texture *texture);
     void geSetBackgroundAtlas(SDL_Texture *background);

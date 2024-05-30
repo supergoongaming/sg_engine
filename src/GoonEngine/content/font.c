@@ -24,12 +24,14 @@ static void fontFree(geFont *f) {
 	if (f->Face) {
 		FT_Done_Face(f->Face);
 	}
+	LogDebug("Freeing font %s", f->ContentName);
 	free(f->Path);
 	free(f->ContentName);
 	free(f);
 }
 
 static char *fontGetContentName(geFont *f) {
+	if (!f->Path) return "";
 	int lenPath = strlen(f->Path);
 	char *buffer = malloc(sizeof(char) * (lenPath + _numBuffer + 1));
 	sprintf(buffer, "%s_%d", f->Path, f->Size);
@@ -42,6 +44,7 @@ static void fontNewContent(geContent *content, void *data) {
 }
 
 static void fontDeleteContent(geContent *content) {
+	if (!content) return;
 	fontFree(content->Data.Font);
 }
 
@@ -81,6 +84,8 @@ geFont *geFontNew(const char *name, int size) {
 	sprintf(buffer, "%s/%s.%s_%d", _fontPrefix, name, _fontFileType, size);
 	geContent *loadedContent = geGetLoadedContent(geContentTypeFont, buffer);
 	if (loadedContent) {
+		LogDebug("Using cached font for %s",
+				 loadedContent->Data.Font->ContentName);
 		return loadedContent->Data.Font;
 	}
 	if (size > 999 || size < 1) {
@@ -94,6 +99,7 @@ geFont *geFontNew(const char *name, int size) {
 	f->Path = strdup(buffer);
 	f->ContentName = fontGetContentName(f);
 	geAddContent(geContentTypeFont, (void *)f);
+	LogDebug("New font created for %s", f->ContentName);
 	return f;
 }
 
@@ -110,3 +116,10 @@ void geFontLoad(geFont *f) {
 	FT_Set_Pixel_Sizes(fontFace, 0, f->Size);
 	f->Face = fontFace;
 }
+void geFontFree(geFont *f) {
+	if (f->ContentName) {
+		geUnloadContent(geContentTypeFont, f->ContentName);
+	}
+}
+
+FT_Face geFontGetFont(geFont *f) { return f->Face; }

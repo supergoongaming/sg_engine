@@ -1,11 +1,13 @@
 #pragma once
 #include <GoonEngine/content/bgm.h>
 #include <GoonEngine/content/font.h>
+#include <GoonEngine/content/textv2.h>
 
 typedef enum geContentTypes {
 	geContentTypeDefault = 0,
 	geContentTypeBgm,
 	geContentTypeFont,
+	geContentTypeText,
 	geContentTypeMax,
 } geContentTypes;
 
@@ -15,6 +17,7 @@ typedef struct geContent {
 	union {
 		geBgm *Bgm;
 		geFont *Font;
+		geRichText *Text;
 	} Data;
 
 } geContent;
