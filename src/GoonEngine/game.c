@@ -8,9 +8,6 @@
 #include <SupergoonSound/include/sound.h>
 #include <GoonPhysics/scene.h>
 
-#define DELTA_TIME_SECONDS (1.0 / 144.0)
-#define DELTA_TIME_MS (1000.0 / 144.0)
-
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -26,6 +23,9 @@ static SDL_Event event;
 static bool shouldQuit = false;
 static uint64_t previousTime = 0;
 static double msBuildup = 0;
+static double secondsBuildup = 0;
+static Uint64 freq = 0;
+static double DELTA_TIME_SECONDS = 1.0 / 60;
 
 void (*DrawUpdateFunc)() = NULL;
 void (*GameUpdateFunc)(double deltaTime) = NULL;
@@ -66,20 +66,20 @@ static bool sdlEventLoop()
     }
     return false;
 }
-
 static int loop_func()
 {
-    uint64_t current = SDL_GetTicks64();
-    uint64_t elapsed = current - previousTime;
+    uint64_t current = SDL_GetPerformanceCounter();
+    double elapsed = (current - previousTime);
+    double elapsedSeconds = (((double)elapsed / (double)freq));
+    secondsBuildup += elapsedSeconds;
     previousTime = current;
-    msBuildup += elapsed;
-    gsUpdateSound();
-    if (msBuildup < DELTA_TIME_MS)
+    int ticks = 0;
+#ifdef __EMSCRIPTEN__
+    while (secondsBuildup >= DELTA_TIME_SECONDS)
     {
-        return 1;
-    }
-    while (msBuildup >= DELTA_TIME_MS)
-    {
+#endif
+        ++ticks;
+        gsUpdateSound();
         geUpdateControllerLastFrame();
         shouldQuit = sdlEventLoop();
         geUpdateKeyboard();
@@ -91,10 +91,13 @@ static int loop_func()
         }
         if (GameUpdateFunc)
         {
-            GameUpdateFunc(DELTA_TIME_MS);
+            GameUpdateFunc(DELTA_TIME_SECONDS);
         }
-        msBuildup -= DELTA_TIME_MS;
+        secondsBuildup -= DELTA_TIME_SECONDS;
+#ifdef __EMSCRIPTEN__
     }
+#endif
+
     SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
     SDL_RenderClear(g_pRenderer);
     if (g_BackgroundAtlas)
@@ -126,6 +129,8 @@ static void LoopWrap()
 
 int gePlayLoop()
 {
+    freq = SDL_GetPerformanceFrequency();       // Sets the frequency, used to know per seconds
+    previousTime = SDL_GetPerformanceCounter(); // Sets the initial time to start the loop.
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(LoopWrap, 0, 1);
 #else
