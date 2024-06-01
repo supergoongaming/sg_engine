@@ -73,31 +73,20 @@ static int loop_func()
     double elapsedSeconds = (((double)elapsed / (double)freq));
     secondsBuildup += elapsedSeconds;
     previousTime = current;
-    int ticks = 0;
-#ifdef __EMSCRIPTEN__
-    while (secondsBuildup >= DELTA_TIME_SECONDS)
+    gsUpdateSound();
+    geUpdateControllerLastFrame();
+    shouldQuit = sdlEventLoop();
+    geUpdateKeyboard();
+    if (shouldQuit)
+        return false;
+    if (g_pScene)
     {
-#endif
-        ++ticks;
-        gsUpdateSound();
-        geUpdateControllerLastFrame();
-        shouldQuit = sdlEventLoop();
-        geUpdateKeyboard();
-        if (shouldQuit)
-            return false;
-        if (g_pScene)
-        {
-            gpSceneUpdate(g_pScene, DELTA_TIME_SECONDS);
-        }
-        if (GameUpdateFunc)
-        {
-            GameUpdateFunc(DELTA_TIME_SECONDS);
-        }
-        secondsBuildup -= DELTA_TIME_SECONDS;
-#ifdef __EMSCRIPTEN__
+        gpSceneUpdate(g_pScene, elapsedSeconds);
     }
-#endif
-
+    if (GameUpdateFunc)
+    {
+        GameUpdateFunc(elapsedSeconds);
+    }
     SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
     SDL_RenderClear(g_pRenderer);
     if (g_BackgroundAtlas)
