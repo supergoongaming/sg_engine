@@ -3,7 +3,8 @@
 #include <GoonEngine/color.h>
 #include <GoonEngine/content/content.h>
 #include <GoonEngine/content/font.h>
-#include <GoonEngine/content/text.h>
+#include <GoonEngine/content/textv2.h>
+#include <GoonEngine/content/image.h>
 #include <GoonEngine/debug.h>
 #include <GoonEngine/rectangle.h>
 #include <SDL2/SDL.h>

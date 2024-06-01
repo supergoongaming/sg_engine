@@ -1,8 +1,8 @@
 #pragma once
-#include <GoonEngine/content/bgm.h>
-#include <GoonEngine/content/font.h>
-#include <GoonEngine/content/image.h>
-#include <GoonEngine/content/textv2.h>
+typedef struct geBgm geBgm;
+typedef struct geFont geFont;
+typedef struct geRichText geRichText;
+typedef struct geImage geImage;
 
 typedef enum geContentTypes {
 	geContentTypeDefault = 0,
@@ -33,6 +33,7 @@ typedef void (*ContentTypeDeleteFunc)(geContent *content);
 typedef void (*ContentTypeLoadFunc)(geContent *content);
 typedef int (*ContentTypeCompareFunc)(const char *lhs, geContent *rhs);
 
+void geContentInitializeAllContentTypes();
 geContent *geGetLoadedContent(geContentTypes type, const char *path);
 int geLoadAllContent();
 int geUnloadAllContent();

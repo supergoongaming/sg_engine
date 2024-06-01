@@ -1,3 +1,5 @@
+#include <GoonEngine/clock.h>
+#include <GoonEngine/content/content.h>
 #include <GoonEngine/debug.h>
 #include <GoonEngine/game.h>
 #include <GoonEngine/gnpch.h>
@@ -7,8 +9,6 @@
 #include <GoonPhysics/scene.h>
 #include <SupergoonSound/include/sound.h>
 #include <ini/ini.h>
-
-static double DELTA_TIME_SECONDS = 1.0 / 60;
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -26,6 +26,7 @@ static bool shouldQuit = false;
 static uint64_t previousTime = 0;
 static double secondsBuildup = 0;
 static Uint64 freq = 0;
+static geClock *frameClock;
 
 void (*DrawUpdateFunc)() = NULL;
 void (*GameUpdateFunc)(double deltaTime) = NULL;
@@ -59,12 +60,8 @@ static bool sdlEventLoop() {
 }
 
 static int loop_func() {
-	uint64_t current = SDL_GetPerformanceCounter();
-	double elapsed = (current - previousTime);
-	double elapsedSeconds = (((double)elapsed / (double)freq));
-	secondsBuildup += elapsedSeconds;
-	previousTime = current;
-	while (secondsBuildup >= DELTA_TIME_SECONDS) {
+	geClockUpdate(frameClock);
+	while (geClockTick(frameClock)) {
 		gsUpdateSound();
 		geUpdateControllerLastFrame();
 		shouldQuit = sdlEventLoop();
@@ -72,12 +69,11 @@ static int loop_func() {
 		if (shouldQuit)
 			return false;
 		if (g_pScene) {
-			gpSceneUpdate(g_pScene, DELTA_TIME_SECONDS);
+			gpSceneUpdate(g_pScene, geClockGetUpdateTimeSeconds());
 		}
 		if (GameUpdateFunc) {
-			GameUpdateFunc(DELTA_TIME_SECONDS);
+			GameUpdateFunc(geClockGetUpdateTimeSeconds());
 		}
-		secondsBuildup -= DELTA_TIME_SECONDS;
 	}
 
 	SDL_SetRenderDrawColor(g_pRenderer, 0, 0, 0, 255);
@@ -94,9 +90,7 @@ static void LoopWrap() {
 }
 
 int gePlayLoop() {
-	// Initialize Loop variables.
-	freq = SDL_GetPerformanceFrequency();		 // Sets the frequency, used to know per seconds
-	previousTime = SDL_GetPerformanceCounter();	 // Sets the initial time to start the loop.
+	frameClock = geClockNew();
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop(LoopWrap, 0, 1);
 #else
@@ -112,11 +106,11 @@ int geInitializeEngine() {
 		fprintf(stderr, "Could not Initialize SDL!\nError: %s", SDL_GetError());
 		return false;
 	}
-
 	geInitializeKeyboard();
 	geInitializeJoysticks();
 	gsInitializeSound();
 	geInitializeRenderingWindow();
+	geContentInitializeAllContentTypes();
 	shouldQuit = sdlEventLoop();
 	return true;
 }

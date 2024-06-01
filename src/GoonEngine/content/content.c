@@ -1,6 +1,11 @@
 #include <GoonEngine/content/content.h>
 #include <GoonEngine/debug.h>
 #include <GoonEngine/gnpch.h>
+// Built in Content Types
+#include <GoonEngine/content/bgm.h>
+#include <GoonEngine/content/font.h>
+#include <GoonEngine/content/image.h>
+#include <GoonEngine/content/textv2.h>
 
 // Content Types
 #include <GoonEngine/content/bgm.h>
@@ -20,7 +25,7 @@ static ContentTypeCompareFunc _compareContentFunctions[geContentTypeMax];
 
 static int findContentIndexByName(geContentTypes type, const char *name) {
 	contentSizeCount *info = &_loadedContentData[type];
-	for (size_t i = 0; i < info->Size; i++) {
+	for (size_t i = 0; i < info->Count; i++) {
 		if (_compareContentFunctions[type](name, _loadedContent[type][i])) {
 			return i;
 		}
@@ -122,4 +127,11 @@ int geAddContentTypeFunctions(geContentTypes type, ContentTypeCreateFunc create,
 	_loadContentFunctions[type] = load;
 	_compareContentFunctions[type] = comp;
 	return true;
+}
+
+void geContentInitializeAllContentTypes() {
+	geInitializeBgmContentType();
+	geInitializeFontContentType();
+	geInitializeImageContentType();
+	geInitializeTextv2ContentType();
 }
