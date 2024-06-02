@@ -88,6 +88,28 @@ int getLetterYBearing(geText *t, char l) {
 	return f->glyph->metrics.horiBearingY >> 6;
 }
 
+int getKerning(geText *t, int i) {
+	if (strlen(t->Text) <= i) {
+		return 0;
+	}
+	FT_Face f = geFontGetFont(t->Font);
+	if (!FT_HAS_KERNING(f)) {
+		return 0;
+	}
+	unsigned int glyph_index_c = FT_Get_Char_Index(f, t->Text[i]);
+	unsigned int glyph_index_n = FT_Get_Char_Index(f, t->Text[i + 1]);
+	FT_Vector delta;
+	int result = FT_Get_Kerning(f, glyph_index_c, glyph_index_n, FT_KERNING_DEFAULT, &delta);
+	if (result) {
+		LogError("Could not get kerning");
+	}
+	result = delta.x >> 6;
+	if (delta.x != 0) {
+		LogDebug("Wow");
+	}
+	return result;
+}
+
 // Adds a word to the text letter points.  Takes the current index, and the current words length and will write it
 void addWordToLetterPoints(geText *t, int wordEndPos, int wordLength, int penX, int penY) {
 	int x = penX, y = penY, wordStartPos = wordEndPos - wordLength;
@@ -96,6 +118,7 @@ void addWordToLetterPoints(geText *t, int wordEndPos, int wordLength, int penX, 
 		int width = getLetterWidth(t, letter);
 		gePoint p;
 		p.x = x;
+		p.x += getKerning(t, wordStartPos + i);
 		p.y = y - getLetterYBearing(t, letter);
 		t->LetterPoints[wordStartPos + i] = p;
 		x += width;
@@ -115,9 +138,14 @@ gePoint measureFullText(geText *t) {
 	int currentWordLength = 0;
 	int currentWordLetters = 0;
 	FT_Face f = geFontGetFont(t->Font);
-	// int startLoc = (f->ascender - f->descender) >> 6;
-	int startLoc = f->ascender >> 6;
-	int lineSpace = f->height >> 6;
+	int unitsPerEM = f->units_per_EM;
+
+	// Convert ascender and descender to pixels
+	int ascenderInPixels = (f->ascender * t->FontSize) / unitsPerEM;
+	int descenderInPixels = (f->descender * t->FontSize) / unitsPerEM;
+	int heightInPixels = (f->height * t->FontSize) / unitsPerEM;
+	int startLoc = ascenderInPixels;
+	int lineSpace = heightInPixels;
 	int penX = 0, penY = startLoc;
 	for (size_t i = 0; i < strlen(t->Text); i++) {
 		char letter = t->Text[i];
@@ -159,7 +187,7 @@ gePoint measureFullText(geText *t) {
 		// Write letters to points.
 	}
 	textSize.x = MAX(textSize.x, penX);
-	textSize.y = penY - (f->descender >> 6);
+	textSize.y = penY - descenderInPixels;
 	if (textSize.y > maxHeight) {
 		LogWarn("Your text overflowed through Y, please adjust your bounds else it will flow past");
 	}
