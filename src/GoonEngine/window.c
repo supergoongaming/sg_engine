@@ -3,8 +3,8 @@
 #include <GoonEngine/window.h>
 #include <ini/ini.h>
 
-SDL_Window *g_pWindow = NULL;
-SDL_Renderer *g_pRenderer = NULL;
+SDL_Window *_window = NULL;
+SDL_Renderer *_renderer = NULL;
 static int g_refreshRate = 60;
 
 static int iniHandler(void *user, const char *section, const char *name,
@@ -39,28 +39,41 @@ int geInitializeRenderingWindow() {
 		LogCritical("Could not load window.ini to create window.");
 		return 1;
 	}
-	g_pWindow = SDL_CreateWindow(settings.Title, SDL_WINDOWPOS_CENTERED,
+	_window = SDL_CreateWindow(settings.Title, SDL_WINDOWPOS_CENTERED,
 								 SDL_WINDOWPOS_CENTERED, settings.WindowX,
 								 settings.WindowY, SDL_WINDOW_SHOWN);
-	if (g_pWindow == NULL) {
+	if (_window == NULL) {
 		fprintf(stderr, "Window could not be created, Error: %s",
 				SDL_GetError());
 		return 0;
 	}
-	g_pRenderer = SDL_CreateRenderer(g_pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (g_pRenderer == NULL) {
+	_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (_renderer == NULL) {
 		LogCritical("Renderer could not be created, Error: %s", SDL_GetError());
 	}
 	LogDebug("Created window\nWidth: %d, Height: %d", settings.WindowX, settings.WindowY);
 	SDL_DisplayMode mode;
-	SDL_GetWindowDisplayMode(g_pWindow, &mode);
+	SDL_GetWindowDisplayMode(_window, &mode);
 	g_refreshRate = mode.refresh_rate ? mode.refresh_rate : 60;
 	LogDebug("Refresh rate is set to %d", g_refreshRate);
-	SDL_RenderSetIntegerScale(g_pRenderer, SDL_TRUE);
-	SDL_RenderSetLogicalSize(g_pRenderer, settings.WorldX, settings.WorldY);
+	SDL_RenderSetIntegerScale(_renderer, SDL_TRUE);
+	SDL_RenderSetLogicalSize(_renderer, settings.WorldX, settings.WorldY);
 	return 0;
 }
 
 int geWindowGetRefreshRate() {
 	return g_refreshRate;
+}
+
+SDL_Renderer* geGlobalRenderer() {
+	return _renderer;
+}
+
+void geStartDrawFrame() {
+	SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 255);
+	SDL_RenderClear(_renderer);
+}
+
+void geEndDrawFrame() {
+	SDL_RenderPresent(_renderer);
 }

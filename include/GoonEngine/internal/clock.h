@@ -1,18 +1,19 @@
 #pragma once
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct geClock geClock;
-geClock* geClockNew();
-geClock* geClockFree(geClock* c);
+/**
+ * @brief Clock is used for measuring the gametime of the game, is a simple wrapper to keep track of timings.
+ *
+ */
+typedef struct geClock {
+	uint64_t Previous;
+} geClock;
 void geClockStart(geClock* c);
 void geClockUpdate(geClock* c);
-int geClockTick(geClock* c);
-double geClockGetTps();
-int geClockGetTicksThisFrame();
-int geClockGetTicksPerSecond();
 double geClockGetUpdateTimeMilliseconds();
 double geClockGetUpdateTimeSeconds();
 #ifdef __cplusplus

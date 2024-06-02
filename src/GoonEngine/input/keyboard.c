@@ -1,5 +1,5 @@
 #include <GoonEngine/gnpch.h>
-#include <GoonEngine/keyboard.h>
+#include <GoonEngine/input/keyboard.h>
 
 static Uint8 _currentKeyboardState[SDL_NUM_SCANCODES];
 static Uint8 _previousKeyboardState[SDL_NUM_SCANCODES];
@@ -33,17 +33,17 @@ int geHandleKeyboardEvent(SDL_Event *event)
     return true;
 }
 
-bool geKeyHeldDown(int key)
+int geKeyHeldDown(int key)
 {
     return _previousKeyboardState[key] && _currentKeyboardState[key];
 }
 
-bool geKeyJustPressed(const int key)
+int geKeyJustPressed(const int key)
 {
     return _currentKeyboardState[key] && !_previousKeyboardState[key];
 }
 
-bool geKeyJustReleased(const int key)
+int geKeyJustReleased(const int key)
 {
     return !_currentKeyboardState[key] && _previousKeyboardState[key];
 }

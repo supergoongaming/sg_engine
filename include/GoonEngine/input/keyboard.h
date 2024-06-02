@@ -13,16 +13,16 @@
 extern "C"
 {
 #endif
-#include <GoonEngine/InputEvent.h>
+#include <GoonEngine/input/InputEvent.h>
 
 typedef union SDL_Event SDL_Event;
 
 int geHandleKeyboardEvent(SDL_Event *event);
 void geInitializeKeyboard();
 void geUpdateKeyboard();
-bool geKeyJustReleased(const int key);
-bool geKeyJustPressed(const int key);
-bool geKeyHeldDown(int key);
+int geKeyJustReleased(const int key);
+int geKeyJustPressed(const int key);
+int geKeyHeldDown(int key);
 #ifdef __cplusplus
 }
 #endif

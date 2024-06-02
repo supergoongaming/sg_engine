@@ -1,5 +1,5 @@
 #include <GoonEngine/gnpch.h>
-#include <GoonEngine/joystick.h>
+#include <GoonEngine/input/joystick.h>
 #include <GoonEngine/debug.h>
 
 typedef struct GamePad

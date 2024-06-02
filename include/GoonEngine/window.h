@@ -10,8 +10,11 @@ typedef struct geWindowSettings {
 	const char* Title;
 } geWindowSettings;
 
+SDL_Renderer* geGlobalRenderer();
 int geWindowGetRefreshRate();
 int geInitializeRenderingWindow();
+void geStartDrawFrame();
+void geEndDrawFrame();
 #ifdef __cplusplus
 }
 #endif

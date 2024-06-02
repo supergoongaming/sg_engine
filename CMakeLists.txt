@@ -22,7 +22,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 message(STATUS "Getting all files for cmake..")
 file(GLOB_RECURSE ENGINE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonEngine/*.c*
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/GoonPhysics/*.c*
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ini/*.c*
 )
 

@@ -5,7 +5,7 @@
 #include <GoonEngine/content/bgm.h>
 #include <GoonEngine/content/font.h>
 #include <GoonEngine/content/image.h>
-#include <GoonEngine/content/textv2.h>
+#include <GoonEngine/content/text.h>
 
 // Content Types
 #include <GoonEngine/content/bgm.h>
@@ -133,5 +133,5 @@ void geContentInitializeAllContentTypes() {
 	geInitializeBgmContentType();
 	geInitializeFontContentType();
 	geInitializeImageContentType();
-	geInitializeTextv2ContentType();
+	geInitializeTextContentType();
 }

@@ -1,7 +1,7 @@
 #pragma once
 typedef struct SDL_Surface SDL_Surface;
 typedef struct geImage geImage;
-#include <GoonEngine/rectangle.h>
+#include <GoonEngine/primitives/rectangle.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

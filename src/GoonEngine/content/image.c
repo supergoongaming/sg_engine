@@ -1,9 +1,8 @@
 #include <GoonEngine/content/content.h>
 #include <GoonEngine/content/image.h>
+#include <GoonEngine/window.h>
 #include <GoonEngine/debug.h>
 #include <SDL2/SDL_render.h>
-
-extern SDL_Renderer *g_pRenderer;
 
 typedef struct geImage {
 	SDL_Texture *Texture;
@@ -51,7 +50,8 @@ void geInitializeImageContentType() {
 
 geImage *geImageNewRenderTarget(const char *contentName, int width,
 								int height) {
-	SDL_Texture *t = SDL_CreateTexture(g_pRenderer, SDL_PIXELFORMAT_RGBA8888,
+									SDL_Renderer* r = geGlobalRenderer();
+	SDL_Texture *t = SDL_CreateTexture(r, SDL_PIXELFORMAT_RGBA8888,
 									   SDL_TEXTUREACCESS_TARGET, width, height);
 	geImage *i = malloc(sizeof(*i));
 	i->Texture = t;
@@ -61,14 +61,16 @@ geImage *geImageNewRenderTarget(const char *contentName, int width,
 }
 void geImageDrawImageToImage(geImage *src, geImage *dst, geRectangle *srcRect,
 							 geRectangle *dstRect) {
-	SDL_SetRenderTarget(g_pRenderer, dst->Texture);
-	SDL_RenderCopy(g_pRenderer, src->Texture, (SDL_Rect *)srcRect,
+									SDL_Renderer* r = geGlobalRenderer();
+	SDL_SetRenderTarget(r, dst->Texture);
+	SDL_RenderCopy(r, src->Texture, (SDL_Rect *)srcRect,
 				   (SDL_Rect *)dstRect);
-	SDL_SetRenderTarget(g_pRenderer, NULL);
+	SDL_SetRenderTarget(r, NULL);
 }
 
 geImage *geImageNewFromSurface(const char *contentName, SDL_Surface *surface) {
-	SDL_Texture *t = SDL_CreateTextureFromSurface(g_pRenderer, surface);
+									SDL_Renderer* r = geGlobalRenderer();
+	SDL_Texture *t = SDL_CreateTextureFromSurface(r, surface);
 	if (t == NULL) {
 		LogError("Could not create texture, Error: %s", SDL_GetError());
 		return NULL;
@@ -79,11 +81,12 @@ geImage *geImageNewFromSurface(const char *contentName, SDL_Surface *surface) {
 	i->Texture = t;
 	i->Name = strdup(contentName);
 	geAddContent(geContentTypeImage, (void *)i);
-    return i;
+	return i;
 }
 
 void geImageDraw(geImage *i, geRectangle *srcRect, geRectangle *dstRect) {
-	SDL_RenderCopyEx(g_pRenderer, i->Texture, (SDL_Rect *)srcRect,
+									SDL_Renderer* r = geGlobalRenderer();
+	SDL_RenderCopyEx(r, i->Texture, (SDL_Rect *)srcRect,
 					 (SDL_Rect *)dstRect, 0, NULL, SDL_FLIP_NONE);
 }
 void geImageLoad(geImage *i) {}

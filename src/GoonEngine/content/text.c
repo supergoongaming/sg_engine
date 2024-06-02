@@ -1,11 +1,11 @@
 
-#include <GoonEngine/SdlSurface.h>
-#include <GoonEngine/color.h>
 #include <GoonEngine/content/content.h>
 #include <GoonEngine/content/font.h>
+#include <GoonEngine/content/image.h>
 #include <GoonEngine/content/text.h>
 #include <GoonEngine/debug.h>
-#include <GoonEngine/rectangle.h>
+#include <GoonEngine/primitives/color.h>
+#include <GoonEngine/primitives/rectangle.h>
 #include <SDL2/SDL.h>
 #include <ft2build.h>
 #include <stdbool.h>
@@ -15,11 +15,14 @@ typedef struct geText {
 	const char *Text;
 	const char *FontName;
 	int FontSize;
+	int WordWrap;
+	int LettersToDraw;
 	geFont *Font;
 	geColor Color;
-	SDL_Texture *Texture;
-	geRectangle DrawRect;
-	Point TextBounds;
+	geImage *Texture;
+	gePoint TextLocation;
+	gePoint TextDrawSize;
+	gePoint TextSize;
 } geText;
 
 SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, int r, int g, int b) {
@@ -48,39 +51,40 @@ SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, int r, int g, int b) {
 	return surface;
 }
 
-SDL_Surface *createEmptySurface(int width, int height) {
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(
-		0, width, height, 32, SDL_PIXELFORMAT_RGBA8888);
-	if (surface == NULL) {
-		printf("Failed to create empty surface: %s\n", SDL_GetError());
-		return NULL;
-	}
-	SDL_FillRect(surface, NULL, SDL_MapRGBA(surface->format, 0, 0, 0, 0));
-	return surface;
+geImage *createEmptyTexture(int width, int height) {
+	return geImageNewRenderTarget("thing", width, height);
 }
 
-SDL_Texture *geCreateTextureForString(const char *word, geFont *font,
-									  Point *textureDimensions, geColor color) {
-	int totalWidth = 0;
+// Word is the entire string here.
+// geImage *createTextureForText(const char *word, geFont *font, gePoint *textureDimensions, geColor color) {
+geImage *createTextureForText(geText *t) {
+	int maxWidth = 0;
 	int maxHeight = 0;
-	FT_Face f = geFontGetFont(font);
-	for (size_t i = 0; i < strlen(word); i++) {
-		char letter = word[i];
-		int result = FT_Load_Char(f, letter, FT_LOAD_RENDER);
-		if (result) {
-			printf("Failed to load character %c with error code %d \n", letter,
-				   result);
-			continue;
-		}
-		totalWidth += (f->glyph->advance.x >> 6);
-		int letterHeight = (f->ascender - f->descender) >> 6;
-		maxHeight = maxHeight > letterHeight ? maxHeight : letterHeight;
+	FT_Face f = geFontGetFont(t->Font);
+	// Set the bounds of the text if set.
+	if (gePointIsZero(&t->TextDrawSize)) {
+		maxWidth = t->TextDrawSize.x;
+		maxHeight = t->TextDrawSize.y;
 	}
-	SDL_Surface *paper = createEmptySurface(totalWidth * 2, maxHeight * 2);
+	// Set the size based on the size of the text.
+	else {
+		for (size_t i = 0; i < strlen(t->Text); i++) {
+			char letter = t->Text[i];
+			int result = FT_Load_Char(f, letter, FT_LOAD_RENDER);
+			if (result) {
+				LogError("Failed to load character %c with error code %d \n", letter, result);
+				continue;
+			}
+			maxWidth += (f->glyph->advance.x >> 6);
+			int letterHeight = (f->ascender - f->descender) >> 6;
+			maxHeight = maxHeight > letterHeight ? maxHeight : letterHeight;
+		}
+	}
+	geImage *paper = createEmptyTexture(maxWidth * 2, maxHeight * 2);
 	int x = 0;
 	int baseline = 0;
-	for (size_t i = 0; i < strlen(word); i++) {
-		char letter = word[i];
+	for (size_t i = 0; i < strlen(t->Text); i++) {
+		char letter = t->Text[i];
 		int result = FT_Load_Char(f, letter, FT_LOAD_RENDER);
 		if (result) {
 			printf("Failed to load character %c with error code %d \n", letter,
@@ -93,32 +97,35 @@ SDL_Texture *geCreateTextureForString(const char *word, geFont *font,
 			baseline = (f->ascender - f->descender) >> 6;
 		}
 		int y = baseline - (f->glyph->metrics.horiBearingY >> 6);
-		SDL_Surface *letterSurface =
-			geCreateSurfaceForCharacter(f, color.R, color.G, color.B);
+		SDL_Surface *letterSurface = geCreateSurfaceForCharacter(f, t->Color.R, t->Color.G, t->Color.B);
 		// Don't blit if this was a space, but still advance.
 		if (!letterSurface) {
 			x += (f->glyph->advance.x >> 6);
 			SDL_FreeSurface(letterSurface);
 			continue;
 		}
-		SDL_Rect dst = {x, y, letterSurface->w, letterSurface->h};
-		SDL_BlitSurface(letterSurface, NULL, paper, &dst);
+		geRectangle dst = {x, y, letterSurface->w, letterSurface->h};
+		// Convert to a texture
+		// SDL_Texture *letterTexture =
+		char letterString[2];
+		letterString[0] = letter;
+		letterString[1] = '\0';
+		geImage *letterTexture =
+			geImageNewFromSurface(letterString, letterSurface);
+		// Draw this onto the paper
+		geImageDrawImageToImage(letterTexture, paper, NULL, &dst);
 		x += (f->glyph->advance.x >> 6);
-		SDL_FreeSurface(letterSurface);
 	}
-	textureDimensions->x = totalWidth;
-	textureDimensions->y = maxHeight;
-	// removed this func, so commented.  should use geImage now
-	// SDL_Texture *charTexture = geCreateTextureFromSurface(paper);
-	// return charTexture;
-	return NULL;
+	t->TextSize.x = maxWidth;
+	t->TextSize.y = maxHeight;
+	return paper;
 }
 
 static void textFree(geText *t) {
 	LogWarn("Freeing text %s", t->Text);
 	if (t->Font) geFontFree(t->Font);
 	t->Font = NULL;
-	geDestroyTexture(t->Texture);
+	geImageFree(t->Texture);
 	t->Texture = NULL;
 	free(t->Font);
 }
@@ -154,15 +161,17 @@ void geInitializeTextContentType() {
 							  textFindContent);
 }
 
-geText *geTextNew(const char *text, const char *fontName, int fontSize,
-				  Point *fontBounds) {
+geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 	geText *t = malloc(sizeof(*t));
 	t->Text = text;
 	t->Texture = NULL;
 	t->Font = NULL;
 	t->FontSize = fontSize;
 	t->FontName = fontName;
-	t->DrawRect.x = t->DrawRect.y = t->DrawRect.w = t->DrawRect.h = 0;
+	t->TextLocation = gePointZero();
+	t->TextSize = gePointZero();
+	t->TextDrawSize = gePointZero();
+	t->WordWrap = true;
 	t->Color.R = t->Color.G = t->Color.B = t->Color.A = 255;
 	geAddContent(geContentTypeText, t);
 	return t;
@@ -175,8 +184,8 @@ void geTextLoad(geText *t) {
 				t->Text);
 	}
 	geFontLoad(t->Font);
-	t->Texture =
-		geCreateTextureForString(t->Text, t->Font, &t->TextBounds, t->Color);
+	// t->Texture = createTextureForText(t->Text, t->Font, &t->TextSize, t->Color);
+	t->Texture = createTextureForText(t);
 }
 
 void geTextSetColor(geText *t, geColor *color) {
@@ -187,17 +196,30 @@ void geTextSetColor(geText *t, geColor *color) {
 }
 void geTextDraw(geText *t) {
 	geRectangle r;
-	r.x = t->DrawRect.x;
-	r.y = t->DrawRect.y;
-	r.w = t->DrawRect.w != 0 ? t->DrawRect.w : t->TextBounds.x;
-	r.h = t->DrawRect.h != 0 ? t->DrawRect.h : t->TextBounds.y;
-	// geDrawTexture(t->Texture, NULL, &r, false);
+	r.x = t->TextLocation.x;
+	r.y = t->TextLocation.y;
+	r.w = t->TextDrawSize.x;
+	r.h = t->TextDrawSize.y;
+	geImageDraw(t->Texture, NULL, &r);
 }
 
-void geTextFree(geText *f) { geUnloadContent(geContentTypeText, f->Text); }
+void geTextFree(geText *f) {
+	geUnloadContent(geContentTypeText, f->Text);
+}
+
+void geTextSetLocation(geText *t, int x, int y) {
+	t->TextLocation.x = x;
+	t->TextLocation.y = y;
+}
+
+void geTextSetDrawSize(geText *t, int x, int y) {
+	t->TextDrawSize.x = x;
+	t->TextDrawSize.y = y;
+}
+
 void geTextSetDrawRect(geText *t, geRectangle *r) {
-	t->DrawRect.x = r->x;
-	t->DrawRect.y = r->y;
-	t->DrawRect.w = r->w;
-	t->DrawRect.h = r->h;
+	t->TextLocation.x = r->x;
+	t->TextLocation.y = r->y;
+	t->TextDrawSize.x = r->w;
+	t->TextDrawSize.y = r->y;
 }

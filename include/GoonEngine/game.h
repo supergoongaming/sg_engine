@@ -1,6 +1,6 @@
 #pragma once
 struct InputEvent;
-#include <GoonEngine/InputEvent.h>
+#include <GoonEngine/input/InputEvent.h>
 #ifdef __cplusplus
 extern "C"
 {

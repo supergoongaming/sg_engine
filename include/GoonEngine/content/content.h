@@ -1,7 +1,7 @@
 #pragma once
 typedef struct geBgm geBgm;
 typedef struct geFont geFont;
-typedef struct geRichText geRichText;
+typedef struct geText geText;
 typedef struct geImage geImage;
 
 typedef enum geContentTypes {
@@ -19,7 +19,7 @@ typedef struct geContent {
 	union {
 		geBgm *Bgm;
 		geFont *Font;
-		geRichText *Text;
+		geText *Text;
 		geImage *Image;
 	} Data;
 
