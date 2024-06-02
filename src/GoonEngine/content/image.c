@@ -67,6 +67,10 @@ void geImageDrawImageToImage(geImage *src, geImage *dst, geRectangle *srcRect,
 }
 
 geImage *geImageNewFromSurface(const char *contentName, SDL_Surface *surface) {
+	geContent *loadedContent = geGetLoadedContent(geContentTypeImage, contentName);
+	if (loadedContent) {
+		return loadedContent->Data.Image;
+	}
 	SDL_Renderer *r = geGlobalRenderer();
 	SDL_Texture *t = SDL_CreateTextureFromSurface(r, surface);
 	if (t == NULL) {
@@ -89,3 +93,14 @@ void geImageDraw(geImage *i, geRectangle *srcRect, geRectangle *dstRect) {
 }
 void geImageLoad(geImage *i) {}
 void geImageFree(geImage *i) { geUnloadContent(geContentTypeImage, i->Name); }
+int geImageWidth(geImage *i) {
+	int w, h;
+	SDL_QueryTexture(i->Texture, NULL, NULL, &w, &h);
+	return w;
+}
+
+int geImageHeight(geImage *i) {
+	int w, h;
+	SDL_QueryTexture(i->Texture, NULL, NULL, &w, &h);
+	return h;
+}

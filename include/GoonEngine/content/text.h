@@ -15,7 +15,7 @@ void geTextFree(geText* t);
 void geTextDraw(geText* t);
 void geTextDrawNative(geText* t);
 
-gePoint geTextMeasureDebug(geText* text);
+// gePoint geTextMeasureDebug(geText* text);
 gePoint geTextGetTextSize(geText* text);
 
 // Update Text

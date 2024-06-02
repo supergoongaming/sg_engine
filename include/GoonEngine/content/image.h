@@ -18,6 +18,8 @@ void geImageDrawImageToImage(geImage* src, geImage* dst, geRectangle* srcRect,
 void geImageLoad(geImage* i);
 void geImageFree(geImage* i);
 void geImageDraw(geImage* i, geRectangle* srcRect, geRectangle* dstRect);
+int geImageWidth(geImage* i);
+int geImageHeight(geImage* i);
 
 #ifdef __cplusplus
 }

@@ -60,8 +60,7 @@ geContent *geGetLoadedContent(geContentTypes type, const char *path) {
 	if (index == -1) return NULL;
 	geContent **array = _loadedContent[type];
 	if (!array)
-		LogCritical(
-			"Loaded content type does not exist, can't get it properly");
+		LogCritical("Loaded content type does not exist, can't get it properly");
 	array[index]->RefCount++;
 	return array[index];
 }
