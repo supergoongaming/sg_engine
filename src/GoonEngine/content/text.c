@@ -6,8 +6,10 @@
 #include <GoonEngine/debug.h>
 #include <GoonEngine/primitives/color.h>
 #include <GoonEngine/primitives/rectangle.h>
+#include <GoonEngine/utils.h>
 #include <SDL2/SDL.h>
 #include <ft2build.h>
+#include <math.h>
 #include <stdbool.h>
 #include FT_FREETYPE_H
 
@@ -20,6 +22,7 @@ typedef struct geText {
 	geFont *Font;
 	geColor Color;
 	geImage *Texture;
+	gePoint TextBounds;
 	gePoint TextLocation;
 	gePoint TextDrawSize;
 	gePoint TextSize;
@@ -51,38 +54,112 @@ SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, int r, int g, int b) {
 	return surface;
 }
 
+// Check if we should start a new word
+bool isLetterSpaceOrNewline(char l) {
+	return l == ' ' || l == '\n';
+}
+
+// Gets the amount of distance to move the y value on word wrap or newline
+int getLineHeight(FT_Face face) {
+	return face->size->metrics.height >> 6;
+}
+
+int checkShouldWrap(int x, int wordLength, int glyphWidth, int maxX) {
+	return x + wordLength + glyphWidth > maxX;
+}
+
+int getLetterWidth(geText *t, char l) {
+	FT_Face f = geFontGetFont(t->Font);
+	int result = FT_Load_Char(f, l, FT_LOAD_DEFAULT);
+	if (result) {
+		LogError("Could not measure character properly.  Char %s, error %d", l, result);
+		return 0;
+	}
+	return f->glyph->advance.x >> 6;
+}
+
+gePoint quickMeasureFullText(geText *t) {
+	int maxWidth = 9999;
+	int maxHeight = 9999;
+	// Set the bounds of the text if set.
+	if (!gePointIsZero(&t->TextBounds)) {
+		maxWidth = t->TextBounds.x;
+		maxHeight = t->TextBounds.y;
+	}
+	// Measure and see where we end up.
+	gePoint textSize = gePointZero();
+	int currentWordLength = 0;
+	FT_Face f = geFontGetFont(t->Font);
+	// int startLoc = (f->ascender - f->descender) >> 6;
+	int startLoc = f->ascender >> 6;
+	int lineSpace = f->height >> 6;
+	int penX = 0, penY = startLoc;
+	for (size_t i = 0; i < strlen(t->Text); i++) {
+		char letter = t->Text[i];
+		if (letter == '\n') {
+			if (currentWordLength) {
+				penX += currentWordLength;
+				if (penX > textSize.x) {
+					textSize.x = penX;
+				}
+			}
+			penX = 0;
+			penY += lineSpace;
+			currentWordLength = 0;
+			continue;
+		}
+		if (letter == ' ') {
+			penX += currentWordLength;
+			currentWordLength = 0;
+		}
+		int letterSize = getLetterWidth(t, letter);
+		if (checkShouldWrap(penX, currentWordLength, letterSize, maxWidth)) {
+			if (penX > textSize.x) {
+				textSize.x = penX;
+			}
+			penX = 0;
+			penY += lineSpace;
+		}
+		currentWordLength += letterSize;
+	}
+	// If we are done looping, and there is a word left, write the word
+	if (currentWordLength) {
+		penX += currentWordLength;
+	}
+	textSize.x = MAX(textSize.x, penX);
+	textSize.y = penY - (f->descender >> 6);
+	if (textSize.y > maxHeight) {
+		LogWarn("Your text overflowed through Y, please adjust your bounds else it will flow past");
+	}
+	return textSize;
+}
+
+gePoint geTextMeasureDebug(geText *text) {
+	return quickMeasureFullText(text);
+}
+
 geImage *createEmptyTexture(int width, int height) {
 	return geImageNewRenderTarget("thing", width, height);
 }
 
-// Word is the entire string here.
-// geImage *createTextureForText(const char *word, geFont *font, gePoint *textureDimensions, geColor color) {
 geImage *createTextureForText(geText *t) {
 	int maxWidth = 0;
 	int maxHeight = 0;
 	FT_Face f = geFontGetFont(t->Font);
-	// Set the bounds of the text if set.
-	if (gePointIsZero(&t->TextDrawSize)) {
-		maxWidth = t->TextDrawSize.x;
-		maxHeight = t->TextDrawSize.y;
-	}
-	// Set the size based on the size of the text.
-	else {
-		for (size_t i = 0; i < strlen(t->Text); i++) {
-			char letter = t->Text[i];
-			int result = FT_Load_Char(f, letter, FT_LOAD_RENDER);
-			if (result) {
-				LogError("Failed to load character %c with error code %d \n", letter, result);
-				continue;
-			}
-			maxWidth += (f->glyph->advance.x >> 6);
-			int letterHeight = (f->ascender - f->descender) >> 6;
-			maxHeight = maxHeight > letterHeight ? maxHeight : letterHeight;
+	for (size_t i = 0; i < strlen(t->Text); i++) {
+		char letter = t->Text[i];
+		int result = FT_Load_Char(f, letter, FT_LOAD_DEFAULT);
+		if (result) {
+			LogError("Failed to load character %c with error code %d \n", letter, result);
+			continue;
 		}
+		maxWidth += (f->glyph->advance.x >> 6);
+		int letterHeight = (f->ascender - f->descender) >> 6;
+		maxHeight = maxHeight > letterHeight ? maxHeight : letterHeight;
 	}
-	geImage *paper = createEmptyTexture(maxWidth * 2, maxHeight * 2);
+	geImage *paper = createEmptyTexture(maxWidth, maxHeight);
 	int x = 0;
-	int baseline = 0;
+	int baseline = f->ascender >> 6;
 	for (size_t i = 0; i < strlen(t->Text); i++) {
 		char letter = t->Text[i];
 		int result = FT_Load_Char(f, letter, FT_LOAD_RENDER);
@@ -90,11 +167,6 @@ geImage *createTextureForText(geText *t) {
 			printf("Failed to load character %c with error code %d \n", letter,
 				   result);
 			continue;
-		}
-		// remember everything is in 64 per one pixel, so you must always use
-		// the bitshifter
-		if (baseline == 0) {
-			baseline = (f->ascender - f->descender) >> 6;
 		}
 		int y = baseline - (f->glyph->metrics.horiBearingY >> 6);
 		SDL_Surface *letterSurface = geCreateSurfaceForCharacter(f, t->Color.R, t->Color.G, t->Color.B);
@@ -105,13 +177,10 @@ geImage *createTextureForText(geText *t) {
 			continue;
 		}
 		geRectangle dst = {x, y, letterSurface->w, letterSurface->h};
-		// Convert to a texture
-		// SDL_Texture *letterTexture =
 		char letterString[2];
 		letterString[0] = letter;
 		letterString[1] = '\0';
-		geImage *letterTexture =
-			geImageNewFromSurface(letterString, letterSurface);
+		geImage *letterTexture = geImageNewFromSurface(letterString, letterSurface);
 		// Draw this onto the paper
 		geImageDrawImageToImage(letterTexture, paper, NULL, &dst);
 		x += (f->glyph->advance.x >> 6);
@@ -171,6 +240,7 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 	t->TextLocation = gePointZero();
 	t->TextSize = gePointZero();
 	t->TextDrawSize = gePointZero();
+	t->TextBounds = gePointZero();
 	t->WordWrap = true;
 	t->Color.R = t->Color.G = t->Color.B = t->Color.A = 255;
 	geAddContent(geContentTypeText, t);
@@ -194,12 +264,26 @@ void geTextSetColor(geText *t, geColor *color) {
 	t->Color.B = color->B;
 	t->Color.A = color->A;
 }
+
+void geTextSetBounds(geText *t, int x, int y) {
+	t->TextBounds.x = x;
+	t->TextBounds.y = y;
+}
+
 void geTextDraw(geText *t) {
 	geRectangle r;
 	r.x = t->TextLocation.x;
 	r.y = t->TextLocation.y;
 	r.w = t->TextDrawSize.x;
 	r.h = t->TextDrawSize.y;
+	geImageDraw(t->Texture, NULL, &r);
+}
+void geTextDrawNative(geText *t) {
+	geRectangle r;
+	r.x = t->TextLocation.x;
+	r.y = t->TextLocation.y;
+	r.w = t->TextSize.x;
+	r.h = t->TextSize.y;
 	geImageDraw(t->Texture, NULL, &r);
 }
 
@@ -222,4 +306,11 @@ void geTextSetDrawRect(geText *t, geRectangle *r) {
 	t->TextLocation.y = r->y;
 	t->TextDrawSize.x = r->w;
 	t->TextDrawSize.y = r->y;
+}
+
+gePoint geTextGetTextSize(geText *text) {
+	gePoint p;
+	p.x = text->TextSize.x;
+	p.y = text->TextSize.y;
+	return p;
 }

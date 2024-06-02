@@ -1,7 +1,7 @@
 #include <GoonEngine/content/content.h>
 #include <GoonEngine/content/image.h>
-#include <GoonEngine/window.h>
 #include <GoonEngine/debug.h>
+#include <GoonEngine/window.h>
 #include <SDL2/SDL_render.h>
 
 typedef struct geImage {
@@ -48,11 +48,9 @@ void geInitializeImageContentType() {
 							  imageFindContent);
 }
 
-geImage *geImageNewRenderTarget(const char *contentName, int width,
-								int height) {
-									SDL_Renderer* r = geGlobalRenderer();
-	SDL_Texture *t = SDL_CreateTexture(r, SDL_PIXELFORMAT_RGBA8888,
-									   SDL_TEXTUREACCESS_TARGET, width, height);
+geImage *geImageNewRenderTarget(const char *contentName, int width, int height) {
+	SDL_Renderer *r = geGlobalRenderer();
+	SDL_Texture *t = SDL_CreateTexture(r, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
 	geImage *i = malloc(sizeof(*i));
 	i->Texture = t;
 	i->Name = strdup(contentName);
@@ -61,7 +59,7 @@ geImage *geImageNewRenderTarget(const char *contentName, int width,
 }
 void geImageDrawImageToImage(geImage *src, geImage *dst, geRectangle *srcRect,
 							 geRectangle *dstRect) {
-									SDL_Renderer* r = geGlobalRenderer();
+	SDL_Renderer *r = geGlobalRenderer();
 	SDL_SetRenderTarget(r, dst->Texture);
 	SDL_RenderCopy(r, src->Texture, (SDL_Rect *)srcRect,
 				   (SDL_Rect *)dstRect);
@@ -69,7 +67,7 @@ void geImageDrawImageToImage(geImage *src, geImage *dst, geRectangle *srcRect,
 }
 
 geImage *geImageNewFromSurface(const char *contentName, SDL_Surface *surface) {
-									SDL_Renderer* r = geGlobalRenderer();
+	SDL_Renderer *r = geGlobalRenderer();
 	SDL_Texture *t = SDL_CreateTextureFromSurface(r, surface);
 	if (t == NULL) {
 		LogError("Could not create texture, Error: %s", SDL_GetError());
@@ -85,7 +83,7 @@ geImage *geImageNewFromSurface(const char *contentName, SDL_Surface *surface) {
 }
 
 void geImageDraw(geImage *i, geRectangle *srcRect, geRectangle *dstRect) {
-									SDL_Renderer* r = geGlobalRenderer();
+	SDL_Renderer *r = geGlobalRenderer();
 	SDL_RenderCopyEx(r, i->Texture, (SDL_Rect *)srcRect,
 					 (SDL_Rect *)dstRect, 0, NULL, SDL_FLIP_NONE);
 }
