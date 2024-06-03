@@ -131,10 +131,10 @@ gePoint measureFullText(geText *t) {
 	int maxHeight = 9999;
 	// Set the bounds of the text if set.
 	if (!gePointIsZero(&t->TextBounds)) {
-		if(t->TextBounds.x) {
+		if (t->TextBounds.x) {
 			maxWidth = t->TextBounds.x;
 		}
-		if(t->TextBounds.y) {
+		if (t->TextBounds.y) {
 			maxHeight = t->TextBounds.y;
 		}
 	}
@@ -182,8 +182,12 @@ gePoint measureFullText(geText *t) {
 			penX = 0;
 			penY += lineSpace;
 		}
-		currentWordLength += letterSize;
-		++currentWordLetters;
+		if (letter != ' ') {
+			currentWordLength += letterSize;
+			++currentWordLetters;
+		} else {
+			penX = penX == 0 ? 0 : penX + letterSize;
+		}
 	}
 	// If we are done looping, and there is a word left, write the word
 	if (currentWordLength) {
@@ -330,24 +334,14 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 	t->TextDrawSize = gePointZero();
 	t->TextBounds = gePointZero();
 	t->WordWrap = true;
+	t->LettersToDraw = strlen(text);
 	t->Color.R = t->Color.G = t->Color.B = t->Color.A = 255;
 	geAddContent(geContentTypeText, t);
 	return t;
 }
 
-void geTextLoad(geText *t) {
-	t->Font = geFontNew(t->FontName, t->FontSize);
-	if (!t->Font) {
-		LogWarn("Could not load font name %s for text, %s", t->FontName,
-				t->Text);
-	}
-	geFontLoad(t->Font);
-	createTexturesForText(t);
-	t->TextSize = measureFullText(t);
-	char buf[200];
-	snprintf(buf, 200, "%s_%s_%d", t->Text, t->FontName, t->FontSize);
-	t->Texture = geImageNewRenderTarget(buf, t->TextSize.x, t->TextSize.y);
-	for (size_t i = 0; i < strlen(t->Text); i++) {
+void loadLetters(geText *t, int startLoc) {
+	for (size_t i = startLoc; i < t->LettersToDraw; i++) {
 		char letter = t->Text[i];
 		if (letter == ' ') {
 			continue;
@@ -370,9 +364,23 @@ void geTextLoad(geText *t) {
 		r.y = t->LetterPoints[i].y;
 		r.w = geImageWidth(image);
 		r.h = geImageHeight(image);
-
 		geImageDrawImageToImage(image, t->Texture, NULL, &r);
 	}
+}
+
+void geTextLoad(geText *t) {
+	t->Font = geFontNew(t->FontName, t->FontSize);
+	if (!t->Font) {
+		LogWarn("Could not load font name %s for text, %s", t->FontName,
+				t->Text);
+	}
+	geFontLoad(t->Font);
+	createTexturesForText(t);
+	t->TextSize = measureFullText(t);
+	char buf[200];
+	snprintf(buf, 200, "%s_%s_%d", t->Text, t->FontName, t->FontSize);
+	t->Texture = geImageNewRenderTarget(buf, t->TextSize.x, t->TextSize.y);
+	loadLetters(t, 0);
 }
 
 void geTextSetColor(geText *t, geColor *color) {
@@ -431,4 +439,15 @@ gePoint geTextGetTextSize(geText *text) {
 	p.x = text->TextSize.x;
 	p.y = text->TextSize.y;
 	return p;
+}
+
+void geTextSetNumDrawCharacters(geText *t, int num) {
+	if (num > strlen(t->Text)) {
+		return;
+	}
+	int current = t->LettersToDraw;
+	t->LettersToDraw = num;
+	if (t->Texture) {
+		loadLetters(t, current);
+	}
 }

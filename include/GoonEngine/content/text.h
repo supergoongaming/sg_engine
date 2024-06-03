@@ -21,6 +21,7 @@ gePoint geTextGetTextSize(geText* text);
 // Update Text
 void geTextSetColor(geText* t, geColor* color);
 void geTextSetBounds(geText* t, int x, int y);
+void geTextSetNumDrawCharacters(geText* t, int num);
 
 // Draw data
 void geTextSetLocation(geText* t, int x, int y);
