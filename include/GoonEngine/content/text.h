@@ -13,7 +13,6 @@ geText* geTextNew(const char* text, const char* fontName, int fontSize);
 void geTextLoad(geText* t);
 void geTextFree(geText* t);
 void geTextDraw(geText* t);
-void geTextDrawNative(geText* t);
 
 // gePoint geTextMeasureDebug(geText* text);
 gePoint geTextGetTextSize(geText* text);
@@ -25,8 +24,6 @@ void geTextSetNumDrawCharacters(geText* t, int num);
 
 // Draw data
 void geTextSetLocation(geText* t, int x, int y);
-void geTextSetDrawSize(geText* t, int x, int y);
-void geTextSetDrawRect(geText* t, geRectangle* drawRect);
 
 #ifdef __cplusplus
 }
