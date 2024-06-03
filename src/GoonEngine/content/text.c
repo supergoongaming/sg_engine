@@ -298,6 +298,7 @@ void geTextLoad(geText *t) {
 	char buf[200];
 	snprintf(buf, 200, "%s_%s_%d", t->Text, t->FontName, t->FontSize);
 	t->Texture = geImageNewRenderTarget(buf, t->BoundingBox.w, t->BoundingBox.h);
+	geImageSetPixels(t);
 	loadLetters(t, 0);
 }
 
