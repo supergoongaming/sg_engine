@@ -1,4 +1,4 @@
-#include <GoonEngine/primitives/point.h>
+#include <GoonEngine/prim/point.h>
 
 gePoint gePointZero() {
 	gePoint point = {0, 0};

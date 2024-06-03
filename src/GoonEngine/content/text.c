@@ -4,8 +4,7 @@
 #include <GoonEngine/content/image.h>
 #include <GoonEngine/content/text.h>
 #include <GoonEngine/debug.h>
-#include <GoonEngine/primitives/color.h>
-#include <GoonEngine/primitives/rectangle.h>
+#include <GoonEngine/prim/color.h>
 #include <GoonEngine/utils.h>
 #include <SDL2/SDL.h>
 #include <ft2build.h>

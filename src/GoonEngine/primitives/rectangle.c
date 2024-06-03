@@ -1,4 +1,4 @@
-#include <GoonEngine/primitives/rectangle.h>
+#include <GoonEngine/prim/rectangle.h>
 
 geRectangle geRectangleZero() {
 	geRectangle rect;

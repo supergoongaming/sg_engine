@@ -1,7 +1,7 @@
 #pragma once
 typedef struct SDL_Surface SDL_Surface;
 typedef struct geImage geImage;
-#include <GoonEngine/primitives/rectangle.h>
+#include <GoonEngine/prim/rectangle.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -9,6 +9,7 @@ extern "C" {
 // Should be ran during engine initialization so that the font content can work
 // properly
 void geInitializeImageContentType();
+geImage* geImageNewFromFile(const char* path);
 geImage* geImageNewFromSurface(const char* contentName, SDL_Surface* surface);
 geImage* geImageNewRenderTarget(const char* contentName, int width, int height);
 // Used for drawing a texture onto a render target texture.  Otherwise this will

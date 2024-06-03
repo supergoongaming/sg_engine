@@ -50,8 +50,6 @@ elseif(UNIX AND NOT APPLE)
     set(LINUX ON)
 endif(APPLE)
 
-# Subdirectory things
-
 # #########################################
 # Initialize
 # #########################################
@@ -64,15 +62,7 @@ add_library(${LIBRARY_TARGET_NAME}
     ${ENGINE_FILES}
 )
 
-# else()
-# add_library(${LIBRARY_TARGET_NAME}
-# SHARED
-# ${ENGINE_FILES}
-# )
-# endif(LINUX)
 set_property(TARGET ${LIBRARY_TARGET_NAME} PROPERTY C_STANDARD 11)
-
-# find_package(PkgConfig REQUIRED)
 find_package(ZLIB)
 include(CTest)
 
@@ -81,7 +71,7 @@ include(CTest)
 # #########################################
 option(CMAKE_DEBUG_VARIABLES "Runs a debug on all variables for troubleshooting" ON)
 option(GOON_BUILD_PCH "Uses a PCH file to try and speed up compilation" ON)
-option(GOON_DEBUG_SOUND "Builds sound from subdirectory instead of using a made package so we can debug" ON)
+option(GOON_DEBUG_SOUND "Builds sound from subdirectory instead of using a made package so we can debug" OFF)
 option(GOON_BUILD_TESTING "Should we enable testing with ctest" OFF)
 set(BUILD_TESTING GOON_BUILD_TESTING) # Set the cmake variable build_testing to our option
 
@@ -116,8 +106,23 @@ message("Going to do the thing.. macos is ${MACOS} and GOON_FULL_MACOS_BUILD is 
 
 if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
     find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
-    add_subdirectory(./external/sg_sound)
-    add_subdirectory(./external/freetype)
+    find_package(supergoonSound REQUIRED)
+    find_package(freetype REQUIRED)
+    find_package(png REQUIRED)
+    # find_library(LIB_PNG
+    # REQUIRED
+    # PATH_SUFFIXES .a
+    # NAMES libpng png.a png.dll libpng.a
+    # HINTS /usr/local/lib /c/cmake/lib)
+
+    if(NOT supergoonSound_FOUND)
+        add_subdirectory(./external/sg_sound)
+    endif(NOT supergoonSound_FOUND)
+
+    if(NOT freetype_FOUND AND NOT Freetype_FOUND)
+        add_subdirectory(./external/freetype)
+    endif(NOT freetype_FOUND AND NOT Freetype_FOUND)
+
 else()
     # Windows doesn't have zlib by default.
     if(WIN32)
@@ -127,6 +132,7 @@ else()
     endif(NOT EMSCRIPTEN)
 
     add_subdirectory(./external/sg_sound)
+    add_subdirectory(./external/freetype)
 endif(MACOS AND NOT GOON_FULL_MACOS_BUILD)
 
 # #########################################
@@ -196,15 +202,26 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # #########################################
 # Linking Options
 # #########################################
+
+if(EMSCRIPTEN OR(MACOS AND NOT GOON_FULL_MACOS_BUILD))
+    set(PNG_LIB_NAME png)
+else()
+    set(PNG_LIB_NAME png_static)
+endif(EMSCRIPTEN OR(MACOS AND NOT GOON_FULL_MACOS_BUILD))
+
+
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
     supergoonSound
     freetype
+    png
 
-    # testing
+    ${PNG_LIB_NAME}
+    ${LIB_PNG}
     ${LIB_VORBISFILE}
     ${LIB_VORBIS}
     ${LIB_OGG}
+    ${OGG_LIBRARIES}
     ${OGG_LIBRARIES}
     PRIVATE
 )
@@ -230,7 +247,9 @@ target_include_directories(${LIBRARY_TARGET_NAME}
     # Need both when not building (using emscripten)
     /emsdk/upstream/emscripten/cache/sysroot/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
     external/sg_sound/src/
 
-    # Freetype cause yeah
+    # Freetype local
+    ${FREETYPE_INCLUDE_DIRS}
 )

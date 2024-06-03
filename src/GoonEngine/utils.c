@@ -1,8 +1,8 @@
 #include <GoonEngine/content/text.h>
 #include <GoonEngine/gnpch.h>
 #include <GoonEngine/internal/clock.h>
-#include <GoonEngine/primitives/color.h>
-#include <GoonEngine/primitives/point.h>
+#include <GoonEngine/prim/color.h>
+#include <GoonEngine/prim/point.h>
 #include <GoonEngine/utils.h>
 #include <GoonEngine/window.h>
 

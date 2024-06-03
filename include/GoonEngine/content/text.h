@@ -2,8 +2,8 @@
 #pragma once
 typedef struct geText geText;
 typedef struct geColor geColor;
-#include <GoonEngine/primitives/point.h>
-#include <GoonEngine/primitives/rectangle.h>
+#include <GoonEngine/prim/point.h>
+#include <GoonEngine/prim/rectangle.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

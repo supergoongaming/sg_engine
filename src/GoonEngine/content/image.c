@@ -65,6 +65,9 @@ void geImageDrawImageToImage(geImage *src, geImage *dst, geRectangle *srcRect,
 				   (SDL_Rect *)dstRect);
 	SDL_SetRenderTarget(r, NULL);
 }
+geImage *geImageNewFromFile(const char *path) {
+	return NULL;
+}
 
 // This does free the surface afterwards, either increases refcount or creates new.
 geImage *geImageNewFromSurface(const char *contentName, SDL_Surface *surface) {
