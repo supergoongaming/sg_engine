@@ -105,7 +105,7 @@ int getKerning(geText *t, int i) {
 	}
 	result = delta.x >> 6;
 	if (delta.x != 0) {
-		LogDebug("Wow");
+		LogWarn("Wow theres actually kerning and this hasen't been tested");
 	}
 	return result;
 }
@@ -114,13 +114,14 @@ int getKerning(geText *t, int i) {
 void addWordToLetterPoints(geText *t, int wordEndPos, int wordLength, int penX, int penY) {
 	int x = penX, y = penY, wordStartPos = wordEndPos - wordLength;
 	for (size_t i = 0; i < wordLength; i++) {
-		char letter = t->Text[wordStartPos + i];
-		int width = getLetterWidth(t, letter);
+		int wordI = wordStartPos + i;
+		char letter = t->Text[wordI];
 		gePoint p;
 		p.x = x;
-		p.x += getKerning(t, wordStartPos + i);
+		p.x -= getKerning(t, wordI);
 		p.y = y - getLetterYBearing(t, letter);
-		t->LetterPoints[wordStartPos + i] = p;
+		t->LetterPoints[wordI] = p;
+		int width = getLetterWidth(t, letter);
 		x += width;
 	}
 }
@@ -130,8 +131,12 @@ gePoint measureFullText(geText *t) {
 	int maxHeight = 9999;
 	// Set the bounds of the text if set.
 	if (!gePointIsZero(&t->TextBounds)) {
-		maxWidth = t->TextBounds.x;
-		maxHeight = t->TextBounds.y;
+		if(t->TextBounds.x) {
+			maxWidth = t->TextBounds.x;
+		}
+		if(t->TextBounds.y) {
+			maxHeight = t->TextBounds.y;
+		}
 	}
 	// Measure and see where we end up.
 	gePoint textSize = gePointZero();
