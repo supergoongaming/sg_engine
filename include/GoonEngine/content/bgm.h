@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
     void geInitializeBgmContentType();
-    geBgm *geBgmNew(const char *bgmName, float bgmStart, float bgmEnd);
+    geBgm *geBgmNew(const char *bgmName);
     void geBgmDelete(geBgm *bgm);
     int geBgmPlay(geBgm *bgm, float volume, int loops);
 #ifdef __cplusplus

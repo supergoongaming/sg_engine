@@ -9,9 +9,12 @@
 #include <GoonEngine/utils.h>
 #include <SDL2/SDL.h>
 #include <ft2build.h>
+#include <limits.h>
 #include <math.h>
 #include <stdbool.h>
 #include FT_FREETYPE_H
+
+#define LETTER_BUFFER_LENGTH 100
 
 typedef struct geText {
 	const char *Text;
@@ -49,10 +52,6 @@ SDL_Surface *geCreateSurfaceForCharacter(FT_Face face, int r, int g, int b) {
 	SDL_SetColorKey(surface, SDL_TRUE, 0);
 	return surface;
 }
-
-// bool isLetterSpaceOrNewline(char l) {
-// 	return l == ' ' || l == '\n';
-// }
 
 int checkShouldWrap(int x, int wordLength, int glyphWidth, int maxX) {
 	return x + wordLength + glyphWidth > maxX;
@@ -116,27 +115,16 @@ void addWordToLetterPoints(geText *t, int wordEndPos, int wordLength, int penX, 
 	}
 }
 
-gePoint measureFullText(geText *t) {
-	int maxWidth = 9999;
-	int maxHeight = 9999;
-	if (!gePointIsZero(&t->TextBounds)) {
-		if (t->TextBounds.x) {
-			maxWidth = t->TextBounds.x;
-		}
-		if (t->TextBounds.y) {
-			maxHeight = t->TextBounds.y;
-		}
-	}
+gePoint measure(geText *t) {
+	int maxWidth = t->TextBounds.x ? t->TextBounds.x : INT_MAX;
+	int maxHeight = t->TextBounds.y ? t->TextBounds.y : INT_MAX;
 	gePoint textSize = gePointZero();
-	int currentWordLength = 0;
-	int currentWordLetters = 0;
+	int currentWordLength = 0, currentWordLetters = 0;
 	FT_Face f = geFontGetFont(t->Font);
-	int unitsPerEM = f->units_per_EM;
-	int ascenderInPixels = (f->ascender * t->FontSize) / unitsPerEM;
-	int descenderInPixels = (f->descender * t->FontSize) / unitsPerEM;
-	int heightInPixels = (f->height * t->FontSize) / unitsPerEM;
+	int ascenderInPixels = (f->ascender * t->FontSize) / f->units_per_EM;
+	int descenderInPixels = (f->descender * t->FontSize) / f->units_per_EM;
+	int lineSpace = (f->height * t->FontSize) / f->units_per_EM;
 	int startLoc = ascenderInPixels;
-	int lineSpace = heightInPixels;
 	int penX = 0, penY = startLoc;
 	for (size_t i = 0; i < strlen(t->Text); i++) {
 		char letter = t->Text[i];
@@ -154,13 +142,14 @@ gePoint measureFullText(geText *t) {
 			currentWordLetters = 0;
 			continue;
 		}
+		int letterSize = getLetterWidth(t, letter);
 		if (letter == ' ') {
 			addWordToLetterPoints(t, i, currentWordLetters, penX, penY);
-			penX += currentWordLength;
+			penX += currentWordLength + letterSize;
 			currentWordLength = 0;
 			currentWordLetters = 0;
+			continue;
 		}
-		int letterSize = getLetterWidth(t, letter);
 		if (checkShouldWrap(penX, currentWordLength, letterSize, maxWidth)) {
 			if (penX > textSize.x) {
 				textSize.x = penX;
@@ -168,12 +157,8 @@ gePoint measureFullText(geText *t) {
 			penX = 0;
 			penY += lineSpace;
 		}
-		if (letter != ' ') {
-			currentWordLength += letterSize;
-			++currentWordLetters;
-		} else {
-			penX = penX == 0 ? 0 : penX + letterSize;
-		}
+		currentWordLength += letterSize;
+		++currentWordLetters;
 	}
 	if (currentWordLength) {
 		addWordToLetterPoints(t, strlen(t->Text), currentWordLetters, penX, penY);
@@ -187,15 +172,18 @@ gePoint measureFullText(geText *t) {
 	return textSize;
 }
 
-// geImage *createEmptyTexture(int width, int height) {
-// 	return geImageNewRenderTarget("thing", width, height);
-// }
+void getLetterContentName(geText *t, char *buf, char letter) {
+	size_t len = 1 + strlen(t->FontName) + 4 + 1;
+	// letter + font + font size
+	snprintf(buf, len, "%c%s%d", letter, t->FontName, t->FontSize);
+}
 
 void createTexturesForText(geText *t) {
 	FT_Face f = geFontGetFont(t->Font);
+	char letterString[LETTER_BUFFER_LENGTH];
 	for (size_t i = 0; i < strlen(t->Text); i++) {
 		char letter = t->Text[i];
-		if (letter == ' ') {
+		if (letter == ' ' || letter == '\n') {
 			continue;
 		}
 		int result = FT_Load_Char(f, letter, FT_LOAD_RENDER);
@@ -209,10 +197,35 @@ void createTexturesForText(geText *t) {
 			LogError("Failed to create surface for letter!");
 			continue;
 		}
-		char letterString[2];
-		letterString[0] = letter;
-		letterString[1] = '\0';
+		getLetterContentName(t, letterString, letter);
 		geImageNewFromSurface(letterString, letterSurface);
+	}
+}
+
+static void loadLetters(geText *t, int startLoc) {
+	char letterString[LETTER_BUFFER_LENGTH];
+	for (size_t i = startLoc; i < t->LettersToDraw; i++) {
+		char letter = t->Text[i];
+		if (letter == ' ' || letter == '\n') {
+			continue;
+		}
+		getLetterContentName(t, letterString, letter);
+		geContent *content = geGetLoadedContent(geContentTypeImage, letterString);
+		if (!content) {
+			LogError("Content not found");
+			continue;
+		}
+		geImage *image = content->Data.Image;
+		if (!image) {
+			LogError("Image is null?");
+			continue;
+		}
+		geRectangle r;
+		r.x = t->LetterPoints[i].x;
+		r.y = t->LetterPoints[i].y;
+		r.w = geImageWidth(image);
+		r.h = geImageHeight(image);
+		geImageDrawImageToImage(image, t->Texture, NULL, &r);
 	}
 }
 
@@ -252,9 +265,7 @@ static int textFindContent(const char *path, geContent *content) {
 }
 
 void geInitializeTextContentType() {
-	geAddContentTypeFunctions(geContentTypeText, textNewContent,
-							  textDeleteContent, textLoadContent,
-							  textFindContent);
+	geAddContentTypeFunctions(geContentTypeText, textNewContent, textDeleteContent, textLoadContent, textFindContent);
 }
 
 geText *geTextNew(const char *text, const char *fontName, int fontSize) {
@@ -274,34 +285,6 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 	return t;
 }
 
-void loadLetters(geText *t, int startLoc) {
-	for (size_t i = startLoc; i < t->LettersToDraw; i++) {
-		char letter = t->Text[i];
-		if (letter == ' ') {
-			continue;
-		}
-		char letterString[2];
-		letterString[0] = letter;
-		letterString[1] = '\0';
-		geContent *content = geGetLoadedContent(geContentTypeImage, letterString);
-		if (!content) {
-			LogError("Content not found");
-			continue;
-		}
-		geImage *image = content->Data.Image;
-		if (!image) {
-			LogError("Image is null?");
-			continue;
-		}
-		geRectangle r;
-		r.x = t->LetterPoints[i].x;
-		r.y = t->LetterPoints[i].y;
-		r.w = geImageWidth(image);
-		r.h = geImageHeight(image);
-		geImageDrawImageToImage(image, t->Texture, NULL, &r);
-	}
-}
-
 void geTextLoad(geText *t) {
 	t->Font = geFontNew(t->FontName, t->FontSize);
 	if (!t->Font) {
@@ -310,7 +293,7 @@ void geTextLoad(geText *t) {
 	}
 	geFontLoad(t->Font);
 	createTexturesForText(t);
-	gePoint textSize = measureFullText(t);
+	gePoint textSize = measure(t);
 	t->BoundingBox.w = textSize.x;
 	t->BoundingBox.h = textSize.y;
 	char buf[200];

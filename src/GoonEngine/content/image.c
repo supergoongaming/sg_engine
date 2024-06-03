@@ -66,6 +66,7 @@ void geImageDrawImageToImage(geImage *src, geImage *dst, geRectangle *srcRect,
 	SDL_SetRenderTarget(r, NULL);
 }
 
+// This does free the surface afterwards, either increases refcount or creates new.
 geImage *geImageNewFromSurface(const char *contentName, SDL_Surface *surface) {
 	geContent *loadedContent = geGetLoadedContent(geContentTypeImage, contentName);
 	if (loadedContent) {
@@ -77,8 +78,7 @@ geImage *geImageNewFromSurface(const char *contentName, SDL_Surface *surface) {
 		LogError("Could not create texture, Error: %s", SDL_GetError());
 		return NULL;
 	}
-	SDL_FreeSurface(
-		surface);  // We no longer need the surface after creating the texture
+	SDL_FreeSurface(surface);
 	geImage *i = malloc(sizeof(*i));
 	i->Texture = t;
 	i->Name = strdup(contentName);

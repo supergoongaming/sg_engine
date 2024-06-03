@@ -8,7 +8,7 @@
 typedef struct geBgm
 {
     char *FilePath;
-    float BgmStart, BgmEnd;
+    // float BgmStart, BgmEnd;
     gsBgm *pBgm;
 
 } geBgm;
@@ -39,8 +39,8 @@ static void geBgmLoadContent(geContent *content)
     if (bgm->pBgm)
         return;
     bgm->pBgm = gsLoadBgm(bgm->FilePath);
-    bgm->pBgm->loop_begin = bgm->BgmStart;
-    bgm->pBgm->loop_end = bgm->BgmEnd;
+    // bgm->pBgm->loop_begin = bgm->BgmStart;
+    // bgm->pBgm->loop_end = bgm->BgmEnd;
 }
 
 static int geBgmFindContent(const char *path, geContent *content)
@@ -53,7 +53,7 @@ void geInitializeBgmContentType()
     geAddContentTypeFunctions(geContentTypeBgm, geBgmNewContent, geBgmDeleteContent, geBgmLoadContent, geBgmFindContent);
 }
 
-geBgm *geBgmNew(const char *bgmName, float bgmStart, float bgmEnd)
+geBgm *geBgmNew(const char *bgmName)
 {
     char buffer[BUFFER_SIZE];
     sprintf(buffer, "assets/audio/%s.ogg", bgmName);
@@ -63,8 +63,6 @@ geBgm *geBgmNew(const char *bgmName, float bgmStart, float bgmEnd)
         return loadedContent->Data.Bgm;
     }
     geBgm *bgm = malloc(sizeof(*bgm));
-    bgm->BgmEnd = bgmEnd;
-    bgm->BgmStart = bgmStart;
     bgm->FilePath = strdup(buffer);
     int result = geAddContent(geContentTypeBgm, bgm);
     if (!result)
