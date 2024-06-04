@@ -1,4 +1,5 @@
 #pragma once
+#include <GoonEngine/prim/color.h>
 
 #ifdef __cplusplus
 extern "C" {
