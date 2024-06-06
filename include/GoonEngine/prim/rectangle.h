@@ -7,7 +7,9 @@ typedef struct geRectangle {
 } geRectangle;
 
 geRectangle geRectangleZero();
-int geRectangleIsZero(geRectangle *lhs);
+int geRectangleIsZero(geRectangle* lhs);
+int geRectangleIsOverlap(geRectangle* lhs, geRectangle* rhs);
+geRectangle geRectangleGetOverlapRect(geRectangle* lhs, geRectangle* rhs);
 
 #ifdef __cplusplus
 }
