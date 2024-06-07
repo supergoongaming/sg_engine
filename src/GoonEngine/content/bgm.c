@@ -35,12 +35,9 @@ static void geBgmDeleteContent(geContent *content)
 static void geBgmLoadContent(geContent *content)
 {
     geBgm *bgm = content->Data.Bgm;
-    // already loaded
-    if (bgm->pBgm)
+    if (bgm->pBgm || !bgm->FilePath)
         return;
     bgm->pBgm = gsLoadBgm(bgm->FilePath);
-    // bgm->pBgm->loop_begin = bgm->BgmStart;
-    // bgm->pBgm->loop_end = bgm->BgmEnd;
 }
 
 static int geBgmFindContent(const char *path, geContent *content)
@@ -64,6 +61,7 @@ geBgm *geBgmNew(const char *bgmName)
     }
     geBgm *bgm = malloc(sizeof(*bgm));
     bgm->FilePath = strdup(buffer);
+    bgm->pBgm = NULL;
     int result = geAddContent(geContentTypeBgm, bgm);
     if (!result)
     {

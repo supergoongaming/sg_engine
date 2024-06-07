@@ -240,6 +240,10 @@ void geImageDrawImageToImage(geImage *src, geImage *dst, geRectangle *srcRect, g
 	SDL_SetRenderTarget(r, NULL);
 }
 geImage *geImageNewFromFile(const char *path) {
+	geContent *loadedContent = geGetLoadedContent(geContentTypeImage, path);
+	if (loadedContent) {
+		return loadedContent->Data.Image;
+	}
 	SDL_Surface *s = loadPNG(path);
 	if (!s) {
 		LogError("Could not load PNG properly, content not fully loaded");
