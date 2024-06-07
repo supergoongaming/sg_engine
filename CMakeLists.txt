@@ -203,18 +203,17 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # Linking Options
 # #########################################
 
-if(EMSCRIPTEN OR LINUX OR(MACOS AND NOT GOON_FULL_MACOS_BUILD))
-    set(PNG_LIB_NAME png)
-else()
+if(WINDOWS)
     set(PNG_LIB_NAME png_static)
-endif(EMSCRIPTEN OR LINUX OR(MACOS AND NOT GOON_FULL_MACOS_BUILD))
+else()
+    set(PNG_LIB_NAME png)
+endif(WINDOWS)
 
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
     supergoonSound
     freetype
-    png
 
     ${PNG_LIB_NAME}
     ${LIB_PNG}
