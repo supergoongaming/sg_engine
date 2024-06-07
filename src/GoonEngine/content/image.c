@@ -177,6 +177,9 @@ static void imageLoadContent(geContent *content) {
 }
 
 static int imageFindContent(const char *path, geContent *content) {
+	if (!content) {
+		return 0;
+	}
 	geImage *i = (geImage *)content->Data.Image;
 	if (!i) {
 		return 0;
@@ -190,7 +193,7 @@ void geInitializeImageContentType() {
 							  imageFindContent);
 }
 
-geImage *geImageNewRenderTarget(const char *contentName, int width, int height) {
+geImage *geImageNewRenderTarget(const char *contentName, int width, int height, geColor *color) {
 	SDL_Renderer *r = geGlobalRenderer();
 	SDL_Texture *t = SDL_CreateTexture(r, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
 	SDL_SetRenderTarget(r, t);
@@ -199,11 +202,13 @@ geImage *geImageNewRenderTarget(const char *contentName, int width, int height) 
 		SDL_Log("Error setting blend mode: %s", SDL_GetError());
 	}
 	SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND);
-	if (SDL_SetRenderDrawColor(r, 0, 0, 100, 200) != 0) {
-		// Handle error
-		SDL_Log("Error setting render draw color: %s", SDL_GetError());
+	if (color) {
+		if (SDL_SetRenderDrawColor(r, color->R, color->G, color->B, color->A) != 0) {
+			// Handle error
+			SDL_Log("Error setting render draw color: %s", SDL_GetError());
+		}
+		SDL_RenderClear(r);
 	}
-	SDL_RenderClear(r);
 	SDL_SetRenderTarget(r, NULL);
 	SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
 	geImage *i = malloc(sizeof(*i));
@@ -213,9 +218,19 @@ geImage *geImageNewRenderTarget(const char *contentName, int width, int height) 
 	return i;
 }
 
-void geImageSetPixels(geImage *i) {
-	// SDL_Renderer *r = geGlobalRenderer();
-	// SDL_SetTextureAlphaMod(i->Texture, 100);
+void geImageSetAlpha(geImage *i, int a) {
+	SDL_Renderer *r = geGlobalRenderer();
+	SDL_SetRenderTarget(r, i->Texture);
+	if (SDL_SetRenderDrawColor(r, 0, 0, 0, a) != 0) {
+		// Handle error
+		SDL_Log("Error setting render draw color: %s", SDL_GetError());
+	}
+	SDL_RenderClear(r);
+	SDL_SetRenderTarget(r, NULL);
+	// int result = SDL_SetTextureAlphaMod(i->Texture, a);
+	// if(result) {
+	// 	LogWarn("error here when setting alphs");
+	// }
 }
 
 void geImageDrawImageToImage(geImage *src, geImage *dst, geRectangle *srcRect, geRectangle *dstRect) {
