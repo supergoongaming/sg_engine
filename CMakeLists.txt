@@ -109,12 +109,12 @@ if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
     find_package(supergoonSound REQUIRED)
     find_package(freetype REQUIRED)
     find_package(png REQUIRED)
+
     # find_library(LIB_PNG
     # REQUIRED
     # PATH_SUFFIXES .a
     # NAMES libpng png.a png.dll libpng.a
     # HINTS /usr/local/lib /c/cmake/lib)
-
     if(NOT supergoonSound_FOUND)
         add_subdirectory(./external/sg_sound)
     endif(NOT supergoonSound_FOUND)
@@ -202,13 +202,11 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # #########################################
 # Linking Options
 # #########################################
-
-if(WINDOWS)
+if(WINDOWS OR (MACOS AND GOON_FULL_MACOS_BUILD))
     set(PNG_LIB_NAME png_static)
 else()
     set(PNG_LIB_NAME png)
-endif(WINDOWS)
-
+endif(WINDOWS OR (MACOS AND GOON_FULL_MACOS_BUILD))
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
