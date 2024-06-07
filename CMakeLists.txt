@@ -133,6 +133,7 @@ else()
 
     add_subdirectory(./external/sg_sound)
     add_subdirectory(./external/freetype)
+    add_subdirectory(./external/libpng)
 endif(MACOS AND NOT GOON_FULL_MACOS_BUILD)
 
 # #########################################

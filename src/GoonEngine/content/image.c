@@ -194,6 +194,10 @@ void geInitializeImageContentType() {
 }
 
 geImage *geImageNewRenderTarget(const char *contentName, int width, int height, geColor *color) {
+	geContent *loadedContent = geGetLoadedContent(geContentTypeImage, contentName);
+	if (loadedContent) {
+		return loadedContent->Data.Image;
+	}
 	SDL_Renderer *r = geGlobalRenderer();
 	SDL_Texture *t = SDL_CreateTexture(r, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
 	SDL_SetRenderTarget(r, t);
