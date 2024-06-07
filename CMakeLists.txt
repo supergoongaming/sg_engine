@@ -222,6 +222,7 @@ target_link_libraries(${LIBRARY_TARGET_NAME}
     ${LIB_OGG}
     ${OGG_LIBRARIES}
     ${OGG_LIBRARIES}
+    ${ZLIB_LIBRARIES}
     PRIVATE
 )
 
