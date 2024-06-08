@@ -29,3 +29,7 @@ void geUtilsDrawFilledRect(geRectangle *dstRect, geColor *color) {
 	SDL_RenderFillRect(r, (SDL_Rect *)dstRect);
 	SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
 }
+
+int geUtilsIsPointInRect(geRectangle *rect, gePoint *point) {
+	return SDL_PointInRect((SDL_Point *)point, (SDL_Rect *)rect);
+}
