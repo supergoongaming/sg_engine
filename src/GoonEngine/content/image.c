@@ -17,7 +17,6 @@ static void imageFree(geImage *i) {
 	if (i->Name) free(i->Name);
 	free(i);
 }
-
 static void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel) {
 	Uint8 *target_pixel = (Uint8 *)surface->pixels + y * surface->pitch + x * sizeof(Uint32);
 	*(Uint32 *)target_pixel = pixel;
@@ -75,8 +74,6 @@ static SDL_Surface *loadPNG(const char *filename) {
 	png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
 
 	// Read any color_type to 8-bit depth, RGBA format.
-	// See http://www.libpng.org/pub/png/libpng-manual.txt
-
 	if (bit_depth == 16)
 		png_set_strip_16(png_ptr);
 
@@ -110,38 +107,25 @@ static SDL_Surface *loadPNG(const char *filename) {
 	// Read the image data
 	png_read_image(png_ptr, row_pointers);
 
-	// Determine Pixel format
-	Uint32 sdl_pixel_format;
-	switch (color_type) {
-		case PNG_COLOR_TYPE_GRAY:
-			sdl_pixel_format = (bit_depth == 16) ? SDL_PIXELFORMAT_RGB565 : SDL_PIXELFORMAT_RGB888;
-			break;
-		case PNG_COLOR_TYPE_PALETTE:
-			sdl_pixel_format = SDL_PIXELFORMAT_RGBA8888;  // You may need to handle palette conversion
-			break;
-		case PNG_COLOR_TYPE_RGB:
-			sdl_pixel_format = SDL_PIXELFORMAT_RGB888;
-			break;
-		case PNG_COLOR_TYPE_RGBA:
-			sdl_pixel_format = SDL_PIXELFORMAT_RGBA8888;
-			break;
-		default:
-			fclose(file);
-			png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-			fprintf(stderr, "Error: Unsupported PNG color type\n");
-			return NULL;
+	// Create an SDL surface with the correct format
+	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGBA8888);
+	if (!surface) {
+		fprintf(stderr, "Error: Unable to create SDL surface\n");
+		for (int y = 0; y < height; y++) {
+			free(row_pointers[y]);
+		}
+		free(row_pointers);
+		fclose(file);
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		return NULL;
 	}
-
-	// Create an SDL surface
-	// SDL_Surface *surface = SDL_CreateRGBSurface(0, width, height, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, sdl_pixel_format);
 
 	// Copy pixel data from PNG to SDL surface
 	for (int y = 0; y < height; y++) {
 		png_bytep row = row_pointers[y];
 		for (int x = 0; x < width; x++) {
 			png_bytep px = &(row[x * 4]);
-			Uint32 color = ((px[0] << 24) | (px[1] << 16) | (px[2] << 8) | px[3]);
+			Uint32 color = SDL_MapRGBA(surface->format, px[0], px[1], px[2], px[3]);
 			putpixel(surface, x, y, color);
 		}
 	}
@@ -211,8 +195,10 @@ geImage *geImageNewRenderTarget(const char *contentName, int width, int height, 
 			// Handle error
 			SDL_Log("Error setting render draw color: %s", SDL_GetError());
 		}
-		SDL_RenderClear(r);
+	} else {
+		SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
 	}
+	SDL_RenderClear(r);
 	SDL_SetRenderTarget(r, NULL);
 	SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
 	geImage *i = malloc(sizeof(*i));
@@ -231,10 +217,18 @@ void geImageSetAlpha(geImage *i, int a) {
 	}
 	SDL_RenderClear(r);
 	SDL_SetRenderTarget(r, NULL);
-	// int result = SDL_SetTextureAlphaMod(i->Texture, a);
-	// if(result) {
-	// 	LogWarn("error here when setting alphs");
-	// }
+}
+void geImageClear(geImage *i, geColor *c) {
+	SDL_Renderer *r = geGlobalRenderer();
+
+	SDL_SetRenderTarget(r, i->Texture);
+	geColor color;
+	if (SDL_SetRenderDrawColor(r, c->R, c->G, c->B, c->A) != 0) {
+		// Handle error
+		SDL_Log("Error setting render draw color: %s", SDL_GetError());
+	}
+	SDL_RenderClear(r);
+	SDL_SetRenderTarget(r, NULL);
 }
 
 void geImageDrawImageToImage(geImage *src, geImage *dst, geRectangle *srcRect, geRectangle *dstRect) {

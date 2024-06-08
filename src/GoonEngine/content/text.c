@@ -21,6 +21,7 @@ typedef struct geText {
 	int FontSize;
 	int WordWrap;
 	int LettersToDraw;
+	int CurrentLettersDrawn;
 	geFont *Font;
 	geColor Color;
 	geImage *Texture;
@@ -279,6 +280,7 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 	t->TextBounds = gePointZero();
 	t->WordWrap = true;
 	t->LettersToDraw = strlen(text);
+	t->CurrentLettersDrawn = 0;
 	t->Color.R = t->Color.G = t->Color.B = t->Color.A = 255;
 	geAddContent(geContentTypeText, t);
 	return t;
@@ -338,9 +340,16 @@ void geTextSetNumDrawCharacters(geText *t, int num) {
 	if (num > strlen(t->Text)) {
 		return;
 	}
+	if(num < t->CurrentLettersDrawn && t->Texture) {
+		// We need to clear and then draw.
+		geColor c = {0,0,100,200};
+		geImageClear(t->Texture, &c );
+	}
+
 	int current = t->LettersToDraw;
 	t->LettersToDraw = num;
 	if (t->Texture) {
 		loadLetters(t, current);
 	}
+	t->CurrentLettersDrawn = num;
 }

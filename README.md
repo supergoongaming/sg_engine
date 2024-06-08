@@ -1,6 +1,6 @@
 # Supergoon Games Engine
 - A C engine that wraps multiple libraries
-- physics, sound, libpng, freetype, etc
+- sound, libpng, freetype, etc
 
 ## Development
 - Mostly developed on macos apple silicon
@@ -21,7 +21,6 @@
 ## Libraries
 - [SDL](https://www.libsdl.org/license.php) - ZLIB - Low level Windowing / Eventing
 - [Supergoon Sound](https://github.com/supergoongaming/sg_sound) - MIT - OpenAL wrapper
-- [Supergoon Physics](https://github.com/supergoongaming/sg_engine) - MIT - Simple aa_bb physics (built into the project currently as we are iterating quickly)
 - [libpng](https://github.com/pnggroup/libpng) - MIT - Reading png files
 - [freetype](https://github.com/freetype/freetype?tab=License-1-ov-file#readme) - Attribution - For handling typing
 - [zlib](https://github.com/madler/zlib?tab=License-1-ov-file#readme) - MIT - Compression
