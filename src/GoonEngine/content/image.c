@@ -156,7 +156,6 @@ static void imageDeleteContent(geContent *content) {
 static void imageLoadContent(geContent *content) {
 	geImage *i = content->Data.Image;
 	if (i) {
-		geImageLoad(i);
 	}
 }
 
@@ -222,7 +221,6 @@ void geImageClear(geImage *i, geColor *c) {
 	SDL_Renderer *r = geGlobalRenderer();
 
 	SDL_SetRenderTarget(r, i->Texture);
-	geColor color;
 	if (SDL_SetRenderDrawColor(r, c->R, c->G, c->B, c->A) != 0) {
 		// Handle error
 		SDL_Log("Error setting render draw color: %s", SDL_GetError());
@@ -286,7 +284,6 @@ void geImageDraw(geImage *i, geRectangle *srcRect, geRectangle *dstRect) {
 	SDL_RenderCopyEx(r, i->Texture, (SDL_Rect *)srcRect,
 					 (SDL_Rect *)dstRect, 0, NULL, SDL_FLIP_NONE);
 }
-void geImageLoad(geImage *i) {}
 void geImageFree(geImage *i) { geUnloadContent(geContentTypeImage, i->Name); }
 int geImageWidth(geImage *i) {
 	int w, h;

@@ -18,9 +18,6 @@ geImage* geImageNewRenderTarget(const char* contentName, int width, int height, 
 void geImageDrawImageToImage(geImage* src, geImage* dst, geRectangle* srcRect, geRectangle* dstRect);
 void geImageSetAlpha(geImage* i, int a);
 void geImageClear(geImage* i, geColor* c);
-
-
-void geImageLoad(geImage* i);
 void geImageFree(geImage* i);
 void geImageDraw(geImage* i, geRectangle* srcRect, geRectangle* dstRect);
 int geImageWidth(geImage* i);
