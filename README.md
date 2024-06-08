@@ -26,4 +26,4 @@
 - [zlib](https://github.com/madler/zlib?tab=License-1-ov-file#readme) - MIT - Compression
 
 ## Valgrind Checks
-- valgrind --track-origins=yes --leak-check=yes --leak-resolution=low --show-leak-kinds=definite ./SupergoonWorld 2>&1 | tee memcheck.txt
+- valgrind --track-origins=yes --leak-check=yes --leak-resolution=low --show-leak-kinds=definite ./BbAdventures 2>&1 | tee memcheck.txt
