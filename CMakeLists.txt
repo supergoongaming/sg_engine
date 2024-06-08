@@ -109,16 +109,9 @@ if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
     find_package(supergoonSound REQUIRED)
     find_package(freetype REQUIRED)
     find_package(png REQUIRED)
-
-    # find_library(LIB_PNG
-    # REQUIRED
-    # PATH_SUFFIXES .a
-    # NAMES libpng png.a png.dll libpng.a
-    # HINTS /usr/local/lib /c/cmake/lib)
     if(NOT supergoonSound_FOUND)
         add_subdirectory(./external/sg_sound)
     endif(NOT supergoonSound_FOUND)
-
     if(NOT freetype_FOUND AND NOT Freetype_FOUND)
         add_subdirectory(./external/freetype)
     endif(NOT freetype_FOUND AND NOT Freetype_FOUND)
@@ -213,9 +206,7 @@ target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
     supergoonSound
     freetype
-
     ${PNG_LIB_NAME}
-    ${LIB_PNG}
     ${LIB_VORBISFILE}
     ${LIB_VORBIS}
     ${LIB_OGG}
