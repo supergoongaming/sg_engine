@@ -196,11 +196,11 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # #########################################
 # Linking Options
 # #########################################
-if(WINDOWS OR (MACOS AND GOON_FULL_MACOS_BUILD))
+if(WIN32 OR (MACOS AND GOON_FULL_MACOS_BUILD))
     set(PNG_LIB_NAME png_static)
 else()
     set(PNG_LIB_NAME png)
-endif(WINDOWS OR (MACOS AND GOON_FULL_MACOS_BUILD))
+endif(WIN32 OR (MACOS AND GOON_FULL_MACOS_BUILD))
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
