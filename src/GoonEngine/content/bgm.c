@@ -2,6 +2,7 @@
 #include <SupergoonSound/include/sound.h>
 #include <GoonEngine/content/bgm.h>
 #include <GoonEngine/content/content.h>
+#include <GoonEngine/utils.h>
 
 #define BUFFER_SIZE 256
 
@@ -50,17 +51,25 @@ void geInitializeBgmContentType()
     geAddContentTypeFunctions(geContentTypeBgm, geBgmNewContent, geBgmDeleteContent, geBgmLoadContent, geBgmFindContent);
 }
 
+#ifdef GN_PLATFORM_MACOS
+static const char* audioPath = "../Resources/assets/audio/%s.ogg";
+#else
+static const char* audioPath = "assets/audio/%s.ogg";
+#endif
+
 geBgm *geBgmNew(const char *bgmName)
 {
     char buffer[BUFFER_SIZE];
-    sprintf(buffer, "assets/audio/%s.ogg", bgmName);
-    geContent *loadedContent = geGetLoadedContent(geContentTypeBgm, buffer);
+    sprintf(buffer, audioPath, bgmName);
+	char buf[1000];
+	GetLoadFilename(buf, sizeof(buf), buffer);
+    geContent *loadedContent = geGetLoadedContent(geContentTypeBgm, buf);
     if (loadedContent)
     {
         return loadedContent->Data.Bgm;
     }
     geBgm *bgm = malloc(sizeof(*bgm));
-    bgm->FilePath = strdup(buffer);
+    bgm->FilePath = strdup(buf);
     bgm->pBgm = NULL;
     int result = geAddContent(geContentTypeBgm, bgm);
     if (!result)

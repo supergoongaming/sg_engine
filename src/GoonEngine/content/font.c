@@ -1,13 +1,18 @@
 #include <GoonEngine/content/content.h>
 #include <GoonEngine/content/font.h>
 #include <GoonEngine/debug.h>
+#include <GoonEngine/utils.h>
 #include <SDL2/SDL_render.h>
 #include <ft2build.h>
 #include <string.h>
 #include FT_FREETYPE_H
 
 #define BUFFER_SIZE 256
+#ifdef GN_PLATFORM_MACOS
+static const char *_fontPrefix = "../Resources/assets/fonts";
+#else
 static const char *_fontPrefix = "assets/fonts";
+#endif
 static const char *_fontFileType = "ttf";
 // Buffer size for fonts, 3 == 999 is max size.
 static const int _numBuffer = 3;
@@ -82,7 +87,10 @@ geFont *geFontNew(const char *name, int size) {
 
 	char buffer[BUFFER_SIZE];
 	sprintf(buffer, "%s/%s.%s_%d", _fontPrefix, name, _fontFileType, size);
-	geContent *loadedContent = geGetLoadedContent(geContentTypeFont, buffer);
+	char buf[1000];
+	GetLoadFilename(buf, sizeof(buf), buffer);
+
+	geContent *loadedContent = geGetLoadedContent(geContentTypeFont, buf);
 	if (loadedContent) {
 		LogDebug("Using cached font for %s",
 				 loadedContent->Data.Font->ContentName);
@@ -93,10 +101,12 @@ geFont *geFontNew(const char *name, int size) {
 		return NULL;
 	}
 	sprintf(buffer, "%s/%s.%s", _fontPrefix, name, _fontFileType);
+
+	GetLoadFilename(buf, sizeof(buf), buffer);
 	geFont *f = malloc(sizeof(*f));
 	f->Face = NULL;
 	f->Size = size;
-	f->Path = strdup(buffer);
+	f->Path = strdup(buf);
 	f->ContentName = fontGetContentName(f);
 	geAddContent(geContentTypeFont, (void *)f);
 	LogDebug("New font created for %s", f->ContentName);

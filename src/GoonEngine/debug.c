@@ -1,5 +1,6 @@
 #include <GoonEngine/gnpch.h>
 #include <GoonEngine/debug.h>
+#include <GoonEngine/utils.h>
 
 #define MAX_LOG_SIZE 200
 #ifdef GN_BENCHMARKING_ENABLED
@@ -28,7 +29,9 @@ static const char *logFileName = "errors.log";
 int InitializeDebugLogFile()
 {
     LogDebug("Opening log file at %s", logFileName);
-    openDebugFile = fopen(logFileName, "a");
+	char buf[1000];
+	GetLoadFilename(buf, sizeof(buf), logFileName);
+    openDebugFile = fopen(buf, "a");
     if (openDebugFile)
         return 1;
     LogError("Could not open file for logging!");

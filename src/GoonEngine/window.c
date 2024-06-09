@@ -1,11 +1,18 @@
 #include <GoonEngine/debug.h>
 #include <GoonEngine/gnpch.h>
+#include <GoonEngine/utils.h>
 #include <GoonEngine/window.h>
 #include <ini/ini.h>
 
 SDL_Window *_window = NULL;
 SDL_Renderer *_renderer = NULL;
 static int g_refreshRate = 60;
+#ifdef GN_PLATFORM_MACOS
+const char *windowPath = "../Resources/assets/config/window.ini";
+#else
+const char *windowPath = "assets/config/window.ini";
+
+#endif
 
 static int iniHandler(void *user, const char *section, const char *name,
 					  const char *value) {
@@ -35,13 +42,17 @@ static int iniHandler(void *user, const char *section, const char *name,
 
 int geInitializeRenderingWindow() {
 	geWindowSettings settings;
-	if (ini_parse("assets/config/window.ini", iniHandler, &settings) < 0) {
+	char buffer[1000];
+	GetLoadFilename(buffer, sizeof(buffer), windowPath);
+	// if (ini_parse(windowPath, iniHandler, &settings) < 0) {
+	LogWarn("Trying path %s", buffer);
+	if (ini_parse(buffer, iniHandler, &settings) < 0) {
 		LogCritical("Could not load window.ini to create window.");
 		return 1;
 	}
 	_window = SDL_CreateWindow(settings.Title, SDL_WINDOWPOS_CENTERED,
-								 SDL_WINDOWPOS_CENTERED, settings.WindowX,
-								 settings.WindowY, SDL_WINDOW_SHOWN);
+							   SDL_WINDOWPOS_CENTERED, settings.WindowX,
+							   settings.WindowY, SDL_WINDOW_SHOWN);
 	if (_window == NULL) {
 		fprintf(stderr, "Window could not be created, Error: %s",
 				SDL_GetError());
@@ -65,7 +76,7 @@ int geWindowGetRefreshRate() {
 	return g_refreshRate;
 }
 
-SDL_Renderer* geGlobalRenderer() {
+SDL_Renderer *geGlobalRenderer() {
 	return _renderer;
 }
 

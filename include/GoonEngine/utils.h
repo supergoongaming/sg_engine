@@ -1,4 +1,5 @@
 #pragma once
+#include <stdlib.h>
 #include <GoonEngine/prim/color.h>
 
 typedef struct gePoint gePoint;
@@ -12,6 +13,7 @@ extern "C" {
 void geUtilsDrawDebugText(const char *text);
 void geUtilsDrawRect(geRectangle *dstRect, geColor *color);
 int geUtilsIsPointInRect(geRectangle *rect, gePoint *point);
+int GetLoadFilename(char* buffer, size_t bufferSize, const char* filename);
 
 #ifdef __cplusplus
 }
