@@ -62,7 +62,8 @@ static void fontLoadContent(geContent *content) {
 
 static int fontFindContent(const char *path, geContent *content) {
 	geFont *f = (geFont *)content->Data.Font;
-	if (!f) {
+	// TODO why do we need to use f->Path not null?  Getting crashes without it.
+	if (!f || !f->Path) {
 		return 0;
 	}
 	char *contentPath = fontGetContentName(f);
