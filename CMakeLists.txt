@@ -106,12 +106,14 @@ message("Going to do the thing.. macos is ${MACOS} and GOON_FULL_MACOS_BUILD is 
 
 if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
     find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
-    find_package(supergoonSound REQUIRED)
-    find_package(Freetype REQUIRED)
+    find_package(supergoonSound)
+    find_package(Freetype)
     find_package(PNG REQUIRED)
+
     if(NOT supergoonSound_FOUND)
         add_subdirectory(./external/sg_sound)
     endif(NOT supergoonSound_FOUND)
+
     if(NOT freetype_FOUND AND NOT Freetype_FOUND)
         add_subdirectory(./external/freetype)
     endif(NOT freetype_FOUND AND NOT Freetype_FOUND)
@@ -196,11 +198,11 @@ target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${FULL_COMPILE_OPTIONS})
 # #########################################
 # Linking Options
 # #########################################
-if(WIN32 OR (MACOS AND GOON_FULL_MACOS_BUILD))
+if(WIN32 OR(MACOS AND GOON_FULL_MACOS_BUILD))
     set(PNG_LIB_NAME png_static)
 else()
     set(PNG_LIB_NAME png)
-endif(WIN32 OR (MACOS AND GOON_FULL_MACOS_BUILD))
+endif(WIN32 OR(MACOS AND GOON_FULL_MACOS_BUILD))
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
@@ -232,13 +234,13 @@ target_link_directories(${LIBRARY_TARGET_NAME}
 target_include_directories(${LIBRARY_TARGET_NAME}
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
+    external/sg_sound/src/
     /usr/local/include
 
     # Need both when not building (using emscripten)
     /emsdk/upstream/emscripten/cache/sysroot/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/
     ${CMAKE_CURRENT_SOURCE_DIR}/external/libpng
-    external/sg_sound/src/
 
     # Freetype local
     ${FREETYPE_INCLUDE_DIRS}

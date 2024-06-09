@@ -1,5 +1,6 @@
 #pragma once
 typedef struct geBgm geBgm;
+typedef struct geSfx geSfx;
 typedef struct geFont geFont;
 typedef struct geText geText;
 typedef struct geImage geImage;
@@ -7,6 +8,7 @@ typedef struct geImage geImage;
 typedef enum geContentTypes {
 	geContentTypeDefault = 0,
 	geContentTypeBgm,
+	geContentTypeSfx,
 	geContentTypeFont,
 	geContentTypeText,
 	geContentTypeImage,
@@ -18,6 +20,7 @@ typedef struct geContent {
 	unsigned int RefCount;
 	union {
 		geBgm *Bgm;
+		geSfx *Sfx;
 		geFont *Font;
 		geText *Text;
 		geImage *Image;

@@ -3,6 +3,7 @@
 #include <GoonEngine/gnpch.h>
 // Built in Content Types
 #include <GoonEngine/content/bgm.h>
+#include <GoonEngine/content/sfx.h>
 #include <GoonEngine/content/font.h>
 #include <GoonEngine/content/image.h>
 #include <GoonEngine/content/text.h>
@@ -133,4 +134,5 @@ void geContentInitializeAllContentTypes() {
 	geInitializeFontContentType();
 	geInitializeImageContentType();
 	geInitializeTextContentType();
+	geInitializeSfxContentType();
 }
