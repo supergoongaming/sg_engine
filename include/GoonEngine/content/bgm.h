@@ -10,9 +10,11 @@ extern "C"
 #endif
     void geInitializeBgmContentType();
     geBgm *geBgmNew(const char *bgmName);
+    void geBgmSetBackground(geBgm* bgm, int isBackground);
     void geBgmLoad(geBgm* bgm);
     void geBgmDelete(geBgm *bgm);
     int geBgmPlay(geBgm *bgm, float volume, int loops);
+    int geBgmStop(geBgm *bgm);
 #ifdef __cplusplus
 }
 #endif

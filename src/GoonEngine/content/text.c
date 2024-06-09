@@ -299,7 +299,7 @@ void geTextLoad(geText *t) {
 	t->BoundingBox.h = textSize.y;
 	char buf[200];
 	snprintf(buf, 200, "%s_%s_%d", t->Text, t->FontName, t->FontSize);
-	geColor c = {0,0,100,200};
+	geColor c = {0, 0, 100, 200};
 	t->Texture = geImageNewRenderTarget(buf, t->BoundingBox.w, t->BoundingBox.h, &c);
 	loadLetters(t, 0);
 }
@@ -340,10 +340,10 @@ void geTextSetNumDrawCharacters(geText *t, int num) {
 	if (num > strlen(t->Text)) {
 		return;
 	}
-	if(num < t->CurrentLettersDrawn && t->Texture) {
+	if (num < t->CurrentLettersDrawn && t->Texture) {
 		// We need to clear and then draw.
-		geColor c = {0,0,100,200};
-		geImageClear(t->Texture, &c );
+		geColor c = {0, 0, 100, 200};
+		geImageClear(t->Texture, &c);
 	}
 
 	int current = t->LettersToDraw;
@@ -352,4 +352,7 @@ void geTextSetNumDrawCharacters(geText *t, int num) {
 		loadLetters(t, current);
 	}
 	t->CurrentLettersDrawn = num;
+}
+int geTextLength(geText *text) {
+	return strlen(text->Text);
 }

@@ -16,6 +16,7 @@ void geTextDraw(geText* t);
 
 // gePoint geTextMeasureDebug(geText* text);
 gePoint geTextGetTextSize(geText* text);
+int geTextLength(geText* text);
 
 // Update Text
 void geTextSetColor(geText* t, geColor* color);

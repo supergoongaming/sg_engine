@@ -10,6 +10,7 @@ typedef struct geBgm {
 	char *FilePath;
 	// float BgmStart, BgmEnd;
 	gsBgm *pBgm;
+	int isBackground;
 
 } geBgm;
 
@@ -62,6 +63,7 @@ geBgm *geBgmNew(const char *bgmName) {
 	geBgm *bgm = malloc(sizeof(*bgm));
 	bgm->FilePath = strdup(buf);
 	bgm->pBgm = NULL;
+	bgm->isBackground = false;
 	int result = geAddContent(geContentTypeBgm, bgm);
 	if (!result) {
 		LogCritical("Could not load BGM, something is wrong with content system.");
@@ -76,13 +78,40 @@ void geBgmDelete(geBgm *bgm) {
 	geUnloadContent(geContentTypeBgm, bgm->FilePath);
 }
 
+void geBgmSetBackground(geBgm *bgm, int isBackground) {
+	bgm->isBackground = isBackground;
+}
+
 int geBgmPlay(geBgm *bgm, float volume, int loops) {
-	gsPreLoadBgm(bgm->pBgm);
-	gsPlayBgm(volume);
-	if (loops == -1) {
-		gsSetPlayerLoops(255);
+	// TODO this is here as if it in load, then it has issues when trying to play a bgm again.
+	if (bgm->isBackground) {
+		gsPreLoadBgm(bgm->pBgm, true);
+
 	} else {
-		gsSetPlayerLoops(loops);
+		gsPreLoadBgm(bgm->pBgm, false);
+	}
+	if (bgm->isBackground) {
+		gsPlayBackgroundBgm(volume);
+		if (loops == -1) {
+			gsSetPlayerLoops(255);
+		} else {
+			gsSetPlayerLoops(loops);
+		}
+	} else {
+		gsPlayBgm(volume);
+		if (loops == -1) {
+			gsSetPlayerLoops(255);
+		} else {
+			gsSetPlayerLoops(loops);
+		}
 	}
 	return true;
+}
+
+int geBgmStop(geBgm *bgm) {
+	if (bgm->isBackground) {
+		gsStopBackgroundBgm();
+	} else {
+		gsStopBgm();
+	}
 }
