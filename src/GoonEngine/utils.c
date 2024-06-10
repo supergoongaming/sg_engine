@@ -23,6 +23,13 @@ void geUtilsDrawRect(geRectangle *dstRect, geColor *color) {
 	SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
 }
 
+void geUtilsDrawRectF(geRectangleF *dstRect, geColor *color) {
+	SDL_Renderer *r = geGlobalRenderer();
+	SDL_SetRenderDrawColor(r, color->R, color->G, color->B, color->A);
+	SDL_RenderDrawRectF(r, (SDL_FRect *)dstRect);
+	SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
+}
+
 void geUtilsDrawFilledRect(geRectangle *dstRect, geColor *color) {
 	SDL_Renderer *r = geGlobalRenderer();
 	SDL_SetRenderDrawColor(r, color->R, color->G, color->B, color->A);

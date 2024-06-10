@@ -106,7 +106,11 @@ message("Going to do the thing.. macos is ${MACOS} and GOON_FULL_MACOS_BUILD is 
 
 if(MACOS AND NOT GOON_FULL_MACOS_BUILD)
     find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
-    find_package(supergoonSound)
+
+    if(NOT GOON_DEBUG_SOUND)
+        find_package(supergoonSound)
+    endif(NOT GOON_DEBUG_SOUND)
+
     find_package(Freetype)
     find_package(PNG REQUIRED)
 

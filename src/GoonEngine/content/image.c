@@ -284,6 +284,11 @@ void geImageDraw(geImage *i, geRectangle *srcRect, geRectangle *dstRect) {
 	SDL_RenderCopyEx(r, i->Texture, (SDL_Rect *)srcRect,
 					 (SDL_Rect *)dstRect, 0, NULL, SDL_FLIP_NONE);
 }
+void geImageDrawF(geImage *i, geRectangle *srcRect, geRectangleF *dstRect) {
+	SDL_Renderer *r = geGlobalRenderer();
+	// SDL_RenderCopyEx(r, i->Texture, (SDL_Rect *)srcRect, (SDL_Rect *)dstRect, 0, NULL, SDL_FLIP_NONE);
+	SDL_RenderCopyExF(r, i->Texture, srcRect, (SDL_FRect *)dstRect, 0, NULL, SDL_FLIP_NONE);
+}
 void geImageFree(geImage *i) { geUnloadContent(geContentTypeImage, i->Name); }
 int geImageWidth(geImage *i) {
 	int w, h;

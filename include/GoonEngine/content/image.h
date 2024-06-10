@@ -20,6 +20,7 @@ void geImageSetAlpha(geImage* i, int a);
 void geImageClear(geImage* i, geColor* c);
 void geImageFree(geImage* i);
 void geImageDraw(geImage* i, geRectangle* srcRect, geRectangle* dstRect);
+void geImageDrawF(geImage* i, geRectangle* srcRect, geRectangleF* dstRect);
 int geImageWidth(geImage* i);
 int geImageHeight(geImage* i);
 
