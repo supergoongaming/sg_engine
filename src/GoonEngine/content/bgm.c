@@ -45,11 +45,11 @@ void geInitializeBgmContentType() {
 	geAddContentTypeFunctions(geContentTypeBgm, geBgmNewContent, geBgmDeleteContent, geBgmLoadContent, geBgmFindContent);
 }
 
-#ifdef GN_PLATFORM_MACOS
-static const char *audioPath = "../Resources/assets/audio/%s.ogg";
-#else
+// #ifdef GN_PLATFORM_MACOS
+// static const char *audioPath = "../Resources/assets/audio/%s.ogg";
+// #else
 static const char *audioPath = "assets/audio/%s.ogg";
-#endif
+// #endif
 
 geBgm *geBgmNew(const char *bgmName) {
 	char buffer[BUFFER_SIZE];

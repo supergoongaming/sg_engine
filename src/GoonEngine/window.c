@@ -7,12 +7,11 @@
 SDL_Window *_window = NULL;
 SDL_Renderer *_renderer = NULL;
 static int g_refreshRate = 60;
-#ifdef GN_PLATFORM_MACOS
-const char *windowPath = "../Resources/assets/config/window.ini";
-#else
+// #ifdef GN_PLATFORM_MACOS
+// const char *windowPath = "../Resources/assets/config/window.ini";
+// #else
 const char *windowPath = "assets/config/window.ini";
-
-#endif
+// #endif
 
 static int iniHandler(void *user, const char *section, const char *name,
 					  const char *value) {

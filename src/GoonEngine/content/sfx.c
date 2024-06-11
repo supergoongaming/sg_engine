@@ -42,11 +42,11 @@ static int geSfxFindContent(const char *path, geContent *content) {
 void geInitializeSfxContentType() {
 	geAddContentTypeFunctions(geContentTypeSfx, geSfxNewContent, geSfxDeleteContent, geSfxLoadContent, geSfxFindContent);
 }
-#ifdef GN_PLATFORM_MACOS
-static const char *audioPath = "../Resources/assets/audio/%s.ogg";
-#else
+// #ifdef GN_PLATFORM_MACOS
+// static const char *audioPath = "../Resources/assets/audio/%s.ogg";
+// #else
 static const char *audioPath = "assets/audio/%s.ogg";
-#endif
+// #endif
 
 geSfx *geSfxNew(const char *n) {
 	char buffer[BUFFER_SIZE];

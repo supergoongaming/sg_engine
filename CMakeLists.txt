@@ -230,6 +230,13 @@ if(NOT EMSCRIPTEN)
     )
 endif(NOT EMSCRIPTEN)
 
+if(WIN32)
+    target_link_libraries(${LIBRARY_TARGET_NAME}
+        PUBLIC
+        SDL2::SDL2main
+    )
+endif(WIN32)
+
 target_link_directories(${LIBRARY_TARGET_NAME}
     PRIVATE
     /usr/local/lib
