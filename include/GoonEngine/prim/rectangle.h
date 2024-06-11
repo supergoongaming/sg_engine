@@ -14,6 +14,8 @@ geRectangle geRectangleZero();
 int geRectangleIsZero(geRectangle* lhs);
 int geRectangleIsOverlap(geRectangle* lhs, geRectangle* rhs);
 geRectangle geRectangleGetOverlapRect(geRectangle* lhs, geRectangle* rhs);
+geRectangleF geRectangleFGetOverlapRect(geRectangleF* lhs, geRectangleF* rhs);
+int geRectangleFIsOverlap(geRectangleF* lhs, geRectangleF* rhs);
 
 #ifdef __cplusplus
 }

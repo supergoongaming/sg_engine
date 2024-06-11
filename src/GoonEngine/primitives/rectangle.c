@@ -18,6 +18,20 @@ int geRectangleIsZero(geRectangle* lhs) {
 int geRectangleIsOverlap(geRectangle* lhs, geRectangle* rhs) {
 	return SDL_HasIntersection((SDL_Rect*)lhs, (SDL_Rect*)rhs);
 }
+
+int geRectangleFIsOverlap(geRectangleF* lhs, geRectangleF* rhs) {
+	return SDL_HasIntersectionF((SDL_FRect*)lhs, (SDL_FRect*)rhs);
+}
+geRectangleF geRectangleFGetOverlapRect(geRectangleF* lhs, geRectangleF* rhs) {
+	if (!geRectangleFIsOverlap(lhs, rhs)) {
+		geRectangleF r = {0,0,0,0};
+		return r;
+	}
+	geRectangleF r;
+	SDL_IntersectFRect((SDL_FRect*)lhs, (SDL_FRect*)rhs, (SDL_FRect*)&r);
+	return r;
+}
+
 geRectangle geRectangleGetOverlapRect(geRectangle* lhs, geRectangle* rhs) {
 	if (!geRectangleIsOverlap(lhs, rhs)) {
 		return geRectangleZero();
