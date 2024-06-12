@@ -63,6 +63,7 @@ add_library(${LIBRARY_TARGET_NAME}
 )
 
 set_property(TARGET ${LIBRARY_TARGET_NAME} PROPERTY C_STANDARD 11)
+set(ZLIB_USE_STATIC_LIBS "ON")
 find_package(ZLIB)
 include(CTest)
 
