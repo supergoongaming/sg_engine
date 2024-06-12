@@ -63,7 +63,11 @@ add_library(${LIBRARY_TARGET_NAME}
 )
 
 set_property(TARGET ${LIBRARY_TARGET_NAME} PROPERTY C_STANDARD 11)
-set(ZLIB_USE_STATIC_LIBS "ON")
+
+if(WIN32)
+    set(ZLIB_USE_STATIC_LIBS "ON")
+endif(WIN32)
+
 find_package(ZLIB)
 include(CTest)
 
@@ -232,12 +236,11 @@ if(NOT EMSCRIPTEN)
 endif(NOT EMSCRIPTEN)
 
 # if(WIN32)
-#     target_link_libraries(${LIBRARY_TARGET_NAME}
-#         PUBLIC
-#         SDL2::SDL2main
-#     )
+# target_link_libraries(${LIBRARY_TARGET_NAME}
+# PUBLIC
+# SDL2::SDL2main
+# )
 # endif(WIN32)
-
 target_link_directories(${LIBRARY_TARGET_NAME}
     PRIVATE
     /usr/local/lib
