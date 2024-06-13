@@ -8,6 +8,7 @@
 
 const char *_systemDefaultFont = "Roboto-Regular";
 const char *_systemBasePath = NULL;
+const char *_systemFilePath = NULL;
 
 void geUtilsDrawDebugText(const char *text) {
 	geText *t = geTextNew(text, _systemDefaultFont, 32);
@@ -62,5 +63,29 @@ int GetLoadFilename(char *buffer, size_t bufferSize, const char *filename) {
 			result = 0;					  // Success
 		}
 	}
+	return result;
+}
+
+int geGetFileFilepath(char *buffer, size_t bufferSize, const char *filename) {
+	if (_systemFilePath != NULL) {
+		strcpy(buffer, filename);
+		return 0;
+	}
+	const char *base_path = SDL_GetPrefPath("Supergoon Games", "BbAdventures");
+	int result = -1;  // Return -1 on error
+
+	if (base_path == NULL) {
+		// Use the current directory if SDL_GetBasePath() fails
+		if (snprintf(buffer, bufferSize, "./%s", filename) < bufferSize) {
+			result = 0;	 // Success
+		}
+	} else {
+		// Construct the path using the base path provided by SDL
+		if (snprintf(buffer, bufferSize, "%s%s", base_path, filename) < bufferSize) {
+			SDL_free((void *)base_path);  // Clean up the SDL memory
+			result = 0;					  // Success
+		}
+	}
+	LogWarn("Path is %s", buffer);
 	return result;
 }
