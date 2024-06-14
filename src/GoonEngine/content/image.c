@@ -160,7 +160,8 @@ static void imageLoadContent(geContent *content) {
 }
 
 static int imageFindContent(const char *path, geContent *content) {
-	if (!content) {
+	// TODO why do we need these?
+	if (!content || !path) {
 		return 0;
 	}
 	geImage *i = (geImage *)content->Data.Image;

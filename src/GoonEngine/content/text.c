@@ -14,6 +14,7 @@
 #include FT_FREETYPE_H
 
 #define LETTER_BUFFER_LENGTH 100
+static geColor _textBackgroundColor = {0, 0, 100, 200};
 
 typedef struct geText {
 	const char *Text;
@@ -269,6 +270,12 @@ void geInitializeTextContentType() {
 }
 
 geText *geTextNew(const char *text, const char *fontName, int fontSize) {
+	LogWarn("New text %s", text);
+	geContent *loadedContent = geGetLoadedContent(geContentTypeText, text);
+	if (loadedContent) {
+		return loadedContent->Data.Text;
+	}
+
 	geText *t = malloc(sizeof(*t));
 	t->Text = text;
 	t->LetterPoints = calloc(strlen(text), sizeof(gePoint));
@@ -299,8 +306,11 @@ void geTextLoad(geText *t) {
 	t->BoundingBox.h = textSize.y;
 	char buf[200];
 	snprintf(buf, 200, "%s_%s_%d", t->Text, t->FontName, t->FontSize);
-	geColor c = {0, 0, 100, 200};
-	t->Texture = geImageNewRenderTarget(buf, t->BoundingBox.w, t->BoundingBox.h, &c);
+	if (!t->Texture) {
+		// TODO right now the texture color is always going to be this, can this be updated?
+		geColor c = {0, 0, 100, 200};
+		t->Texture = geImageNewRenderTarget(buf, t->BoundingBox.w, t->BoundingBox.h, &c);
+	}
 	loadLetters(t, 0);
 }
 
@@ -310,6 +320,12 @@ void geTextSetColor(geText *t, geColor *color) {
 	t->Color.B = color->B;
 	t->Color.A = color->A;
 }
+void geTextSetTextureBackgroundColor(geColor *c) {
+	_textBackgroundColor.R = c->R;
+	_textBackgroundColor.G = c->G;
+	_textBackgroundColor.B = c->B;
+	_textBackgroundColor.A = c->A;
+}
 
 void geTextSetBounds(geText *t, int x, int y) {
 	t->TextBounds.x = x;
@@ -317,7 +333,15 @@ void geTextSetBounds(geText *t, int x, int y) {
 }
 
 void geTextDraw(geText *t) {
-	geImageDraw(t->Texture, NULL, &t->BoundingBox);
+	// geImageDraw(t->Texture, NULL, &t->BoundingBox);
+	geRectangle d;
+	d.x = t->BoundingBox.x;
+	d.y = t->BoundingBox.y;
+	// Try setting to image size.
+	d.w = t->TextBounds.x;
+	d.h = t->TextBounds.y;
+	// geImageDraw(t->Texture, NULL, &t->BoundingBox);
+	geImageDraw(t->Texture, NULL, &d);
 }
 
 void geTextFree(geText *f) {
@@ -334,6 +358,9 @@ gePoint geTextGetTextSize(geText *text) {
 	p.x = text->BoundingBox.w;
 	p.y = text->BoundingBox.h;
 	return p;
+}
+void geTextSetImage(geText *t, geImage *i) {
+	t->Texture = i;
 }
 
 void geTextSetNumDrawCharacters(geText *t, int num) {

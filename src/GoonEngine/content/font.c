@@ -29,10 +29,13 @@ static void fontFree(geFont *f) {
 	if (f->Face) {
 		FT_Done_Face(f->Face);
 	}
-	LogDebug("Freeing font %s", f->ContentName);
+	LogWarn("Freeing font %s", f->ContentName);
 	free(f->Path);
 	free(f->ContentName);
+	f->Path = NULL;
+	f->ContentName = NULL;
 	free(f);
+	f = NULL;
 }
 
 static char *fontGetContentName(geFont *f) {
@@ -51,6 +54,8 @@ static void fontNewContent(geContent *content, void *data) {
 static void fontDeleteContent(geContent *content) {
 	if (!content) return;
 	fontFree(content->Data.Font);
+	content->Data.Font = NULL;
+	content = NULL;
 }
 
 static void fontLoadContent(geContent *content) {
@@ -79,6 +84,7 @@ void geInitializeFontContentType() {
 }
 
 geFont *geFontNew(const char *name, int size) {
+	LogWarn("New font %s!", name);
 	if (!_loadedLibrary) {
 		if (FT_Init_FreeType(&_loadedLibrary)) {
 			LogCritical("Could not initialize FreeType library\n");

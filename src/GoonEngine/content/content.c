@@ -27,6 +27,9 @@ static ContentTypeCompareFunc _compareContentFunctions[geContentTypeMax];
 static int findContentIndexByName(geContentTypes type, const char *name) {
 	contentSizeCount *info = &_loadedContentData[type];
 	for (size_t i = 0; i < info->Count; i++) {
+		if(!_loadedContent[type][i]) {
+			continue;
+		}
 		if (_compareContentFunctions[type](name, _loadedContent[type][i])) {
 			return i;
 		}
