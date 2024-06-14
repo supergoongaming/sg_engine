@@ -16,9 +16,10 @@ typedef struct geBgm {
 
 static void geBgmFree(geBgm *bgm) {
 	free(bgm->FilePath);
-	if (bgm->pBgm)
-
-		free(bgm->pBgm);
+	if (bgm->pBgm) {
+		gsUnloadBgm(bgm->pBgm);
+		bgm->pBgm = NULL;
+	}
 	free(bgm);
 }
 

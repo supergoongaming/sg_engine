@@ -105,6 +105,10 @@ void addWordToLetterPoints(geText *t, int wordEndPos, int wordLength, int penX, 
 	int x = penX, y = penY, wordStartPos = wordEndPos - wordLength;
 	for (size_t i = 0; i < wordLength; i++) {
 		int wordI = wordStartPos + i;
+		if(wordI >= strlen(t->Text)) {
+			LogWarn("How is this possible?");
+			return;
+		}
 		char letter = t->Text[wordI];
 		gePoint p;
 		p.x = x;
