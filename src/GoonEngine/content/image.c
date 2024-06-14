@@ -267,12 +267,14 @@ geImage *geImageNewFromFile(const char *path) {
 geImage *geImageNewFromSurface(const char *contentName, SDL_Surface *surface) {
 	geContent *loadedContent = geGetLoadedContent(geContentTypeImage, contentName);
 	if (loadedContent) {
+		SDL_FreeSurface(surface);
 		return loadedContent->Data.Image;
 	}
 	SDL_Renderer *r = geGlobalRenderer();
 	SDL_Texture *t = SDL_CreateTextureFromSurface(r, surface);
 	if (t == NULL) {
 		LogError("Could not create texture, Error: %s", SDL_GetError());
+		SDL_FreeSurface(surface);
 		return NULL;
 	}
 	SDL_FreeSurface(surface);
@@ -290,12 +292,12 @@ void geImageDraw(geImage *i, geRectangle *srcRect, geRectangle *dstRect) {
 }
 void geImageDrawF(geImage *i, geRectangle *srcRect, geRectangleF *dstRect) {
 	SDL_Renderer *r = geGlobalRenderer();
-	SDL_RenderCopyExF(r, i->Texture, (SDL_Rect*)srcRect, (SDL_FRect *)dstRect, 0, NULL, SDL_FLIP_NONE);
+	SDL_RenderCopyExF(r, i->Texture, (SDL_Rect *)srcRect, (SDL_FRect *)dstRect, 0, NULL, SDL_FLIP_NONE);
 }
 void geImageFree(geImage *i) {
 	if (i && i->Name && i->Texture) {
 		LogWarn("Freeing an image from something");
-		geUnloadContent(geContentTypeImage, i->Name);
+		geUnloadContent(geContentTypeImage, i->Name, 0);
 	}
 }
 int geImageWidth(geImage *i) {

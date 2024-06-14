@@ -15,6 +15,7 @@ int geWindowGetRefreshRate();
 int geInitializeRenderingWindow();
 void geStartDrawFrame();
 void geEndDrawFrame();
+void geWindowExit();
 #ifdef __cplusplus
 }
 #endif

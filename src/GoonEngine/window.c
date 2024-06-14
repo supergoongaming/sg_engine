@@ -7,14 +7,9 @@
 SDL_Window *_window = NULL;
 SDL_Renderer *_renderer = NULL;
 static int g_refreshRate = 60;
-// #ifdef GN_PLATFORM_MACOS
-// const char *windowPath = "../Resources/assets/config/window.ini";
-// #else
 const char *windowPath = "assets/config/window.ini";
-// #endif
 
-static int iniHandler(void *user, const char *section, const char *name,
-					  const char *value) {
+static int iniHandler(void *user, const char *section, const char *name, const char *value) {
 	geWindowSettings *pWindowSettings = (geWindowSettings *)user;
 
 #define SECTION_MATCH(s) strcmp(section, s) == 0
@@ -68,6 +63,7 @@ int geInitializeRenderingWindow() {
 	LogDebug("Refresh rate is set to %d", g_refreshRate);
 	SDL_RenderSetIntegerScale(_renderer, SDL_TRUE);
 	SDL_RenderSetLogicalSize(_renderer, settings.WorldX, settings.WorldY);
+	free(settings.Title);
 	return 0;
 }
 
@@ -86,4 +82,8 @@ void geStartDrawFrame() {
 
 void geEndDrawFrame() {
 	SDL_RenderPresent(_renderer);
+}
+
+void geWindowExit() {
+
 }

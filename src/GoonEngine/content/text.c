@@ -231,15 +231,14 @@ static void loadLetters(geText *t, int startLoc) {
 }
 
 static void textFree(geText *t) {
-	LogWarn("Freeing text %s", t->Text);
 	if (t->Font) geFontFree(t->Font);
-	free(t->LetterPoints);
 	t->Font = NULL;
+	if (t->LetterPoints) free(t->LetterPoints);
+	t->LetterPoints = NULL;
 	if (t->Texture) {
 		geImageFree(t->Texture);
-		t->Texture = NULL;
 	}
-	// free(t->Font);
+	t->Texture = NULL;
 	free(t);
 	t = NULL;
 }
@@ -281,7 +280,7 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 
 	geText *t = malloc(sizeof(*t));
 	t->Text = text;
-	t->LetterPoints = calloc(strlen(text), sizeof(gePoint));
+	t->LetterPoints = calloc(strlen(text) + 1, sizeof(gePoint));
 	t->Texture = NULL;
 	t->Font = NULL;
 	t->FontSize = fontSize;
@@ -348,7 +347,7 @@ void geTextDraw(geText *t) {
 }
 
 void geTextFree(geText *f) {
-	geUnloadContent(geContentTypeText, f->Text);
+	geUnloadContent(geContentTypeText, f->Text, 0);
 }
 
 void geTextSetLocation(geText *t, int x, int y) {

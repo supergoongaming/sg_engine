@@ -17,6 +17,7 @@ typedef struct geBgm {
 static void geBgmFree(geBgm *bgm) {
 	free(bgm->FilePath);
 	if (bgm->pBgm)
+
 		free(bgm->pBgm);
 	free(bgm);
 }
@@ -75,7 +76,7 @@ void geBgmLoad(geBgm *bgm) {
 }
 
 void geBgmDelete(geBgm *bgm) {
-	geUnloadContent(geContentTypeBgm, bgm->FilePath);
+	geUnloadContent(geContentTypeBgm, bgm->FilePath, false);
 }
 
 void geBgmSetBackground(geBgm *bgm, int isBackground) {

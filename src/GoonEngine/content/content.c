@@ -79,33 +79,36 @@ int geLoadAllContent() {
 	return true;
 }
 
+// Unloads content regardless of ref count, useful to start fresh or when closing.
 int geUnloadAllContent() {
 	for (size_t i = 0; i < geContentTypeMax; i++) {
 		contentSizeCount data = _loadedContentData[i];
 		for (size_t j = 0; j < data.Count; j++) {
-			_deleteContentFunctions[i](_loadedContent[i][j]);
+			geUnloadContent(i, _loadedContent[i][j], true);
+			// _deleteContentFunctions[i](_loadedContent[i][j]);
+			// free(_loadedContent[i][j]);
+			// _loadedContent[i][j] = NULL;
 		}
 	}
 	return true;
 }
 
-int geUnloadContent(geContentTypes type, const char *data) {
-	LogWarn("Trying to find");
+// int geUnloadContent(geContentTypes type, const char *data) {
+int geUnloadContent(geContentTypes type, const char *data, int force) {
 	int loc = findContentIndexByName(type, data);
-	LogWarn("Found");
 	if (loc == -1) {
 		LogDebug("Did not find content with type %d with path %s", type, data);
 		return false;
 	}
 	geContent *content = _loadedContent[type][loc];
-	if(!content) {
-		LogError("It's an error here for some reason when unloading content");
+	if (!content) {
+		LogDebug("It's an error here for some reason when unloading content");
 		return false;
 	}
-	if (--content->RefCount == 0) {
-		if (!_deleteContentFunctions[type])
-			LogCritical(
-				"No delete function available for this type, please register!");
+	if (force || --content->RefCount == 0) {
+		if (!_deleteContentFunctions[type]) {
+			LogCritical("No delete function available for this type, please register!");
+		}
 		_deleteContentFunctions[type](content);
 		_loadedContent[type][loc] = NULL;
 		free(content);

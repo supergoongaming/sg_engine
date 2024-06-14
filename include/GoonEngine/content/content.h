@@ -40,7 +40,8 @@ void geContentInitializeAllContentTypes();
 geContent *geGetLoadedContent(geContentTypes type, const char *path);
 int geLoadAllContent();
 int geUnloadAllContent();
-int geUnloadContent(geContentTypes type, const char *data);
+// int geUnloadContent(geContentTypes type, const char *data);
+int geUnloadContent(geContentTypes type, const char *data, int force);
 int geAddContent(geContentTypes type, void *data);
 int geAddContentTypeFunctions(geContentTypes type, ContentTypeCreateFunc create,
 							  ContentTypeDeleteFunc del,

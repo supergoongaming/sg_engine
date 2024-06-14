@@ -29,10 +29,10 @@ static void fontFree(geFont *f) {
 	if (f->Face) {
 		FT_Done_Face(f->Face);
 	}
-LogWarn("Freeing font %s", f->ContentName);
-	free(f->Path);
-	free(f->ContentName);
+	f->Face = NULL;
+	if (f->Path) free(f->Path);
 	f->Path = NULL;
+	if (f->ContentName) free(f->ContentName);
 	f->ContentName = NULL;
 	free(f);
 	f = NULL;
@@ -132,8 +132,8 @@ void geFontLoad(geFont *f) {
 	f->Face = fontFace;
 }
 void geFontFree(geFont *f) {
-	if (f->ContentName) {
-		geUnloadContent(geContentTypeFont, f->ContentName);
+	if (f && f->ContentName) {
+		geUnloadContent(geContentTypeFont, f->ContentName, 0);
 	}
 }
 
