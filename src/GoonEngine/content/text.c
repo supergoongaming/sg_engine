@@ -235,9 +235,13 @@ static void textFree(geText *t) {
 	if (t->Font) geFontFree(t->Font);
 	free(t->LetterPoints);
 	t->Font = NULL;
-	geImageFree(t->Texture);
-	t->Texture = NULL;
-	free(t->Font);
+	if (t->Texture) {
+		geImageFree(t->Texture);
+		t->Texture = NULL;
+	}
+	// free(t->Font);
+	free(t);
+	t = NULL;
 }
 
 static void textNewContent(geContent *content, void *data) {
@@ -270,7 +274,6 @@ void geInitializeTextContentType() {
 }
 
 geText *geTextNew(const char *text, const char *fontName, int fontSize) {
-	LogWarn("New text %s", text);
 	geContent *loadedContent = geGetLoadedContent(geContentTypeText, text);
 	if (loadedContent) {
 		return loadedContent->Data.Text;

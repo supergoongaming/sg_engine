@@ -73,7 +73,7 @@ void geSfxDelete(geSfx *s) {
 	geUnloadContent(geContentTypeSfx, s->FilePath);
 }
 
-int geSfxPlay(geSfx *s, float volume, int loops) {
+int geSfxPlay(geSfx *s, float volume) {
 	gsPlaySfxOneShot(s->pSfx, volume);
 	return true;
 }

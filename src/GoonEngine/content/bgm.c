@@ -114,4 +114,5 @@ int geBgmStop(geBgm *bgm) {
 	} else {
 		gsStopBgm();
 	}
+	return 1;
 }

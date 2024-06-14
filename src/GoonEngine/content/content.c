@@ -3,9 +3,9 @@
 #include <GoonEngine/gnpch.h>
 // Built in Content Types
 #include <GoonEngine/content/bgm.h>
-#include <GoonEngine/content/sfx.h>
 #include <GoonEngine/content/font.h>
 #include <GoonEngine/content/image.h>
+#include <GoonEngine/content/sfx.h>
 #include <GoonEngine/content/text.h>
 
 // Content Types
@@ -27,7 +27,7 @@ static ContentTypeCompareFunc _compareContentFunctions[geContentTypeMax];
 static int findContentIndexByName(geContentTypes type, const char *name) {
 	contentSizeCount *info = &_loadedContentData[type];
 	for (size_t i = 0; i < info->Count; i++) {
-		if(!_loadedContent[type][i]) {
+		if (!_loadedContent[type][i]) {
 			continue;
 		}
 		if (_compareContentFunctions[type](name, _loadedContent[type][i])) {
@@ -90,19 +90,26 @@ int geUnloadAllContent() {
 }
 
 int geUnloadContent(geContentTypes type, const char *data) {
+	LogWarn("Trying to find");
 	int loc = findContentIndexByName(type, data);
+	LogWarn("Found");
 	if (loc == -1) {
 		LogDebug("Did not find content with type %d with path %s", type, data);
 		return false;
 	}
 	geContent *content = _loadedContent[type][loc];
+	if(!content) {
+		LogError("It's an error here for some reason when unloading content");
+		return false;
+	}
 	if (--content->RefCount == 0) {
-		LogDebug("RefCount is 0, deleting type %d with name %s", type, data);
 		if (!_deleteContentFunctions[type])
 			LogCritical(
 				"No delete function available for this type, please register!");
 		_deleteContentFunctions[type](content);
 		_loadedContent[type][loc] = NULL;
+		free(content);
+		content = NULL;
 	}
 	return true;
 }

@@ -11,7 +11,7 @@ void geInitializeSfxContentType();
 geSfx *geSfxNew(const char *n);
 void geSfxLoad(geSfx *s);
 void geSfxDelete(geSfx *s);
-int geSfxPlay(geSfx *s, float volume, int loops);
+int geSfxPlay(geSfx *s, float volume);
 #ifdef __cplusplus
 }
 #endif

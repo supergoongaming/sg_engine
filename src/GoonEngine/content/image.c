@@ -11,11 +11,13 @@ typedef struct geImage {
 } geImage;
 
 static void imageFree(geImage *i) {
-	LogWarn("Freeing image %s", i->Name);
 	if (i->Texture) SDL_DestroyTexture(i->Texture);
 	i->Texture = NULL;
+	LogWarn("Freeing image %s", i->Name);
 	if (i->Name) free(i->Name);
+	i->Name = NULL;
 	free(i);
+	i = NULL;
 }
 static void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel) {
 	Uint8 *target_pixel = (Uint8 *)surface->pixels + y * surface->pitch + x * sizeof(Uint32);
@@ -151,6 +153,7 @@ static void imageNewContent(geContent *content, void *data) {
 static void imageDeleteContent(geContent *content) {
 	if (!content) return;
 	imageFree(content->Data.Image);
+	content->Data.Image = NULL;
 }
 
 static void imageLoadContent(geContent *content) {
@@ -287,10 +290,14 @@ void geImageDraw(geImage *i, geRectangle *srcRect, geRectangle *dstRect) {
 }
 void geImageDrawF(geImage *i, geRectangle *srcRect, geRectangleF *dstRect) {
 	SDL_Renderer *r = geGlobalRenderer();
-	// SDL_RenderCopyEx(r, i->Texture, (SDL_Rect *)srcRect, (SDL_Rect *)dstRect, 0, NULL, SDL_FLIP_NONE);
-	SDL_RenderCopyExF(r, i->Texture, srcRect, (SDL_FRect *)dstRect, 0, NULL, SDL_FLIP_NONE);
+	SDL_RenderCopyExF(r, i->Texture, (SDL_Rect*)srcRect, (SDL_FRect *)dstRect, 0, NULL, SDL_FLIP_NONE);
 }
-void geImageFree(geImage *i) { geUnloadContent(geContentTypeImage, i->Name); }
+void geImageFree(geImage *i) {
+	if (i && i->Name && i->Texture) {
+		LogWarn("Freeing an image from something");
+		geUnloadContent(geContentTypeImage, i->Name);
+	}
+}
 int geImageWidth(geImage *i) {
 	int w, h;
 	SDL_QueryTexture(i->Texture, NULL, NULL, &w, &h);
