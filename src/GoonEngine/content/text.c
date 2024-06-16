@@ -17,7 +17,7 @@
 static geColor _textBackgroundColor = {0, 0, 100, 200};
 
 typedef struct geText {
-	const char *Text;
+	char *Text;
 	const char *FontName;
 	int FontSize;
 	int WordWrap;
@@ -247,6 +247,9 @@ static void textFree(geText *t) {
 		geImageFree(t->Texture);
 		// geUnloadContent(geContentTypeImage, t->Texture, 0);
 	}
+	if (t->Text) {
+		free(t->Text);
+	}
 	t->Texture = NULL;
 	free(t);
 	t = NULL;
@@ -288,7 +291,8 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 	}
 
 	geText *t = malloc(sizeof(*t));
-	t->Text = text;
+	// t->Text = text;
+	t->Text = strdup(text);
 	// TODO trying 10 here as I kept getting a write out of bounds.., I thought 1 would be good enough for null terminator but..
 	t->LetterPoints = calloc(strlen(text) + 10, sizeof(gePoint));
 	t->Texture = NULL;
@@ -357,7 +361,7 @@ void geTextDraw(geText *t) {
 }
 
 void geTextFree(geText *f) {
-	geUnloadContent(geContentTypeText, f->Text, 0);
+	geUnloadContent(geContentTypeText, f->Text);
 }
 
 void geTextSetLocation(geText *t, int x, int y) {

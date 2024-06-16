@@ -77,7 +77,7 @@ void geBgmLoad(geBgm *bgm) {
 }
 
 void geBgmDelete(geBgm *bgm) {
-	geUnloadContent(geContentTypeBgm, bgm->FilePath, false);
+	geUnloadContent(geContentTypeBgm, bgm->FilePath);
 }
 
 void geBgmSetBackground(geBgm *bgm, int isBackground) {

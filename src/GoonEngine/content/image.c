@@ -296,7 +296,7 @@ void geImageDrawF(geImage *i, geRectangle *srcRect, geRectangleF *dstRect) {
 }
 void geImageFree(geImage *i) {
 	if (i) {
-		geUnloadContent(geContentTypeImage, i->Name, 0);
+		geUnloadContent(geContentTypeImage, i->Name);
 	}
 }
 int geImageWidth(geImage *i) {

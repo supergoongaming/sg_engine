@@ -122,22 +122,13 @@ int geUnloadAllContent() {
 	return true;
 }
 
-int geUnloadContent(geContentTypes type, const char *data, int force) {
+int geUnloadContent(geContentTypes type, const char *data) {
 	int loc = findContentIndexByName(type, data);
 	if (loc == -1) {
 		LogDebug("Did not find content with type %d with path %s", type, data);
 		return false;
 	}
 	unloadContent(type, loc);
-	// geContent *content = _loadedContent[type][loc];
-	// if (!content) {
-	// 	LogDebug("It's an error here for some reason when unloading content");
-	// 	return false;
-	// }
-
-	// if (force || --content->RefCount == 0) {
-	// 	unloadContent(type, loc);
-	// }
 	return true;
 }
 

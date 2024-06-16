@@ -135,7 +135,7 @@ void geFontLoad(geFont *f) {
 
 void geFontFree(geFont *f) {
 	if (f) {
-		geUnloadContent(geContentTypeFont, f->ContentName, 0);
+		geUnloadContent(geContentTypeFont, f->ContentName);
 	}
 }
 

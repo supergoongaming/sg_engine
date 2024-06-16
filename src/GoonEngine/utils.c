@@ -7,8 +7,8 @@
 #include <GoonEngine/window.h>
 
 const char *_systemDefaultFont = "Roboto-Regular";
-const char *_systemBasePath = NULL;
-const char *_systemFilePath = NULL;
+char *_systemBasePath = NULL;
+char *_systemFilePath = NULL;
 
 void geUtilsDrawDebugText(const char *text) {
 	geText *t = geTextNew(text, _systemDefaultFont, 32);
@@ -45,22 +45,22 @@ int geUtilsIsPointInRect(geRectangle *rect, gePoint *point) {
 
 int geGetLoadFilename(char *buffer, size_t bufferSize, const char *filename) {
 	if (_systemBasePath != NULL) {
-		strcpy(buffer, filename);
+		snprintf(buffer, bufferSize, "%s%s", _systemBasePath, filename);
 		return 0;
 	}
 	const char *base_path = SDL_GetBasePath();
-	int result = -1;  // Return -1 on error
+	int result = -1;
 
 	if (base_path == NULL) {
-		// Use the current directory if SDL_GetBasePath() fails
 		if (snprintf(buffer, bufferSize, "./%s", filename) < bufferSize) {
-			result = 0;	 // Success
+			result = 0;
 		}
 	} else {
-		// Construct the path using the base path provided by SDL
 		if (snprintf(buffer, bufferSize, "%s%s", base_path, filename) < bufferSize) {
-			SDL_free((void *)base_path);  // Clean up the SDL memory
-			result = 0;					  // Success
+			_systemBasePath = strdup(base_path);
+			SDL_free((void *)base_path);
+
+			result = 0;
 		}
 	}
 	return result;
@@ -68,7 +68,7 @@ int geGetLoadFilename(char *buffer, size_t bufferSize, const char *filename) {
 
 int geGetFileFilepath(char *buffer, size_t bufferSize, const char *filename) {
 	if (_systemFilePath != NULL) {
-		strcpy(buffer, filename);
+		snprintf(buffer, bufferSize, "%s%s", _systemFilePath, filename);
 		return 0;
 	}
 	const char *base_path = SDL_GetPrefPath("Supergoon Games", "BbAdventures");
@@ -82,6 +82,7 @@ int geGetFileFilepath(char *buffer, size_t bufferSize, const char *filename) {
 	} else {
 		// Construct the path using the base path provided by SDL
 		if (snprintf(buffer, bufferSize, "%s%s", base_path, filename) < bufferSize) {
+			_systemFilePath = strdup(base_path);
 			SDL_free((void *)base_path);  // Clean up the SDL memory
 			result = 0;					  // Success
 		}
