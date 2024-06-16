@@ -92,8 +92,17 @@ static int unloadContent(geContentTypes t, int i) {
 	}
 	geContent *c = _loadedContent[t][i];
 	if (!c) {
-		LogWarn("Content is null, not deleting");
+		LogDebug("It's an error here for some reason when unloading content");
 		return false;
+	}
+
+	// if (force || --content->RefCount == 0) {
+	// 	unloadContent(type, loc);
+	// }
+	// If ref count isn't empty, don't destroy it.
+	--c->RefCount;
+	if (c->RefCount > 0) {
+		return true;
 	}
 	_deleteContentFunctions[t](c);
 	_loadedContent[t][i] = NULL;
@@ -119,15 +128,16 @@ int geUnloadContent(geContentTypes type, const char *data, int force) {
 		LogDebug("Did not find content with type %d with path %s", type, data);
 		return false;
 	}
-	geContent *content = _loadedContent[type][loc];
-	if (!content) {
-		LogDebug("It's an error here for some reason when unloading content");
-		return false;
-	}
+	unloadContent(type, loc);
+	// geContent *content = _loadedContent[type][loc];
+	// if (!content) {
+	// 	LogDebug("It's an error here for some reason when unloading content");
+	// 	return false;
+	// }
 
-	if (force || --content->RefCount == 0) {
-		unloadContent(type, loc);
-	}
+	// if (force || --content->RefCount == 0) {
+	// 	unloadContent(type, loc);
+	// }
 	return true;
 }
 
