@@ -105,7 +105,7 @@ void addWordToLetterPoints(geText *t, int wordEndPos, int wordLength, int penX, 
 	int x = penX, y = penY, wordStartPos = wordEndPos - wordLength;
 	for (size_t i = 0; i < wordLength; i++) {
 		int wordI = wordStartPos + i;
-		if(wordI >= strlen(t->Text)) {
+		if (wordI >= strlen(t->Text)) {
 			LogWarn("How is this possible?");
 			return;
 		}
@@ -235,12 +235,17 @@ static void loadLetters(geText *t, int startLoc) {
 }
 
 static void textFree(geText *t) {
-	if (t->Font) geFontFree(t->Font);
+	LogWarn("Freeing text %s", t->Text);
+	if (t->Font) {
+		// geUnloadContentWithContent(geContentTypeFont, t->Font, 0);
+		geFontFree(t->Font);
+	}
 	t->Font = NULL;
 	if (t->LetterPoints) free(t->LetterPoints);
 	t->LetterPoints = NULL;
 	if (t->Texture) {
 		geImageFree(t->Texture);
+		// geUnloadContent(geContentTypeImage, t->Texture, 0);
 	}
 	t->Texture = NULL;
 	free(t);
@@ -284,7 +289,8 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 
 	geText *t = malloc(sizeof(*t));
 	t->Text = text;
-	t->LetterPoints = calloc(strlen(text) + 1, sizeof(gePoint));
+	// TODO trying 10 here as I kept getting a write out of bounds.., I thought 1 would be good enough for null terminator but..
+	t->LetterPoints = calloc(strlen(text) + 10, sizeof(gePoint));
 	t->Texture = NULL;
 	t->Font = NULL;
 	t->FontSize = fontSize;

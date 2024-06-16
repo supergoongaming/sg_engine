@@ -26,6 +26,7 @@ typedef struct geFont {
 } geFont;
 
 static void fontFree(geFont *f) {
+	LogWarn("Freeing font %s", f->ContentName);
 	if (f->Face) {
 		FT_Done_Face(f->Face);
 	}
@@ -94,7 +95,7 @@ geFont *geFontNew(const char *name, int size) {
 	char buffer[BUFFER_SIZE];
 	sprintf(buffer, "%s/%s.%s_%d", _fontPrefix, name, _fontFileType, size);
 	char buf[1000];
-	GetLoadFilename(buf, sizeof(buf), buffer);
+	geGetLoadFilename(buf, sizeof(buf), buffer);
 
 	geContent *loadedContent = geGetLoadedContent(geContentTypeFont, buf);
 	if (loadedContent) {
@@ -108,7 +109,7 @@ geFont *geFontNew(const char *name, int size) {
 	}
 	sprintf(buffer, "%s/%s.%s", _fontPrefix, name, _fontFileType);
 
-	GetLoadFilename(buf, sizeof(buf), buffer);
+	geGetLoadFilename(buf, sizeof(buf), buffer);
 	geFont *f = malloc(sizeof(*f));
 	f->Face = NULL;
 	f->Size = size;
@@ -131,8 +132,9 @@ void geFontLoad(geFont *f) {
 	FT_Set_Pixel_Sizes(fontFace, 0, f->Size);
 	f->Face = fontFace;
 }
+
 void geFontFree(geFont *f) {
-	if (f && f->ContentName) {
+	if (f) {
 		geUnloadContent(geContentTypeFont, f->ContentName, 0);
 	}
 }

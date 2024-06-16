@@ -57,7 +57,7 @@ geBgm *geBgmNew(const char *bgmName) {
 	char buffer[BUFFER_SIZE];
 	sprintf(buffer, audioPath, bgmName);
 	char buf[1000];
-	GetLoadFilename(buf, sizeof(buf), buffer);
+	geGetLoadFilename(buf, sizeof(buf), buffer);
 	geContent *loadedContent = geGetLoadedContent(geContentTypeBgm, buf);
 	if (loadedContent) {
 		return loadedContent->Data.Bgm;

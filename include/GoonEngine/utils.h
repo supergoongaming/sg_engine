@@ -15,7 +15,7 @@ void geUtilsDrawDebugText(const char *text);
 void geUtilsDrawRect(geRectangle *dstRect, geColor *color);
 void geUtilsDrawRectF(geRectangleF *dstRect, geColor *color);
 int geUtilsIsPointInRect(geRectangle *rect, gePoint *point);
-int GetLoadFilename(char* buffer, size_t bufferSize, const char* filename);
+int geGetLoadFilename(char* buffer, size_t bufferSize, const char* filename);
 int geGetFileFilepath(char* buffer, size_t bufferSize, const char* filename);
 
 #ifdef __cplusplus

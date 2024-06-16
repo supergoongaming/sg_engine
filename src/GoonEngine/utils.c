@@ -43,7 +43,7 @@ int geUtilsIsPointInRect(geRectangle *rect, gePoint *point) {
 	return SDL_PointInRect((SDL_Point *)point, (SDL_Rect *)rect);
 }
 
-int GetLoadFilename(char *buffer, size_t bufferSize, const char *filename) {
+int geGetLoadFilename(char *buffer, size_t bufferSize, const char *filename) {
 	if (_systemBasePath != NULL) {
 		strcpy(buffer, filename);
 		return 0;

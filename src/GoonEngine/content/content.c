@@ -79,21 +79,40 @@ int geLoadAllContent() {
 	return true;
 }
 
+/**
+ * @brief Unloads content using a content function
+ *
+ * @param t the content type to unload
+ * @param i the position in the loaded content
+ * @return int True if successful
+ */
+static int unloadContent(geContentTypes t, int i) {
+	if (!_deleteContentFunctions[t]) {
+		LogCritical("No delete function available for this type, please register!");
+	}
+	geContent *c = _loadedContent[t][i];
+	if (!c) {
+		LogWarn("Content is null, not deleting");
+		return false;
+	}
+	_deleteContentFunctions[t](c);
+	_loadedContent[t][i] = NULL;
+	free(c);
+	c = NULL;
+	return true;
+}
+
 // Unloads content regardless of ref count, useful to start fresh or when closing.
 int geUnloadAllContent() {
 	for (size_t i = 0; i < geContentTypeMax; i++) {
 		contentSizeCount data = _loadedContentData[i];
 		for (size_t j = 0; j < data.Count; j++) {
-			geUnloadContent(i, _loadedContent[i][j], true);
-			// _deleteContentFunctions[i](_loadedContent[i][j]);
-			// free(_loadedContent[i][j]);
-			// _loadedContent[i][j] = NULL;
+			unloadContent(i, j);
 		}
 	}
 	return true;
 }
 
-// int geUnloadContent(geContentTypes type, const char *data) {
 int geUnloadContent(geContentTypes type, const char *data, int force) {
 	int loc = findContentIndexByName(type, data);
 	if (loc == -1) {
@@ -105,14 +124,9 @@ int geUnloadContent(geContentTypes type, const char *data, int force) {
 		LogDebug("It's an error here for some reason when unloading content");
 		return false;
 	}
+
 	if (force || --content->RefCount == 0) {
-		if (!_deleteContentFunctions[type]) {
-			LogCritical("No delete function available for this type, please register!");
-		}
-		_deleteContentFunctions[type](content);
-		_loadedContent[type][loc] = NULL;
-		free(content);
-		content = NULL;
+		unloadContent(type, loc);
 	}
 	return true;
 }
@@ -123,10 +137,11 @@ int geAddContent(geContentTypes type, void *data) {
 	geContent *content = malloc(sizeof(*content));
 	content->RefCount = 1;
 	content->Type = type;
-	if (!_newContentFunctions[type])
+	if (!_newContentFunctions[type]) {
 		LogCritical(
 			"Content type is not available, please register this function "
 			"properly!");
+	}
 	_newContentFunctions[type](content, data);
 	_loadedContent[type][info->Count++] = content;
 	return true;

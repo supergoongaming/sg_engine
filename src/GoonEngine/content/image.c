@@ -295,8 +295,7 @@ void geImageDrawF(geImage *i, geRectangle *srcRect, geRectangleF *dstRect) {
 	SDL_RenderCopyExF(r, i->Texture, (SDL_Rect *)srcRect, (SDL_FRect *)dstRect, 0, NULL, SDL_FLIP_NONE);
 }
 void geImageFree(geImage *i) {
-	if (i && i->Name && i->Texture) {
-		LogWarn("Freeing an image from something");
+	if (i) {
 		geUnloadContent(geContentTypeImage, i->Name, 0);
 	}
 }

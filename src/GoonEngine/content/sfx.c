@@ -52,7 +52,7 @@ geSfx *geSfxNew(const char *n) {
 	char buffer[BUFFER_SIZE];
 	sprintf(buffer, audioPath, n);
 	char buf[1000];
-	GetLoadFilename(buf, sizeof(buf), buffer);
+	geGetLoadFilename(buf, sizeof(buf), buffer);
 	geContent *loadedContent = geGetLoadedContent(geContentTypeBgm, buf);
 	if (loadedContent) {
 		return loadedContent->Data.Sfx;

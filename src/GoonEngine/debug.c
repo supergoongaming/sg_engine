@@ -30,7 +30,7 @@ int InitializeDebugLogFile()
 {
     LogDebug("Opening log file at %s", logFileName);
 	char buf[1000];
-	// GetLoadFilename(buf, sizeof(buf), logFileName);
+	// geGetLoadFilename(buf, sizeof(buf), logFileName);
 	geGetFileFilepath(buf, sizeof(buf), logFileName);
     openDebugFile = fopen(buf, "a");
     if (openDebugFile)

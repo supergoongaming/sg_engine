@@ -37,7 +37,7 @@ static int iniHandler(void *user, const char *section, const char *name, const c
 int geInitializeRenderingWindow() {
 	geWindowSettings settings;
 	char buffer[1000];
-	GetLoadFilename(buffer, sizeof(buffer), windowPath);
+	geGetLoadFilename(buffer, sizeof(buffer), windowPath);
 	// if (ini_parse(windowPath, iniHandler, &settings) < 0) {
 	LogWarn("Trying path %s", buffer);
 	if (ini_parse(buffer, iniHandler, &settings) < 0) {
@@ -63,7 +63,7 @@ int geInitializeRenderingWindow() {
 	LogDebug("Refresh rate is set to %d", g_refreshRate);
 	SDL_RenderSetIntegerScale(_renderer, SDL_TRUE);
 	SDL_RenderSetLogicalSize(_renderer, settings.WorldX, settings.WorldY);
-	free(settings.Title);
+	free((void *)settings.Title);
 	return 0;
 }
 
@@ -85,5 +85,4 @@ void geEndDrawFrame() {
 }
 
 void geWindowExit() {
-
 }
