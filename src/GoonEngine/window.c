@@ -39,7 +39,7 @@ int geInitializeRenderingWindow() {
 	char buffer[1000];
 	geGetLoadFilename(buffer, sizeof(buffer), windowPath);
 	// if (ini_parse(windowPath, iniHandler, &settings) < 0) {
-	LogWarn("Trying path %s", buffer);
+	LogDebug("Trying path %s", buffer);
 	if (ini_parse(buffer, iniHandler, &settings) < 0) {
 		LogCritical("Could not load window.ini to create window.");
 		return 1;

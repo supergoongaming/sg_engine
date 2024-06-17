@@ -109,7 +109,7 @@ int geGamepadLeftAxisXThisFrameMovement(const int padNum) {
 	GamePad *pad = &_connectedGamepads[padNum];
 	// TODO this should be changed and inside joystick?
 	int xInt = SDL_CONTROLLER_AXIS_LEFTX;
-	int yInt = SDL_CONTROLLER_AXIS_LEFTY;
+	// int yInt = SDL_CONTROLLER_AXIS_LEFTY;
 	return pad->thisFrameAxis[xInt] - pad->lastFrameAxis[xInt];
 	// int x = pad->thisFrameAxis[xInt] - pad->lastFrameAxis[xInt];
 	// int y = pad->thisFrameAxis[yInt] - pad->lastFrameAxis[yInt];

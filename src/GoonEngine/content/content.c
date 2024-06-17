@@ -59,14 +59,27 @@ int geAddContentTypeCreateFunc(geContentTypes type,
 	return false;
 }
 
-geContent *geGetLoadedContent(geContentTypes type, const char *path) {
+static geContent *getLoadedContent(int type, const char *path, int incrementRef) {
 	int index = findContentIndexByName(type, path);
 	if (index == -1) return NULL;
 	geContent **array = _loadedContent[type];
 	if (!array)
 		LogCritical("Loaded content type does not exist, can't get it properly");
-	array[index]->RefCount++;
+	if (strcmp(path, "eBitPotion32") == 0) {
+		// LogWarn("Incrementing the e to be %d", array[index]->RefCount + 1);
+	}
+	if (incrementRef) {
+		++array[index]->RefCount;
+	}
 	return array[index];
+}
+
+geContent *geGetLoadedContent(geContentTypes type, const char *path) {
+	return getLoadedContent(type, path, true);
+}
+
+geContent *geGetLoadedContentWeak(geContentTypes type, const char *path) {
+	return getLoadedContent(type, path, false);
 }
 
 int geLoadAllContent() {
@@ -95,13 +108,9 @@ static int unloadContent(geContentTypes t, int i) {
 		LogDebug("It's an error here for some reason when unloading content");
 		return false;
 	}
-
-	// if (force || --content->RefCount == 0) {
-	// 	unloadContent(type, loc);
-	// }
-	// If ref count isn't empty, don't destroy it.
 	--c->RefCount;
 	if (c->RefCount > 0) {
+		// LogWarn("Lowered refcount to %d", c->RefCount);
 		return true;
 	}
 	_deleteContentFunctions[t](c);
@@ -158,6 +167,18 @@ int geAddContentTypeFunctions(geContentTypes type, ContentTypeCreateFunc create,
 	return true;
 }
 
+void geContentDebugContentType(geContentTypes t) {
+	contentSizeCount *info = &_loadedContentData[t];
+	for (size_t i = 0; i < info->Count; i++) {
+		geContent *c = _loadedContent[t][i];
+		if (!c) continue;
+		if (t == geContentTypeImage) {
+			geImage *i = (geImage *)c->Data.Image;
+			const char *filename = geImageFilename(i);
+			LogWarn("Content is %s and refcount is %d", filename, c->RefCount);
+		}
+	}
+}
 void geContentInitializeAllContentTypes() {
 	geInitializeBgmContentType();
 	geInitializeFontContentType();

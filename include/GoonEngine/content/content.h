@@ -38,6 +38,8 @@ typedef int (*ContentTypeCompareFunc)(const char *lhs, geContent *rhs);
 
 void geContentInitializeAllContentTypes();
 geContent *geGetLoadedContent(geContentTypes type, const char *path);
+// DOes not increment refcount.
+geContent *geGetLoadedContentWeak(geContentTypes type, const char *path);
 /**
  * @brief Loads all content that isn't already loaded in the content system.
  *
@@ -52,6 +54,7 @@ int geAddContentTypeFunctions(geContentTypes type, ContentTypeCreateFunc create,
 							  ContentTypeDeleteFunc del,
 							  ContentTypeLoadFunc load,
 							  ContentTypeCompareFunc comp);
+void geContentDebugContentType(geContentTypes t);
 
 #ifdef __cplusplus
 }

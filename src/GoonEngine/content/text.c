@@ -23,6 +23,7 @@ typedef struct geText {
 	int LettersToDraw;
 	int CurrentLettersDrawn;
 	int PaddingL, PaddingR, PaddingT, PaddingB;
+	int Loaded;
 	geFont *Font;
 	geColor Color;
 	geImage *Texture;
@@ -182,7 +183,6 @@ gePoint measure(geText *t) {
 
 void getLetterContentName(geText *t, char *buf, char letter) {
 	size_t len = 1 + strlen(t->FontName) + 4 + 1;
-	// letter + font + font size
 	snprintf(buf, len, "%c%s%d", letter, t->FontName, t->FontSize);
 }
 
@@ -218,9 +218,10 @@ static void loadLetters(geText *t, int startLoc) {
 			continue;
 		}
 		getLetterContentName(t, letterString, letter);
-		geContent *content = geGetLoadedContent(geContentTypeImage, letterString);
+		geContent *content;
+		content = geGetLoadedContentWeak(geContentTypeImage, letterString);
 		if (!content) {
-			LogError("Content not found");
+			LogError("Content not found when looking for %s", letterString);
 			continue;
 		}
 		geImage *image = content->Data.Image;
@@ -236,11 +237,33 @@ static void loadLetters(geText *t, int startLoc) {
 		geImageDrawImageToImage(image, t->Texture, NULL, &r);
 	}
 }
+static void unloadLetters(geText *t) {
+	char letterString[LETTER_BUFFER_LENGTH];
+	size_t size = strlen(t->Text);
+	for (size_t i = 0; i < size; i++) {
+		char letter = t->Text[i];
+		if (letter == ' ' || letter == '\n') {
+			continue;
+		}
+		getLetterContentName(t, letterString, letter);
+		// LogWarn("Letter is %c and letterstring is %s, trying to delete", letter, letterString);
+		geContent *content = geGetLoadedContentWeak(geContentTypeImage, letterString);
+		if (!content) {
+			LogError("Content not found when trying to delete letter %s", letterString);
+			continue;
+		}
+		geImage *image = content->Data.Image;
+		if (!image) {
+			LogError("Image is null? when trying to delete letter");
+			continue;
+		}
+		geImageFree(image);
+	}
+}
 
 static void textFree(geText *t) {
-	LogWarn("Freeing text %s", t->Text);
+	LogDebug("Freeing text %s", t->Text);
 	if (t->Font) {
-		// geUnloadContentWithContent(geContentTypeFont, t->Font, 0);
 		geFontFree(t->Font);
 	}
 	t->Font = NULL;
@@ -248,8 +271,8 @@ static void textFree(geText *t) {
 	t->LetterPoints = NULL;
 	if (t->Texture) {
 		geImageFree(t->Texture);
-		// geUnloadContent(geContentTypeImage, t->Texture, 0);
 	}
+	unloadLetters(t);
 	if (t->Text) {
 		free(t->Text);
 	}
@@ -294,7 +317,6 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 	}
 
 	geText *t = malloc(sizeof(*t));
-	// t->Text = text;
 	t->Text = strdup(text);
 	// TODO trying 10 here as I kept getting a write out of bounds.., I thought 1 would be good enough for null terminator but..
 	t->LetterPoints = calloc(strlen(text) + 10, sizeof(gePoint));
@@ -307,6 +329,7 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 	t->TextBounds = gePointZero();
 	t->WordWrap = true;
 	t->LettersToDraw = strlen(text);
+	t->Loaded = false;
 	t->CurrentLettersDrawn = 0;
 	t->Color.R = t->Color.G = t->Color.B = t->Color.A = 255;
 	geAddContent(geContentTypeText, t);
@@ -314,6 +337,7 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 }
 
 void geTextLoad(geText *t) {
+	if (t->Loaded) return;
 	if (!t->Font) {
 		t->Font = geFontNew(t->FontName, t->FontSize);
 		if (!t->Font) {
@@ -326,14 +350,15 @@ void geTextLoad(geText *t) {
 	gePoint textSize = measure(t);
 	t->BoundingBox.w = textSize.x;
 	t->BoundingBox.h = textSize.y;
-	char buf[200];
-	snprintf(buf, 200, "%s_%s_%d", t->Text, t->FontName, t->FontSize);
+	char buf[BUFSIZ];
+	snprintf(buf, BUFSIZ, "%s_%s_%d", t->Text, t->FontName, t->FontSize);
 	if (!t->Texture) {
 		// TODO right now the texture color is always going to be this, can this be updated?
 		geColor c = {0, 0, 100, 200};
 		t->Texture = geImageNewRenderTarget(buf, t->BoundingBox.w, t->BoundingBox.h, &c);
 	}
 	loadLetters(t, 0);
+	t->Loaded = true;
 }
 
 void geTextSetPadding(geText *t, int l, int r, int top, int b) {

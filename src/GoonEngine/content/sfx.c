@@ -14,7 +14,7 @@ typedef struct geSfx {
 } geSfx;
 
 static void geSfxFree(geSfx *s) {
-	LogWarn("Freeing Sfx %s", s->FilePath);
+	LogDebug("Freeing Sfx %s", s->FilePath);
 	free(s->FilePath);
 	if (s->pSfx)
 		gsUnloadSfx(s->pSfx);

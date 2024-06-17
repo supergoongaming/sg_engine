@@ -15,7 +15,7 @@ typedef struct geBgm {
 } geBgm;
 
 static void geBgmFree(geBgm *bgm) {
-	LogWarn("Freeing bgm %s", bgm->FilePath);
+	LogDebug("Freeing bgm %s", bgm->FilePath);
 	free(bgm->FilePath);
 	if (bgm->pBgm) {
 		gsUnloadBgm(bgm->pBgm);

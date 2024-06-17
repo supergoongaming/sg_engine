@@ -22,7 +22,7 @@ typedef struct geFont {
 } geFont;
 
 static void fontFree(geFont *f) {
-	LogWarn("Freeing font %s", f->ContentName);
+	LogDebug("Freeing font %s", f->ContentName);
 	if (f->Face) {
 		FT_Done_Face(f->Face);
 	}

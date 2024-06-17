@@ -23,6 +23,7 @@ void geImageDraw(geImage* i, geRectangle* srcRect, geRectangle* dstRect);
 void geImageDrawF(geImage* i, geRectangle* srcRect, geRectangleF* dstRect);
 int geImageWidth(geImage* i);
 int geImageHeight(geImage* i);
+const char* geImageFilename(geImage* i);
 
 #ifdef __cplusplus
 }
