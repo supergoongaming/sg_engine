@@ -5,6 +5,7 @@
 #include <SupergoonSound/include/sound.h>
 
 #define BUFFER_SIZE 256
+static const char *audioPath = "assets/audio/%s.ogg";
 
 typedef struct geSfx {
 	char *FilePath;
@@ -13,6 +14,7 @@ typedef struct geSfx {
 } geSfx;
 
 static void geSfxFree(geSfx *s) {
+	LogWarn("Freeing Sfx %s", s->FilePath);
 	free(s->FilePath);
 	if (s->pSfx)
 		gsUnloadSfx(s->pSfx);
@@ -42,16 +44,11 @@ static int geSfxFindContent(const char *path, geContent *content) {
 void geInitializeSfxContentType() {
 	geAddContentTypeFunctions(geContentTypeSfx, geSfxNewContent, geSfxDeleteContent, geSfxLoadContent, geSfxFindContent);
 }
-// #ifdef GN_PLATFORM_MACOS
-// static const char *audioPath = "../Resources/assets/audio/%s.ogg";
-// #else
-static const char *audioPath = "assets/audio/%s.ogg";
-// #endif
 
 geSfx *geSfxNew(const char *n) {
 	char buffer[BUFFER_SIZE];
 	sprintf(buffer, audioPath, n);
-	char buf[1000];
+	char buf[BUFFER_SIZE];
 	geGetLoadFilename(buf, sizeof(buf), buffer);
 	geContent *loadedContent = geGetLoadedContent(geContentTypeBgm, buf);
 	if (loadedContent) {
@@ -67,6 +64,9 @@ geSfx *geSfxNew(const char *n) {
 	return s;
 }
 void geSfxLoad(geSfx *s) {
+	if (s->pSfx) {
+		return;
+	}
 	gsLoadSfx(s->pSfx);
 }
 void geSfxDelete(geSfx *s) {

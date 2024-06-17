@@ -5,16 +5,17 @@
 #include <SupergoonSound/include/sound.h>
 
 #define BUFFER_SIZE 256
+static const char *audioPath = "assets/audio/%s.ogg";
 
 typedef struct geBgm {
 	char *FilePath;
-	// float BgmStart, BgmEnd;
 	gsBgm *pBgm;
 	int isBackground;
 
 } geBgm;
 
 static void geBgmFree(geBgm *bgm) {
+	LogWarn("Freeing bgm %s", bgm->FilePath);
 	free(bgm->FilePath);
 	if (bgm->pBgm) {
 		gsUnloadBgm(bgm->pBgm);
@@ -46,12 +47,6 @@ static int geBgmFindContent(const char *path, geContent *content) {
 void geInitializeBgmContentType() {
 	geAddContentTypeFunctions(geContentTypeBgm, geBgmNewContent, geBgmDeleteContent, geBgmLoadContent, geBgmFindContent);
 }
-
-// #ifdef GN_PLATFORM_MACOS
-// static const char *audioPath = "../Resources/assets/audio/%s.ogg";
-// #else
-static const char *audioPath = "assets/audio/%s.ogg";
-// #endif
 
 geBgm *geBgmNew(const char *bgmName) {
 	char buffer[BUFFER_SIZE];
