@@ -66,6 +66,7 @@ typedef enum geKeyboardKeys {
 	geKey_BACKSPACE = 42,
 	geKey_TAB = 43,
 	geKey_SPACE = 44,
+	geKey_LSHIFT = 225
 } geKeyboardKeys;
 
 #ifdef __cplusplus
