@@ -310,10 +310,12 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 }
 
 void geTextLoad(geText *t) {
-	t->Font = geFontNew(t->FontName, t->FontSize);
 	if (!t->Font) {
-		LogWarn("Could not load font name %s for text, %s", t->FontName,
-				t->Text);
+		t->Font = geFontNew(t->FontName, t->FontSize);
+		if (!t->Font) {
+			LogWarn("Could not load font name %s for text, %s", t->FontName,
+					t->Text);
+		}
 	}
 	geFontLoad(t->Font);
 	createTexturesForText(t);

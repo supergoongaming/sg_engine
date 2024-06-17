@@ -73,6 +73,9 @@ geBgm *geBgmNew(const char *bgmName) {
 	return bgm;
 }
 void geBgmLoad(geBgm *bgm) {
+	if (bgm->pBgm) {
+		return;
+	}
 	bgm->pBgm = gsLoadBgm(bgm->FilePath);
 }
 

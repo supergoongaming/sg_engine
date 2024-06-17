@@ -38,6 +38,11 @@ typedef int (*ContentTypeCompareFunc)(const char *lhs, geContent *rhs);
 
 void geContentInitializeAllContentTypes();
 geContent *geGetLoadedContent(geContentTypes type, const char *path);
+/**
+ * @brief Loads all content that isn't already loaded in the content system.
+ *
+ * @return int if successful
+ */
 int geLoadAllContent();
 int geUnloadAllContent();
 // int geUnloadContent(geContentTypes type, const char *data);
