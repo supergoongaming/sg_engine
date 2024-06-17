@@ -11,9 +11,9 @@ typedef struct geImage {
 } geImage;
 
 static void imageFree(geImage *i) {
+	LogWarn("Freeing image %s", i->Name);
 	if (i->Texture) SDL_DestroyTexture(i->Texture);
 	i->Texture = NULL;
-	LogWarn("Freeing image %s", i->Name);
 	if (i->Name) free(i->Name);
 	i->Name = NULL;
 	free(i);
@@ -158,8 +158,6 @@ static void imageDeleteContent(geContent *content) {
 
 static void imageLoadContent(geContent *content) {
 	geImage *i = content->Data.Image;
-	if (i) {
-	}
 }
 
 static int imageFindContent(const char *path, geContent *content) {
