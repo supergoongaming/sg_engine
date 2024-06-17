@@ -1,8 +1,7 @@
-
+#include <GoonEngine/content/text.h>
 #include <GoonEngine/content/content.h>
 #include <GoonEngine/content/font.h>
 #include <GoonEngine/content/image.h>
-#include <GoonEngine/content/text.h>
 #include <GoonEngine/debug.h>
 #include <GoonEngine/prim/color.h>
 #include <GoonEngine/utils.h>
@@ -400,4 +399,22 @@ void geTextSetNumDrawCharacters(geText *t, int num) {
 }
 int geTextLength(geText *text) {
 	return strlen(text->Text);
+}
+
+gePoint geTextLocation(geText *t) {
+	gePoint p;
+	p.x = t->BoundingBox.x;
+	p.y = t->BoundingBox.y;
+	return p;
+}
+
+geRectangle geTextBoundingBox(geText *t) {
+	return t->BoundingBox;
+}
+// TODO sometimes this is bigger than the background?  Probably something with the bounding box measurement?
+geRectangle geTextBoundingBoxWithBackground(geText *t) {
+	geRectangle r = t->BoundingBox;
+	r.w = MAX(r.w, geImageWidth(t->Texture));
+	r.h = MAX(r.h, geImageHeight(t->Texture));
+	return r;
 }

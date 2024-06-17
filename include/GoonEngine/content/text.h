@@ -18,6 +18,9 @@ void geTextDraw(geText* t);
 // gePoint geTextMeasureDebug(geText* text);
 gePoint geTextGetTextSize(geText* text);
 int geTextLength(geText* text);
+gePoint geTextLocation(geText* t);
+geRectangle geTextBoundingBox(geText* t);
+geRectangle geTextBoundingBoxWithBackground(geText* t);
 
 // Update Text
 void geTextSetColor(geText* t, geColor* color);
