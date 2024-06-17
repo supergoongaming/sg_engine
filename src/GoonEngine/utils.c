@@ -7,8 +7,8 @@
 #include <GoonEngine/window.h>
 
 const char *_systemDefaultFont = "Roboto-Regular";
-char *_systemBasePath = NULL;
-char *_systemFilePath = NULL;
+static char *_systemBasePath = NULL;
+static char *_systemFilePath = NULL;
 
 void geUtilsDrawDebugText(const char *text) {
 	geText *t = geTextNew(text, _systemDefaultFont, 32);
