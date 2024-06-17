@@ -109,18 +109,18 @@ void geUpdateControllerLastFrame()
     }
 }
 
-bool geGamepadButtonJustReleased(const int padNum, const int button)
+bool geGamepadButtonJustReleased(const int padNum, const geGameControllerButton button)
 {
     return _numGamePads > padNum && (!_connectedGamepads[padNum].thisFrameButtons[button] && _connectedGamepads[padNum].lastFrameButtons[button]);
 }
-bool geGamepadButtonJustPressed(const int padNum, const int button)
+bool geGamepadButtonJustPressed(const int padNum, const geGameControllerButton button)
 {
     // if (padNum > _numGamePads)
     //     return false;
     // return _connectedGamepads[padNum].thisFrameButtons[button] && !_connectedGamepads[padNum].lastFrameButtons[button];
     return _numGamePads > padNum && (_connectedGamepads[padNum].thisFrameButtons[button] && !_connectedGamepads[padNum].lastFrameButtons[button]);
 }
-bool geGamepadButtonHeldDown(const int padNum, const int button)
+bool geGamepadButtonHeldDown(const int padNum, const geGameControllerButton button)
 {
     return _numGamePads > padNum && (_connectedGamepads[padNum].lastFrameButtons[button] && _connectedGamepads[padNum].thisFrameButtons[button]);
 }
