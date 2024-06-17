@@ -8,11 +8,7 @@
 #include FT_FREETYPE_H
 
 #define BUFFER_SIZE 256
-// #ifdef GN_PLATFORM_MACOS
-// static const char *_fontPrefix = "../Resources/assets/fonts";
-// #else
 static const char *_fontPrefix = "assets/fonts";
-// #endif
 static const char *_fontFileType = "ttf";
 // Buffer size for fonts, 3 == 999 is max size.
 static const int _numBuffer = 3;
@@ -56,7 +52,7 @@ static void fontDeleteContent(geContent *content) {
 	if (!content) return;
 	fontFree(content->Data.Font);
 	content->Data.Font = NULL;
-	content = NULL;
+	// content = NULL;
 }
 
 static void fontLoadContent(geContent *content) {
