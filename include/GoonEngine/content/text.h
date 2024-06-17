@@ -23,6 +23,7 @@ geRectangle geTextBoundingBox(geText* t);
 geRectangle geTextBoundingBoxWithBackground(geText* t);
 
 // Update Text
+void geTextSetPadding(geText* t, int l, int r, int top, int b);
 void geTextSetColor(geText* t, geColor* color);
 void geTextSetBounds(geText* t, int x, int y);
 void geTextSetNumDrawCharacters(geText* t, int num);

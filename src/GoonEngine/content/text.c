@@ -1,7 +1,7 @@
-#include <GoonEngine/content/text.h>
 #include <GoonEngine/content/content.h>
 #include <GoonEngine/content/font.h>
 #include <GoonEngine/content/image.h>
+#include <GoonEngine/content/text.h>
 #include <GoonEngine/debug.h>
 #include <GoonEngine/prim/color.h>
 #include <GoonEngine/utils.h>
@@ -22,6 +22,7 @@ typedef struct geText {
 	int WordWrap;
 	int LettersToDraw;
 	int CurrentLettersDrawn;
+	int PaddingL, PaddingR, PaddingT, PaddingB;
 	geFont *Font;
 	geColor Color;
 	geImage *Texture;
@@ -122,14 +123,17 @@ void addWordToLetterPoints(geText *t, int wordEndPos, int wordLength, int penX, 
 gePoint measure(geText *t) {
 	int maxWidth = t->TextBounds.x ? t->TextBounds.x : INT_MAX;
 	int maxHeight = t->TextBounds.y ? t->TextBounds.y : INT_MAX;
+	maxWidth -= t->PaddingR;
 	gePoint textSize = gePointZero();
 	int currentWordLength = 0, currentWordLetters = 0;
 	FT_Face f = geFontGetFont(t->Font);
 	int ascenderInPixels = (f->ascender * t->FontSize) / f->units_per_EM;
 	int descenderInPixels = (f->descender * t->FontSize) / f->units_per_EM;
 	int lineSpace = (f->height * t->FontSize) / f->units_per_EM;
-	int startLoc = ascenderInPixels;
-	int penX = 0, penY = startLoc;
+	int startLoc = ascenderInPixels + t->PaddingT;
+
+	// int penX = 0, penY = startLoc;
+	int penX = t->PaddingL, penY = startLoc;
 	for (size_t i = 0; i < strlen(t->Text); i++) {
 		char letter = t->Text[i];
 		if (letter == '\n') {
@@ -140,7 +144,7 @@ gePoint measure(geText *t) {
 					textSize.x = penX;
 				}
 			}
-			penX = 0;
+			penX = t->PaddingL;
 			penY += lineSpace;
 			currentWordLength = 0;
 			currentWordLetters = 0;
@@ -158,7 +162,7 @@ gePoint measure(geText *t) {
 			if (penX > textSize.x) {
 				textSize.x = penX;
 			}
-			penX = 0;
+			penX = t->PaddingL;
 			penY += lineSpace;
 		}
 		currentWordLength += letterSize;
@@ -294,6 +298,7 @@ geText *geTextNew(const char *text, const char *fontName, int fontSize) {
 	t->Text = strdup(text);
 	// TODO trying 10 here as I kept getting a write out of bounds.., I thought 1 would be good enough for null terminator but..
 	t->LetterPoints = calloc(strlen(text) + 10, sizeof(gePoint));
+	t->PaddingB = t->PaddingL = t->PaddingR = t->PaddingL = 0;
 	t->Texture = NULL;
 	t->Font = NULL;
 	t->FontSize = fontSize;
@@ -329,6 +334,13 @@ void geTextLoad(geText *t) {
 		t->Texture = geImageNewRenderTarget(buf, t->BoundingBox.w, t->BoundingBox.h, &c);
 	}
 	loadLetters(t, 0);
+}
+
+void geTextSetPadding(geText *t, int l, int r, int top, int b) {
+	t->PaddingL = l;
+	t->PaddingB = b;
+	t->PaddingT = top;
+	t->PaddingR = r;
 }
 
 void geTextSetColor(geText *t, geColor *color) {
