@@ -36,6 +36,7 @@ static bool sdlEventLoop() {
 				break;
 			case SDL_CONTROLLERBUTTONUP:
 			case SDL_CONTROLLERBUTTONDOWN:
+			case SDL_CONTROLLERAXISMOTION:
 			case SDL_CONTROLLERDEVICEADDED:
 				geHandleJoystickEvent(&event);
 				break;

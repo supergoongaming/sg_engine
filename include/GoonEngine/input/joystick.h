@@ -32,6 +32,10 @@ typedef enum geGameControllerButton {
 void geHandleJoystickEvent(const SDL_Event *event);
 void geInitializeJoysticks();
 void geUpdateControllerLastFrame();
+int geGamepadLeftAxisXThisFrameMovement(const int padNum);
+int geGamepadLeftAxisYThisFrameMovement(const int padNum);
+float geGamepadLeftAxisXFloat(const int padNum);
+float geGamepadLeftAxisYFloat(const int padNum);
 bool geGamepadButtonJustReleased(const int padNum, const geGameControllerButton button);
 bool geGamepadButtonJustPressed(const int padNum, const geGameControllerButton button);
 bool geGamepadButtonHeldDown(const int padNum, const geGameControllerButton button);
