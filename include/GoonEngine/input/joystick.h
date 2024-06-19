@@ -36,6 +36,7 @@ int geGamepadLeftAxisXThisFrameMovement(const int padNum);
 int geGamepadLeftAxisYThisFrameMovement(const int padNum);
 float geGamepadLeftAxisXFloat(const int padNum);
 float geGamepadLeftAxisYFloat(const int padNum);
+bool geGamepadButtonJustPressedAnyPad(geGameControllerButton button, int* pad);
 bool geGamepadButtonJustReleased(const int padNum, const geGameControllerButton button);
 bool geGamepadButtonJustPressed(const int padNum, const geGameControllerButton button);
 bool geGamepadButtonHeldDown(const int padNum, const geGameControllerButton button);

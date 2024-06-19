@@ -95,6 +95,17 @@ void geUpdateControllerLastFrame() {
 bool geGamepadButtonJustReleased(const int padNum, const geGameControllerButton button) {
 	return _numGamePads > padNum && (!_connectedGamepads[padNum].thisFrameButtons[button] && _connectedGamepads[padNum].lastFrameButtons[button]);
 }
+
+bool geGamepadButtonJustPressedAnyPad(geGameControllerButton button, int *pad) {
+	for (size_t i = 0; i < _numGamePads; i++) {
+		if (geGamepadButtonJustPressed(i, button)) {
+			*pad = i;
+			return true;
+		}
+	}
+	return false;
+}
+
 bool geGamepadButtonJustPressed(const int padNum, const geGameControllerButton button) {
 	return _numGamePads > padNum && (_connectedGamepads[padNum].thisFrameButtons[button] && !_connectedGamepads[padNum].lastFrameButtons[button]);
 }
