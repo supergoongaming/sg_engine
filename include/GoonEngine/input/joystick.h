@@ -31,6 +31,7 @@ typedef enum geGameControllerButton {
 
 void geHandleJoystickEvent(const SDL_Event *event);
 void geInitializeJoysticks();
+int geGamepadMaxPads();
 void geUpdateControllerLastFrame();
 int geGamepadLeftAxisXThisFrameMovement(const int padNum);
 int geGamepadLeftAxisYThisFrameMovement(const int padNum);
