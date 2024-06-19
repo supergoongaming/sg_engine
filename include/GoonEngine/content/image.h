@@ -16,7 +16,10 @@ geImage* geImageNewRenderTarget(const char* contentName, int width, int height, 
 // Used for drawing a texture onto a render target texture.  Otherwise this will
 // fail. (use geImageNewRenderTarget to create render target)
 void geImageDrawImageToImage(geImage* src, geImage* dst, geRectangle* srcRect, geRectangle* dstRect);
+// this is used for render target images.
 void geImageSetAlpha(geImage* i, int a);
+// This is used for images that are static, from a png
+void geImageStaticSetAlpha(geImage* i, int a);
 void geImageClear(geImage* i, geColor* c);
 void geImageFree(geImage* i);
 void geImageDraw(geImage* i, geRectangle* srcRect, geRectangle* dstRect);

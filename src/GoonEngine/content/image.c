@@ -238,6 +238,9 @@ void geImageDrawImageToImage(geImage *src, geImage *dst, geRectangle *srcRect, g
 	SDL_RenderCopy(r, src->Texture, (SDL_Rect *)srcRect, (SDL_Rect *)dstRect);
 	SDL_SetRenderTarget(r, NULL);
 }
+void geImageStaticSetAlpha(geImage* i, int a) {
+	SDL_SetTextureAlphaMod(i->Texture, a);
+}
 geImage *geImageNewFromFile(const char *path) {
 	geContent *loadedContent = geGetLoadedContent(geContentTypeImage, path);
 	if (loadedContent) {
@@ -250,6 +253,7 @@ geImage *geImageNewFromFile(const char *path) {
 	}
 	SDL_Renderer *r = geGlobalRenderer();
 	SDL_Texture *t = SDL_CreateTextureFromSurface(r, s);
+	SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND);
 	if (t == NULL) {
 		LogError("Could not create texture, Error: %s", SDL_GetError());
 		return NULL;
