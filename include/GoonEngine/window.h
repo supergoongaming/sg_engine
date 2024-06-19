@@ -13,6 +13,7 @@ typedef struct geWindowSettings {
 SDL_Renderer* geGlobalRenderer();
 int geWindowGetRefreshRate();
 int geInitializeRenderingWindow();
+void geWindowToggleFullscreen();
 void geStartDrawFrame();
 void geEndDrawFrame();
 void geWindowExit();

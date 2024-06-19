@@ -109,11 +109,7 @@ int geGamepadLeftAxisXThisFrameMovement(const int padNum) {
 	GamePad *pad = &_connectedGamepads[padNum];
 	// TODO this should be changed and inside joystick?
 	int xInt = SDL_CONTROLLER_AXIS_LEFTX;
-	// int yInt = SDL_CONTROLLER_AXIS_LEFTY;
 	return pad->thisFrameAxis[xInt] - pad->lastFrameAxis[xInt];
-	// int x = pad->thisFrameAxis[xInt] - pad->lastFrameAxis[xInt];
-	// int y = pad->thisFrameAxis[yInt] - pad->lastFrameAxis[yInt];
-	// return _connectedGamepads[padNum].thisFrameAxis;
 }
 
 int geGamepadLeftAxisYThisFrameMovement(const int padNum) {
@@ -131,11 +127,7 @@ float geGamepadLeftAxisXFloat(const int padNum) {
 		return 0;
 	}
 	GamePad *pad = &_connectedGamepads[padNum];
-	// int xInt = SDL_CONTROLLER_AXIS_LEFTX;
-	// int num = pad->thisFrameAxis[xInt];
 	Sint16 xRaw = SDL_GameControllerGetAxis(pad->SdlController, SDL_CONTROLLER_AXIS_LEFTX);
-	// Sint16 yRaw = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
-
 	// Normalize to -1 to 1
 	float x = xRaw / 32767.0f;
 	if (fabs(x) < DEADZONE) x = 0;
@@ -146,8 +138,6 @@ float geGamepadLeftAxisYFloat(const int padNum) {
 		return 0;
 	}
 	GamePad *pad = &_connectedGamepads[padNum];
-	// int xInt = SDL_CONTROLLER_AXIS_LEFTX;
-	// int num = pad->thisFrameAxis[xInt];
 	Sint16 yRaw = SDL_GameControllerGetAxis(pad->SdlController, SDL_CONTROLLER_AXIS_LEFTY);
 	float y = yRaw / 32767.0f;
 	if (fabs(y) < DEADZONE) y = 0;

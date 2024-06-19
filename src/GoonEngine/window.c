@@ -6,6 +6,7 @@
 
 SDL_Window *_window = NULL;
 SDL_Renderer *_renderer = NULL;
+static int _fullscreen = false;
 static int g_refreshRate = 60;
 const char *windowPath = "assets/config/window.ini";
 
@@ -67,6 +68,15 @@ int geInitializeRenderingWindow() {
 	return 0;
 }
 
+void geWindowToggleFullscreen() {
+	if (_fullscreen) {
+		SDL_SetWindowFullscreen(_window, 0);
+		_fullscreen = false;
+	} else {
+		SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
+		_fullscreen = true;
+	}
+}
 int geWindowGetRefreshRate() {
 	return g_refreshRate;
 }

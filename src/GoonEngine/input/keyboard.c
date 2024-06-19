@@ -1,5 +1,6 @@
 #include <GoonEngine/gnpch.h>
 #include <GoonEngine/input/keyboard.h>
+#include <GoonEngine/window.h>
 
 static Uint8 _currentKeyboardState[SDL_NUM_SCANCODES];
 static Uint8 _previousKeyboardState[SDL_NUM_SCANCODES];
@@ -28,6 +29,9 @@ int geHandleKeyboardEvent(SDL_Event *event)
         quit.type = SDL_QUIT;
         SDL_PushEvent(&quit);
         return true;
+    }
+    if (event->type == SDL_KEYDOWN && (event->key.keysym.sym == SDLK_f )) {
+        geWindowToggleFullscreen();
     }
 
     return true;
